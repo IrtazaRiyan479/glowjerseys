@@ -184,7 +184,6 @@ const Experience = () => {
             rotation={[0, 0, 0]}
             polar={[-Math.PI / 3.2, Math.PI / 3.2]}
             azimuth={[-Math.PI, Math.PI]}
-            config={{ mass: 0.6, tension: 120, friction: 18 }}
           >
           <group
               position={[0, 0.08, 0.08]}
@@ -211,7 +210,7 @@ const Experience = () => {
             far={1.5}
           />
 
-         <EffectComposer disableNormalPass>
+         <EffectComposer enableNormalPass={false}>
             {/* 1. Tight Core Glow */}
             <Bloom 
               luminanceThreshold={1.0} 
