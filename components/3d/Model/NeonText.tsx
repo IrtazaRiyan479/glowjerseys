@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 
 interface NeonTextProps {
   text: string;
@@ -10,7 +11,6 @@ interface NeonTextProps {
   scale?: number;
   isNumber?: boolean;
   curve?: boolean;
-  /** When false, text still shows but without the strong neon glow */
   neonOn?: boolean;
 }
 
@@ -23,6 +23,14 @@ export default function NeonText({
   curve = false,
   neonOn = true,
 }: NeonTextProps) {
+  
+  // 1. Wait for local fonts to load before drawing the canvas
+  const [fontLoaded, setFontLoaded] = useState(false);
+  useEffect(() => {
+    document.fonts.ready.then(() => setFontLoaded(true));
+  }, []);
+
+  // 2. Generate the Canvas Alpha Mask
   const texture = useMemo(() => {
     if (!text) return null;
 
@@ -37,30 +45,20 @@ export default function NeonText({
     ctx.clearRect(0, 0, width, height);
 
     const fontSize = isNumber
-      ? text.length === 1
-        ? 380
-        : 300
-      : text.length <= 5
-        ? 170
-        : text.length <= 8
-          ? 145
-          : 120;
+      ? text.length === 1 ? 380 : 300
+      : text.length <= 5 ? 170 : text.length <= 8 ? 145 : 120;
 
-    ctx.font = `900 ${fontSize}px "Arial Black", "Impact", sans-serif`;
+    // Font will successfully apply because of the fontLoaded state trigger
+    ctx.font = `normal ${fontSize}px "Chaniago", "Arial Black", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
 
-    // Soft glow only when neon is on
-    if (neonOn) {
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 20;
-    } else {
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-    }
-    ctx.fillStyle = color;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = color;
+    // Assign both stroke and fill styles
+    ctx.lineWidth = isNumber ? 12 : 8; 
+    ctx.strokeStyle = '#ffffff'; 
+    ctx.fillStyle = '#ffffff'; 
 
     if (curve && !isNumber) {
       const centerX = width / 2;
@@ -72,17 +70,13 @@ export default function NeonText({
       let radius: number;
 
       if (len <= 5) {
-        spacingFactor = 0.11;
-        radius = 1100;
+        spacingFactor = 0.11; radius = 1100;
       } else if (len <= 8) {
-        spacingFactor = 0.115;
-        radius = 1150;
+        spacingFactor = 0.115; radius = 1150;
       } else if (len <= 11) {
-        spacingFactor = 0.08;
-        radius = 970;
+        spacingFactor = 0.08; radius = 970;
       } else {
-        spacingFactor = 0.068;
-        radius = 950;
+        spacingFactor = 0.068; radius = 950;
       }
 
       const totalAngle = Math.min(len * spacingFactor, 1.05);
@@ -91,45 +85,102 @@ export default function NeonText({
       characters.forEach((char, i) => {
         const t = len === 1 ? 0.5 : i / (len - 1);
         const angle = startAngle + t * totalAngle;
-
         const x = centerX + Math.sin(angle) * radius;
         const y = centerY - Math.cos(angle) * (radius * 0.11);
 
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle * 0.4);
-        ctx.fillText(char, 0, 0);
+        // CHANGED: Use fillText for solid normal text instead of strokeText
+        ctx.fillText(char, 0, 0); 
         ctx.restore();
       });
     } else {
-      ctx.fillText(text.toUpperCase(), width / 2, height / 2);
+      if (isNumber) {
+        ctx.strokeText(text.toUpperCase(), width / 2, height / 2); // Outlined Number
+      } else {
+        ctx.fillText(text.toUpperCase(), width / 2, height / 2);   // Solid Straight Text
+      }
     }
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
     return tex;
-  }, [text, color, isNumber, curve, text.length, neonOn]);
+  }, [text, isNumber, curve, text.length, fontLoaded]); // re-runs when font is ready
+
+  // 3. Setup Shader Material Logic
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  // CHANGED: Solid text emits massively more light than outlines. Drop intensity from 8.0 to 2.5 for text to stop the blurry camera blowout.
+  const activeIntensity = neonOn ? (isNumber ? 8.0 : 2.5) : 0.6;
+
+  useFrame((_, delta) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value += delta;
+      materialRef.current.uniforms.uIntensity.value = activeIntensity;
+      materialRef.current.uniforms.uColor1.value.set(color);
+      materialRef.current.uniforms.uColor2.value.set(color);
+    }
+  });
 
   if (!texture || !text) return null;
 
   const planeWidth = isNumber
-    ? text.length === 1
-      ? 0.38
-      : 0.65
+    ? text.length === 1 ? 0.38 : 0.65
     : Math.min(0.62 + text.length * 0.038, 1.15);
 
   const planeHeight = isNumber ? 0.37 : 0.26;
 
+  const vertexShader = `
+    varying vec2 vUv;
+    varying vec3 vPosition;
+    void main() {
+      vUv = uv;
+      vPosition = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShader = `
+    uniform vec3 uColor1;
+    uniform vec3 uColor2;
+    uniform float uTime;
+    uniform float uIntensity;
+    uniform sampler2D uTexture;
+
+    varying vec2 vUv;
+    varying vec3 vPosition;
+
+    void main() {
+      vec4 texColor = texture2D(uTexture, vUv);
+      if (texColor.a < 0.1) discard; 
+
+      float wave = sin(vPosition.y * 10.0 + uTime * 2.5) * 0.5 + 0.5;
+      float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
+      
+      vec3 finalColor = mix(uColor1, uColor2, wave) * pulse * uIntensity;
+      gl_FragColor = vec4(finalColor, texColor.a);
+    }
+  `;
+
   return (
     <mesh position={position} scale={scale}>
       <planeGeometry args={[planeWidth, planeHeight]} />
-      <meshBasicMaterial
-        map={texture}
-        transparent
+      <shaderMaterial
+        ref={materialRef}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        uniforms={{
+          uTime: { value: 0 },
+          uColor1: { value: new THREE.Color(color) },
+          uColor2: { value: new THREE.Color(color) },
+          uIntensity: { value: activeIntensity },
+          uTexture: { value: texture }
+        }}
+        transparent={true}
         toneMapped={false}
         depthWrite={false}
-        opacity={neonOn ? 0.95 : 0.75}
       />
     </mesh>
   );

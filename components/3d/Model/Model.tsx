@@ -1,7 +1,8 @@
 'use client';
 
 import { useGLTF } from '@react-three/drei';
-import React, { useEffect, useMemo } from 'react';
+import { useLoader, useFrame } from '@react-three/fiber';
+import React, { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import NeonText from './NeonText';
 
@@ -13,76 +14,234 @@ interface ModelProps {
   number?: string;
   nameColor?: string;
   numberColor?: string;
-  /** When false, neon outline and text glow are turned off */
   neonOn?: boolean;
+  isDark?: boolean;
+  textureVariant?: 1 | 2; // Add this line
 }
 
 const Model = ({
   glbUrl,
-  outlineColor = '#00ff66',
+  outlineColor = '#ff3300',
   backboardColor = 'transparent',
   name = '',
   number = '',
   nameColor = '#ffffff',
   numberColor = '#ffffff',
   neonOn = true,
+  isDark = true,
+  textureVariant = 1, // Add this line
 }: ModelProps) => {
-  const { scene } = useGLTF(glbUrl);
-
-  // Clone so we don't mutate the cached original
+ const { scene } = useGLTF(glbUrl);
   const clonedScene = useMemo(() => scene.clone(true), [scene]);
 
+  // Load ALL textures upfront
+  const [c1, n1, c2, n2] = useLoader(THREE.TextureLoader, [
+    '/textures/wall/BrickWall01.jpg',
+    '/textures/wall/BrickWall01_Normal.jpg',
+    '/textures/wall/BrickWall02.jpg',
+    '/textures/wall/BrickWall02_Normal.jpg',
+  ]);
+
+  // Exact shaders from reference project
+  const vertexShader = `
+      uniform vec3 uMouseWorld;
+      uniform float uTime;
+      
+      varying vec3 vPosition;
+      varying float vDistanceToMouse;
+  
+      void main() {
+          vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+          float distanceToMouse = distance(worldPosition, uMouseWorld);
+        
+          float falloff = 1.0 - smoothstep(0.0, 0.7, distanceToMouse);
+          falloff = pow(falloff, 2.0);
+        
+          vec3 deformDirection = normalize(worldPosition - uMouseWorld);
+          
+          // MINIMAL CHANGE: Commented out deformation to prevent mouse movement control
+          // vec3 newPosition = position + deformDirection * sin(distanceToMouse * 10.0 - uTime * 3.0) *  0.1 * falloff * 0.5;
+          vec3 newPosition = position; 
+  
+          vPosition = newPosition;
+          vDistanceToMouse = distanceToMouse;
+        
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+      }
+  `;
+
+  const fragmentShader = `
+      uniform vec3 uColor1;
+      uniform vec3 uColor2;
+      uniform float uTime;
+      uniform float uIntensity;
+  
+      varying vec3 vPosition;
+      varying float vDistanceToMouse;
+  
+      void main() {
+          float wave = sin(vPosition.y * 3.0 + uTime * 2.5) * 0.5 + 0.5;
+          float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
+        
+          float distanceFactor = 1.0 - smoothstep(0.0, 0.5, vDistanceToMouse);
+        
+          vec3 color = mix(uColor1, uColor2, wave) * pulse * uIntensity * (1.0 + distanceFactor * 0.3);
+          gl_FragColor = vec4(color, 1.0);
+      }
+  `;
+
+  // Ref to hold and update the shader material
+  const neonMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
+
+  // Run the pulsing time logic from reference project
+  useFrame((_, delta) => {
+    if (neonMaterialRef.current) {
+      neonMaterialRef.current.uniforms.uTime.value += delta;
+    }
+  });
+
+  // Configure textures
   useEffect(() => {
+    [c1, n1, c2, n2].forEach((tex) => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 3);
+      tex.anisotropy = 8;
+    });
+    c1.colorSpace = c2.colorSpace = THREE.SRGBColorSpace;
+    n1.colorSpace = n2.colorSpace = THREE.LinearSRGBColorSpace;
+  }, [c1, n1, c2, n2]);
+
+  // Dynamically select the active textures based on state
+  const activeColorMap = textureVariant === 1 ? c1 : c2;
+  const activeNormalMap = textureVariant === 1 ? n1 : n2;
+
+ useEffect(() => {
     clonedScene.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) return;
 
       const nameLower = child.name.toLowerCase();
 
-      // ===== BACKBOARD =====
-      if (nameLower.includes('plane')) {
-        const isClear = backboardColor === 'transparent';
-        const mat = new THREE.MeshPhysicalMaterial({
-          color: isClear ? '#ffffff' : backboardColor,
-          transparent: true,
-          // Dropped opacity slightly so it doesn't trap light
-          opacity: isClear ? 0.8 : 1, 
-          transmission: isClear ? 0.95 : 0, 
-          // FIX: Changed roughness to 0.0 for perfectly smooth glass to stop light scatter
-          roughness: 0.0, 
-          metalness: 0,
-          ior: 1.0, 
-          side: THREE.FrontSide,
+      // ===== 1. GLB WALL TEXTURE =====
+      if (nameLower.includes('plane')) { 
+        child.material = new THREE.MeshStandardMaterial({
+          map: activeColorMap,          
+          normalMap: activeNormalMap,   
+          normalScale: new THREE.Vector2(1.2, 1.2),
+          roughness: 0.85,
+          metalness: 0.05,
+          color: isDark ? '#888888' : '#ffffff',
         });
-        child.material = mat;
+        child.material.needsUpdate = true;
+      }
+      
+      // ===== 2. NEON OUTLINE =====
+      else if (nameLower.includes('neon')) { 
+        if (!neonMaterialRef.current) {
+          neonMaterialRef.current = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: {
+              uTime: { value: 0 },
+              uColor1: { value: new THREE.Color(outlineColor) },
+              uColor2: { value: new THREE.Color(outlineColor) },
+              uIntensity: { value: neonOn ? 8.0 : 0.6 },
+              uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }, 
+            },
+            transparent: true,
+            toneMapped: false, 
+          });
+        } else {
+          neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
+          neonMaterialRef.current.uniforms.uColor2.value.set(outlineColor);
+          neonMaterialRef.current.uniforms.uIntensity.value = neonOn ? 8.0 : 0.6;
+        }
+        
+        child.material = neonMaterialRef.current;
+        child.material.needsUpdate = true;
       }
 
-    // ===== NEON OUTLINE =====
-      if (nameLower.includes('vert')) {
-        const mat = new THREE.MeshPhysicalMaterial({
-          color: neonOn ? '#ffffff' : outlineColor,
-          emissive: neonOn ? outlineColor : '#000000',
-          emissiveIntensity: neonOn ? 2.5 : 0,
-          roughness: neonOn ? 0.1 : 0.4,
-          metalness: 0,
-          transmission: 0,
-          ior: 1.5,
-          thickness: 0,
-          transparent: false,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.1,
-          toneMapped: !neonOn,
-          side: THREE.FrontSide,
+      // ===== 3. HARDWARE (Chains, Wires, Cords) =====
+      else if (nameLower.includes('chain') || nameLower.includes('wire') || nameLower.includes('cord') || nameLower.includes('cable')) {
+        // Prevents the hanging chain and bottom cord from turning into glass
+        const isChain = nameLower.includes('chain');
+        child.material = new THREE.MeshStandardMaterial({
+          color: isChain ? '#888888' : '#e0e0e0', // Darker for chains, lighter for power cord
+          metalness: isChain ? 0.8 : 0.1,
+          roughness: isChain ? 0.4 : 0.8,
         });
-        child.material = mat;
+        child.material.needsUpdate = true;
+      }
+
+      // ===== 4. THE BACKBOARD (Catch-all for the main shirt body) =====
+      else { 
+        // NOTE: Replace 'inner' with the exact mesh name from your Blender outliner
+        const isInnerMesh = nameLower.includes('jersey');
+        const isClear = backboardColor === 'transparent';
+
+        if (isInnerMesh && !isClear) {
+          // Inner Mesh: Solid colored fill
+          child.material = new THREE.MeshPhysicalMaterial({
+            color: backboardColor,
+            metalness: 0.1,
+            roughness: 0.3, // Slightly rougher for solid plastic look
+            transparent: true,
+            opacity: 0.95,
+            side: THREE.DoubleSide,
+          });
+        } else {
+          // Outer Mesh (or transparent inner): 100% Glass
+          child.material = new THREE.MeshPhysicalMaterial({
+            color: isClear ? '#ffffff' : backboardColor,
+            metalness: 0.1,
+            roughness: 0.0,
+            transmission: 1.0, 
+            ior: 1.5,
+            thickness: 0.01,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.0,
+            transparent: true,
+            opacity: 1.0,          
+            side: THREE.DoubleSide,
+          });
+        }
+        child.material.needsUpdate = true;
       }
     });
-  }, [clonedScene, outlineColor, backboardColor, neonOn]);
+  }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap]);
+
+  // Strategically placed physical lights to follow the shirt silhouette
+  // Format: [x, y, z] - The Z is slightly negative to push the light behind the backboard
+  const bounceLights = [
+    [0, 0.15, -0.05],      // Collar / Top
+    [-0.18, 0.05, -0.05],  // Left Sleeve
+    [0.18, 0.05, -0.05],   // Right Sleeve
+    [-0.12, -0.15, -0.05], // Bottom Left
+    [0.12, -0.15, -0.05],  // Bottom Right
+    [0, 0, -0.05],         // Center Core Fill
+  ];
 
   return (
     <group position={[0, -0.05, 0]} scale={1.15}>
       <primitive object={clonedScene} />
 
-      {name && (
+      {/* The Physical Light Rig for Wall & Chain Reflections */}
+      {neonOn && (
+        <group>
+          {bounceLights.map((pos, index) => (
+            <pointLight
+              key={`bounce-${index}`}
+              position={new THREE.Vector3(...pos)}
+              color={outlineColor}
+              intensity={1.5} // Bright enough to hit the wall
+              distance={0.6}  // Prevents light from spilling across the whole room
+              decay={2}       // Physically accurate inverse-square falloff
+              castShadow={false} // Kept false to allow light to pass through the glass backboard smoothly
+            />
+          ))}
+        </group>
+      )}
+
+      {/* {name && (
         <NeonText
           text={name}
           color={nameColor}
@@ -103,11 +262,11 @@ const Model = ({
           curve={false}
           neonOn={neonOn}
         />
-      )}
+      )} */}
     </group>
   );
 };
 
-useGLTF.preload('/3d/models/glowjerseys.glb');
+useGLTF.preload('/3d/models/BlueSoccer.glb');
 
 export default Model;
