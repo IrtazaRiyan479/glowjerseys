@@ -116,8 +116,10 @@ export default function NeonText({
 
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
-  // Synced exactly to Model_14.tsx outline intensity
-  const activeIntensity = 6.0; 
+  // Higher default glow; softer for yellow / neutral white / white
+const softColors = ['#ffe800', '#fbeccb', '#ffffff'];
+const isSoft = softColors.includes(color.toLowerCase());
+const activeIntensity = neonOn ? (isSoft ? 3.2 : 9.0) : 0.35;
 
   useFrame((_, delta) => {
     if (materialRef.current) {
@@ -201,7 +203,7 @@ const fragmentShader = `
           map={texture}
           color={color}
           emissive={color}
-          emissiveIntensity={0.35} 
+          emissiveIntensity={isSoft ? 0.2 : 0.35}
           roughness={0.25}
           metalness={0.1}
           clearcoat={1.0}

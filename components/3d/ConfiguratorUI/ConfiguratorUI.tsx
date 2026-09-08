@@ -441,7 +441,7 @@ const ConfiguratorUI = ({
 </div>
 
 {/* ── SCENE CONTROLS ──────────────────────────────── */}
-<div className="flex gap-2 mb-5">
+{/* <div className="flex gap-2 mb-5">
   <button
     type="button"
     onClick={() => setIsDark(!isDark)}
@@ -450,18 +450,118 @@ const ConfiguratorUI = ({
     {isDark ? 'Switch to Day' : 'Switch to Night'}
   </button>
 
+</div> */}
+
+{/* ── QUANTITY + ADD TO CART ───────────────────────── */}
+<div className="mt-6 flex items-center gap-3">
+  <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+    <button
+      type="button"
+      className="w-10 h-11 text-lg text-gray-600 hover:bg-gray-50"
+      onClick={() => {/* wire qty later */}}
+    >
+      −
+    </button>
+    <span className="w-10 h-11 flex items-center justify-center text-sm font-medium border-x border-gray-300">
+      1
+    </span>
+    <button
+      type="button"
+      className="w-10 h-11 text-lg text-gray-600 hover:bg-gray-50"
+      onClick={() => {/* wire qty later */}}
+    >
+      +
+    </button>
+  </div>
+
   <button
     type="button"
-    onClick={() => setNeonOn(!neonOn)}
-    className={`flex-1 py-2.5 rounded-[9px] text-[12.5px] font-semibold border transition-all ${
-      neonOn
-        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-        : 'border-[#c7ccd1] bg-white text-gray-800 hover:border-gray-400'
-    }`}
+    className="flex-1 h-11 rounded-md bg-[#0b45ff] text-white text-sm font-bold tracking-wide hover:bg-[#0939d6] transition"
   >
-    {neonOn ? 'Neon: ON' : 'Neon: OFF'}
+    ADD TO CART
   </button>
 </div>
+
+{/* ── ACCORDIONS ───────────────────────────────────── */}
+<div className="mt-6 border-t border-gray-200">
+  {/* Sizes */}
+  <details className="group border-b border-gray-200">
+    <summary className="flex items-center justify-between py-4 cursor-pointer list-none text-sm font-medium text-gray-800">
+      <span className="flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M4 7h16M4 12h10M4 17h14" />
+        </svg>
+        SIZES
+      </span>
+      <svg className="w-4 h-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </summary>
+    <div className="pb-4 text-sm text-gray-600 leading-relaxed space-y-3">
+      <div>
+        <p className="font-semibold text-gray-800 mb-1">STANDARD</p>
+        <p>Baseball: 19.69 × 17.40 in</p>
+        <p>Basketball: 13.61 × 20.19 in</p>
+        <p>Football: 19.69 × 16.15 in</p>
+        <p>Hockey: 16.18 × 20.19 in</p>
+        <p>Soccer: 20.19 × 18.14 in</p>
+      </div>
+      <div>
+        <p className="font-semibold text-gray-800 mb-1">LARGE</p>
+        <p>Baseball: 30.0 × 26.51 in</p>
+        <p>Basketball: 20.0 × 30.0 in</p>
+        <p>Football: 30.0 × 24.61 in</p>
+        <p>Hockey: 24.44 × 30.0 in</p>
+        <p>Soccer: 26.96 × 30.0 in</p>
+      </div>
+    </div>
+  </details>
+
+  {/* What's in the box */}
+  <details className="group border-b border-gray-200">
+    <summary className="flex items-center justify-between py-4 cursor-pointer list-none text-sm font-medium text-gray-800">
+      <span className="flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+        </svg>
+        WHAT&apos;S IN THE BOX?
+      </span>
+      <svg className="w-4 h-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </summary>
+    <ul className="pb-4 text-sm text-gray-600 list-disc pl-5 space-y-1">
+      <li>Remote Control</li>
+      <li>Easy To Assemble Mounting Kit</li>
+    </ul>
+  </details>
+
+  {/* Shipping */}
+  <details className="group border-b border-gray-200">
+    <summary className="flex items-center justify-between py-4 cursor-pointer list-none text-sm font-medium text-gray-800">
+      <span className="flex items-center gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+        </svg>
+        SHIPPING DETAILS
+      </span>
+      <svg className="w-4 h-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </summary>
+    <div className="pb-4 text-sm text-gray-600 space-y-1">
+      <p>Free Shipping (14–21 Days)</p>
+      <p>Express Shipping (7–10 Days)</p>
+    </div>
+  </details>
+</div>
+
+{/* ── REFUND NOTE ──────────────────────────────────── */}
+<p className="mt-5 text-[11px] leading-relaxed text-gray-500 uppercase tracking-wide">
+  Custom Glow Jerseys are not refundable, returnable, or replaceable.
+  Please make sure all details are correct.
+</p>
+
     </div>
   );
 };

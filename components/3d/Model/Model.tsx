@@ -104,8 +104,10 @@ const Model = ({
   useEffect(() => {
     [c1, n1, c2, n2].forEach((tex) => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(4, 3);
-      tex.anisotropy = 8;
+     tex.repeat.set(3, 2);   // was 4,3 — less GPU work
+tex.anisotropy = 2;     // was 4
+tex.generateMipmaps = true;
+tex.minFilter = THREE.LinearMipmapLinearFilter;
     });
     c1.colorSpace = c2.colorSpace = THREE.SRGBColorSpace;
     n1.colorSpace = n2.colorSpace = THREE.LinearSRGBColorSpace;
@@ -211,20 +213,19 @@ else if (nameLower.includes('neon')) {
         });
 
         // Solid, glossy plastic look for the inner backboard color
-     const solidColorMaterial = new THREE.MeshPhysicalMaterial({
-          color: backboardColor,
-          metalness: 0.1,
-          roughness: 0.05,
-          transmission: 0.85,      // CHANGED: High transmission for the "colored glass" look
-          ior: 1.45,
-          thickness: 0.02,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.0,
-          envMapIntensity: 2.0,
-          transparent: true,       // CHANGED: Allows it to be see-through
-          opacity: 1.0,          
-          side: THREE.DoubleSide,
-        });
+   const solidColorMaterial = new THREE.MeshPhysicalMaterial({
+  color: backboardColor,
+  metalness: 0.02,
+  roughness: 0.12,
+  transmission: 0.0,        // fully blocks the wall
+  thickness: 0.0,
+  clearcoat: 1.0,
+  clearcoatRoughness: 0.08,
+  envMapIntensity: 1.2,     // still gets environment reflections
+  transparent: false,
+  opacity: 1.0,
+  side: THREE.DoubleSide,
+});
 
         // Apply the solid color strictly to the inner mesh when a color is selected
         if (isInnerMesh && !isClear) {
@@ -240,14 +241,14 @@ else if (nameLower.includes('neon')) {
 
   // Strategically placed physical lights to follow the shirt silhouette
   // Format: [x, y, z] - The Z is slightly negative to push the light behind the backboard
-  const bounceLights = [
-    [0, 0.15, -0.05],      // Collar / Top
-    [-0.18, 0.05, -0.05],  // Left Sleeve
-    [0.18, 0.05, -0.05],   // Right Sleeve
-    [-0.12, -0.15, -0.05], // Bottom Left
-    [0.12, -0.15, -0.05],  // Bottom Right
-    [0, 0, -0.05],         // Center Core Fill
-  ];
+const bounceLights = neonOn
+  ? [
+      [0, 0.15, -0.05],
+      [-0.15, 0.05, -0.05],
+      [0.15, 0.05, -0.05],
+      [0, -0.12, -0.05],
+    ]
+  : [];
 
   const dynamicBounceIntensity = backboardColor === 'transparent' ? 0.3 : 1.5;
 

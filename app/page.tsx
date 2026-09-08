@@ -19,7 +19,7 @@ const Page = () => {
   const [numberColor, setNumberColor] = useState('#ffffff');
   const [backboardColor, setBackboardColor] = useState('transparent');
   const [selectedSport, setSelectedSport] = useState('Basketball');
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [neonOn, setNeonOn] = useState(true);
 
   const SPORT_MODELS: Record<string, string> = {
@@ -47,6 +47,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
         backboardColor={backboardColor}
         isDark={isDark}
         neonOn={neonOn}
+        setNeonOn={setNeonOn}
       />
     </div>
 
