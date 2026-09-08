@@ -300,8 +300,8 @@ else if (nameLower.includes('neon')) {
 
 useGLTF.preload('/3d/models/BlueSoccer.glb');
 useGLTF.preload('/3d/models/BaseBall.glb');
-useGLTF.preload('/3d/models/BasketBall.glb');
-useGLTF.preload('/3d/models/FootBall.glb');
+useGLTF.preload('/3d/models/Basketball.glb');
+useGLTF.preload('/3d/models/Football.glb');
 useGLTF.preload('/3d/models/Hockey.glb');
 
 export default Model;
