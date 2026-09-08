@@ -117,7 +117,7 @@ export default function NeonText({
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   // Synced exactly to Model_14.tsx outline intensity
-  const activeIntensity = 19.0; 
+  const activeIntensity = 7.0; 
 
   useFrame((_, delta) => {
     if (materialRef.current) {
