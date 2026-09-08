@@ -118,7 +118,7 @@ export default function NeonText({
 
 const softColors = ['#ffe800', '#fbeccb', '#ffffff'];
 const isSoft = softColors.includes(color.toLowerCase());
-const activeIntensity = neonOn ? (isSoft ? 3.2 : 9.0) : 0.35;
+const activeIntensity = neonOn ? (isSoft ? 6.5 : 12.0) : 0.35;
 
   useFrame((_, delta) => {
     if (materialRef.current) {
@@ -204,6 +204,7 @@ const fragmentShader = `
           transparent={true}
           toneMapped={false}
           depthWrite={false}
+          blending={THREE.AdditiveBlending}
         />
       ) : (
         <meshPhysicalMaterial

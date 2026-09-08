@@ -2,7 +2,10 @@
 
 import Experience from '@/components/3d/Experience/Experience';
 import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { uploadImage } from '@/actions/cloudinary/uploadImage';
+import { useCartStore } from '@/store/cartStore';
+import type { JerseySelectedOptions } from '@/data';
 
 const sizeOptionData = [{ value: 16, unit: 'in' }, { value: 20, unit: 'in' }, { value: 24, unit: 'in' }];
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
@@ -19,6 +22,7 @@ const Page = () => {
   const [selectedSport, setSelectedSport] = useState('Basketball');
   const [isDark, setIsDark] = useState(false);
   const [neonOn, setNeonOn] = useState(true);
+  const [quantity, setQuantity] = useState(1);
 
   const SPORT_MODELS: Record<string, string> = {
   Baseball: '/3d/models/BaseBall.glb',
@@ -28,7 +32,38 @@ const Page = () => {
   Hockey: '/3d/models/Hockey.glb',
 };
 
+const addItem = useCartStore((s) => s.addItem);
+const snapshotRef = useRef<(() => Promise<string | null>) | null>(null);
+
+const handleAddToCart = async () => {
+  let previewImageUrl: string | undefined;
+  const dataUrl = await snapshotRef.current?.();
+  if (dataUrl) {
+    try {
+      previewImageUrl = await uploadImage(dataUrl);
+    } catch {
+      previewImageUrl = dataUrl;
+    }
+  }
+
+  const selectedOptions: JerseySelectedOptions = {
+    size: sizeOptionValue ?? 20,
+    sport: selectedSport,
+    name,
+    number,
+    jerseyColor: outlineColor,
+    nameColor,
+    numberColor,
+    backboardColor,
+    previewImageUrl,
+  };
+
+  addItem(selectedOptions, quantity);
+  console.log('Cart line', selectedOptions, 'qty', quantity);
+};
+
 const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb';
+
 
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-[#1a1a1a]">
@@ -45,6 +80,9 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
         isDark={isDark}
         neonOn={neonOn}
         setNeonOn={setNeonOn}
+        onSnapshotReady={(fn) => {
+  snapshotRef.current = fn;
+}}
       />
     </div>
 
@@ -76,6 +114,9 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
           setIsDark={setIsDark}
           neonOn={neonOn}
           setNeonOn={setNeonOn}
+          quantity={quantity}
+          setQuantity={setQuantity}
+          onAddToCart={handleAddToCart}
         />
       </div>
     </div>

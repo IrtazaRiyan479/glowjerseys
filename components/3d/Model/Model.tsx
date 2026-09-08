@@ -88,7 +88,8 @@ const Model = ({
   
       void main() {
           float wave = sin(vPosition.y * 3.0 + uTime * 2.5) * 0.5 + 0.5;
-          float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
+          // float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
+          float pulse = 1.0;
         
           float distanceFactor = 1.0 - smoothstep(0.0, 0.5, vDistanceToMouse);
         
@@ -176,8 +177,8 @@ else if (nameLower.includes('neon')) {
           uIntensity: { value: 8.0 },
           uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }, 
         },
-        transparent: true,
-        toneMapped: false, 
+        transparent: false,
+        toneMapped: false,
       });
     } else {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
@@ -267,10 +268,7 @@ const bounceLights = neonOn
     ]
   : [];
 
-const dynamicBounceIntensity =
-  backboardColor === 'transparent' || backboardColor === 'Transparent'
-    ? isTex2 ? 0.9 : 0.3
-    : isTex2 ? 2.8 : 1.5;
+const bounceIntensity = isTex2 ? 10.6 : 1.0;
 
   return (
     <group position={[0, -0.05, 0]} scale={1.15}>
@@ -283,8 +281,8 @@ const dynamicBounceIntensity =
   key={`bounce-${index}`}
   position={new THREE.Vector3(...pos)}
   color={outlineColor}
-  intensity={dynamicBounceIntensity}
-  distance={isTex2 ? 1.0 : 0.6}
+  intensity={bounceIntensity}
+  distance={isTex2 ? 1.5 : 0.7}
   decay={2}
   castShadow={false}
 />
@@ -320,10 +318,6 @@ const dynamicBounceIntensity =
   );
 };
 
-useGLTF.preload('/3d/models/BlueSoccer.glb');
-useGLTF.preload('/3d/models/BaseBall.glb');
 useGLTF.preload('/3d/models/Basketball.glb');
-useGLTF.preload('/3d/models/Football.glb');
-useGLTF.preload('/3d/models/Hockey.glb');
 
 export default Model;

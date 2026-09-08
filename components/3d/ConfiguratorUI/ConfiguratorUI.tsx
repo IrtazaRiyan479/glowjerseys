@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 interface ConfiguratorUIProps {
   sizeOptionData: any[];
   sizeOptionValue: number | undefined;
@@ -30,6 +28,9 @@ interface ConfiguratorUIProps {
   setIsDark: (v: boolean) => void;
   neonOn: boolean;
   setNeonOn: (v: boolean) => void;
+  quantity: number;
+  setQuantity: (v: number) => void;
+  onAddToCart?: () => void;
 }
 
 /** Exact colors from glowjerseys.com/products/custom-jersey */
@@ -85,6 +86,9 @@ const ConfiguratorUI = ({
   setIsDark,
   neonOn,
   setNeonOn,
+  quantity,
+  setQuantity,
+  onAddToCart
 }: ConfiguratorUIProps) => {
   const nameLen = name?.length ?? 0;
   const numberLen = number?.length ?? 0;
@@ -97,6 +101,7 @@ const ConfiguratorUI = ({
   const swatchSelected =
     'scale-[1.14] border-white shadow-[0_0_0_2px_#000,0_0_0_4px_#fff,0_0_13px_1px_currentColor] z-10';
   const swatchIdle = 'border-[rgba(0,0,0,0.12)]';
+
 
   return (
    <div
@@ -456,17 +461,17 @@ const ConfiguratorUI = ({
     <button
       type="button"
       className="w-10 h-11 text-lg text-gray-600 hover:bg-gray-50"
-      onClick={() => {/* wire qty later */}}
+      onClick={() => setQuantity(Math.max(1, quantity - 1))}
     >
       −
     </button>
     <span className="w-10 h-11 flex items-center justify-center text-sm font-medium border-x border-gray-300">
-      1
+      {quantity}
     </span>
     <button
       type="button"
       className="w-10 h-11 text-lg text-gray-600 hover:bg-gray-50"
-      onClick={() => {/* wire qty later */}}
+      onClick={() => setQuantity(Math.min(99, quantity + 1))}
     >
       +
     </button>
@@ -474,6 +479,7 @@ const ConfiguratorUI = ({
 
   <button
     type="button"
+    onClick={onAddToCart}
     className="flex-1 h-11 rounded-md bg-[#0b45ff] text-white text-sm font-bold tracking-wide hover:bg-[#0939d6] transition"
   >
     ADD TO CART

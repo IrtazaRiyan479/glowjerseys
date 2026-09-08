@@ -1,18 +1,13 @@
 'use client';
 
-import { Canvas, useLoader, useThree, useFrame } from '@react-three/fiber';
+import { Canvas} from '@react-three/fiber';
 import { ContactShadows, Environment } from '@react-three/drei';
-import {
-  TextureLoader,
-  RepeatWrapping,
-  SRGBColorSpace,
-  LinearSRGBColorSpace,
-} from 'three';
-import React, { Suspense, useState, useCallback, useEffect } from 'react';
+import { Suspense, useState} from 'react';
 import * as THREE from 'three';
 import Model from '../Model/Model';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { KernelSize } from 'postprocessing';
+import SnapshotController from './SnapshotController';
 
 interface ExperienceProps {
   glbUrl: string;
@@ -25,6 +20,7 @@ interface ExperienceProps {
   isDark: boolean;
   neonOn: boolean;
   setNeonOn: (v: boolean) => void;
+  onSnapshotReady?: (fn: () => Promise<string | null>) => void;
 }
 
 const Experience = ({
@@ -38,6 +34,7 @@ const Experience = ({
   isDark,
   neonOn,
   setNeonOn,
+  onSnapshotReady,
 }: ExperienceProps) => {
   const [textureVariant, setTextureVariant] = useState<1 | 2>(1);
 
@@ -96,22 +93,42 @@ const Experience = ({
   </button>
 </div>
 
+<button
+  type="button"
+  className="absolute bottom-6 right-4 z-50 px-3 py-2 rounded-md bg-white/90 text-black text-xs font-semibold shadow"
+  onClick={async () => {
+    const fn = (window as any).__takeJerseySnapshot;
+    if (!fn) return alert('Snapshot not ready');
+    const dataUrl = await fn();
+    if (!dataUrl) return alert('Snapshot failed');
+    const w = window.open('');
+    if (w) {
+      w.document.write(`<img src="${dataUrl}" style="max-width:100%" />`);
+    }
+  }}
+>
+  Test Snapshot
+</button>
+
   <Canvas
   shadows={false}
-  dpr={[1, 1.25]}
+  dpr={[1, Math.min(2)]}
   camera={{
-    position: [0, 0.05, 1.9],
-    fov: 35,
+    position: [0, 0.05, 1.95],
+    fov: 32,
     near: 0.1,
     far: 40,
   }}
   gl={{
     antialias: true,
+    alpha: false,
     toneMapping: THREE.ACESFilmicToneMapping,
+    toneMappingExposure: 1.0,
     outputColorSpace: THREE.SRGBColorSpace,
     powerPreference: 'high-performance',
     stencil: false,
     depth: true,
+    preserveDrawingBuffer: true,
   }}
 >
        {isDark ? (
@@ -144,6 +161,7 @@ const Experience = ({
               isDark={isDark} 
               textureVariant={textureVariant}
             />
+            {onSnapshotReady && <SnapshotController onReady={onSnapshotReady} />}
           </group>
 
           <ContactShadows
@@ -158,13 +176,12 @@ const Experience = ({
 
        <EffectComposer multisampling={0}>
   <Bloom
-    kernelSize={KernelSize.MEDIUM}
-    luminanceThreshold={0.75}
-    intensity={0.25}
+    kernelSize={KernelSize.SMALL}
+    luminanceThreshold={0.8}
+    intensity={0.4}
     mipmapBlur
   />
 </EffectComposer>
-
           
         </Suspense>
       </Canvas>
