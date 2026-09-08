@@ -21,6 +21,8 @@ interface ExperienceProps {
   nameColor: string;
   numberColor: string;
   backboardColor: string;
+  isDark: boolean;
+  neonOn: boolean;
 }
 
 const Experience = ({
@@ -30,43 +32,24 @@ const Experience = ({
   nameColor,
   numberColor,
   backboardColor,
+  isDark,
+  neonOn,
 }: ExperienceProps) => {
-  const [isDark, setIsDark] = useState(true);
-  const [neonOn, setNeonOn] = useState(true);
-  // 1. ADDED: New state for toggling textures
-  const [textureVariant, setTextureVariant] = useState<1 | 2>(1); 
+  const [textureVariant, setTextureVariant] = useState<1 | 2>(1);
 
 
   return (
     <div className="relative h-full w-full bg-[#1a1a1a]">
-      {/* Control panel */}
-      <div className="absolute top-4 left-4 z-50 flex flex-col gap-2">
-        <button
-          onClick={() => setIsDark((d) => !d)}
-          className="px-4 py-2 bg-white text-black rounded font-medium shadow hover:bg-gray-100 transition"
-        >
-          {isDark ? 'Switch to Day' : 'Switch to Night'}
-        </button>
 
-        <button
-          onClick={() => setNeonOn((n) => !n)}
-          className={`px-4 py-2 rounded font-medium shadow transition ${
-            neonOn
-              ? 'bg-emerald-400 text-black hover:bg-emerald-300'
-              : 'bg-gray-700 text-white hover:bg-gray-600'
-          }`}
-        >
-          {neonOn ? 'Neon: ON' : 'Neon: OFF'}
-        </button>
-
-        {/* 2. ADDED: Texture toggle button */}
-        <button
-          onClick={() => setTextureVariant((v) => (v === 1 ? 2 : 1))}
-          className="px-4 py-2 bg-blue-500 text-white rounded font-medium shadow hover:bg-blue-400 transition"
-        >
-          Switch Texture
-        </button>
-      </div>
+      {/* Texture button — bottom of shirt */}
+<div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
+  <button
+    onClick={() => setTextureVariant((v) => (v === 1 ? 2 : 1))}
+    className="px-5 py-2.5 bg-white/90 backdrop-blur text-black rounded-full text-sm font-semibold shadow-lg hover:bg-white transition"
+  >
+    Switch Texture
+  </button>
+</div>
 
       <Canvas
         shadows

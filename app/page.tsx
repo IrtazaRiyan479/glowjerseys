@@ -18,25 +18,31 @@ const Page = () => {
   const [nameColor, setNameColor] = useState('#ffffff');
   const [numberColor, setNumberColor] = useState('#ffffff');
   const [backboardColor, setBackboardColor] = useState('transparent');
+  const [selectedSport, setSelectedSport] = useState('Basketball');
+  const [isDark, setIsDark] = useState(true);
+  const [neonOn, setNeonOn] = useState(true);
 
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-[#1a1a1a]">
       
-      {/* LEFT SIDE: 3D Experience (Takes up 2/3 of the screen) */}
-      <div className="relative h-full w-2/3">
-        <Experience 
-          name={name}
-          number={number}
-          outlineColor={outlineColor}
-          nameColor={nameColor}
-          numberColor={numberColor}
-          backboardColor={backboardColor}
-        />
-      </div>
+    {/* LEFT SIDE: 3D — takes all remaining space */}
+    <div className="relative h-full flex-1 min-w-0">
+      <Experience
+        name={name}
+        number={number}
+        outlineColor={outlineColor}
+        nameColor={nameColor}
+        numberColor={numberColor}
+        backboardColor={backboardColor}
+        isDark={isDark}
+        neonOn={neonOn}
+      />
+    </div>
 
       {/* RIGHT SIDE: Configurator UI (Takes up 1/3 of the screen) */}
-      <div className="h-full w-1/3 overflow-y-auto bg-white text-black shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10">
-        <ConfiguratorUI 
+<div className="h-full w-[580px] shrink-0 overflow-y-auto bg-white text-black shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10">
+      <div className="p-5">
+        <ConfiguratorUI
           sizeOptionData={sizeOptionData}
           sizeOptionValue={sizeOptionValue}
           setSizeOptionValue={setSizeOptionValue}
@@ -44,6 +50,8 @@ const Page = () => {
           sportsTypeValue={sportsTypeValue}
           setSportsTypeValue={setSportsTypeValue}
           configurationData={null}
+          selectedSport={selectedSport}
+          setSelectedSport={setSelectedSport}
           name={name}
           setName={setName}
           number={number}
@@ -56,8 +64,13 @@ const Page = () => {
           setNumberColor={setNumberColor}
           backboardColor={backboardColor}
           setBackboardColor={setBackboardColor}
+          isDark={isDark}
+          setIsDark={setIsDark}
+          neonOn={neonOn}
+          setNeonOn={setNeonOn}
         />
       </div>
+    </div>
 
     </div>
   );
