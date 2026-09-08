@@ -179,7 +179,7 @@ const fragmentShader = `
 
       vec3 color = uColor1 * uIntensity * (1.0 + distanceFactor * 0.3);
       
-      gl_FragColor = vec4(color, texColor.a);
+      gl_FragColor = vec4(color, 1.0);
     }
   `;
 
@@ -204,7 +204,6 @@ const fragmentShader = `
           transparent={true}
           toneMapped={false}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
         />
       ) : (
         <meshPhysicalMaterial
