@@ -24,13 +24,11 @@ export default function NeonText({
   neonOn = true,
 }: NeonTextProps) {
   
-  // 1. Wait for local fonts to load before drawing the canvas
   const [fontLoaded, setFontLoaded] = useState(false);
   useEffect(() => {
     document.fonts.ready.then(() => setFontLoaded(true));
   }, []);
 
-  // 2. Generate the Canvas Alpha Mask
   const texture = useMemo(() => {
     if (!text) return null;
 
@@ -46,19 +44,20 @@ export default function NeonText({
 
     const fontSize = isNumber
       ? text.length === 1 ? 380 : 300
-      : text.length <= 5 ? 170 : text.length <= 8 ? 145 : 120;
+      : text.length <= 5 ? 220 : text.length <= 8 ? 145 : 120;
 
-    // Font will successfully apply because of the fontLoaded state trigger
-    ctx.font = `normal ${fontSize}px "Chaniago", "Arial Black", sans-serif`;
+    ctx.font = `normal ${fontSize}px "Bondtique", "Arial Black", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
 
-    // Assign both stroke and fill styles
-    ctx.lineWidth = isNumber ? 12 : 8; 
-    ctx.strokeStyle = '#ffffff'; 
-    ctx.fillStyle = '#ffffff'; 
+    // Formatting for the text
+    ctx.lineWidth = isNumber ? 16 : 12; 
+    ctx.strokeStyle = '#ffffff'; // For outlines
+    ctx.fillStyle = '#ffffff';   // For solid fills
+    ctx.lineCap = 'round';   
+    ctx.lineJoin = 'round';  
 
     if (curve && !isNumber) {
       const centerX = width / 2;
@@ -91,15 +90,18 @@ export default function NeonText({
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle * 0.4);
-        // CHANGED: Use fillText for solid normal text instead of strokeText
+        
+        // Solid fill for the curved name
         ctx.fillText(char, 0, 0); 
         ctx.restore();
       });
     } else {
       if (isNumber) {
-        ctx.strokeText(text.toUpperCase(), width / 2, height / 2); // Outlined Number
+        // Outline for the number
+        ctx.strokeText(text.toUpperCase(), width / 2, height / 2); 
       } else {
-        ctx.fillText(text.toUpperCase(), width / 2, height / 2);   // Solid Straight Text
+        // Solid fill for straight names
+        ctx.fillText(text.toUpperCase(), width / 2, height / 2);
       }
     }
 
@@ -107,13 +109,12 @@ export default function NeonText({
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
     return tex;
-  }, [text, isNumber, curve, text.length, fontLoaded]); // re-runs when font is ready
+  }, [text, isNumber, curve, text.length, fontLoaded]); 
 
-  // 3. Setup Shader Material Logic
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
-  // CHANGED: Solid text emits massively more light than outlines. Drop intensity from 8.0 to 2.5 for text to stop the blurry camera blowout.
-  const activeIntensity = neonOn ? (isNumber ? 8.0 : 2.5) : 0.6;
+  // Synced exactly to Model_14.tsx outline intensity
+  const activeIntensity = 2.0; 
 
   useFrame((_, delta) => {
     if (materialRef.current) {
@@ -167,21 +168,39 @@ export default function NeonText({
   return (
     <mesh position={position} scale={scale}>
       <planeGeometry args={[planeWidth, planeHeight]} />
-      <shaderMaterial
-        ref={materialRef}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={{
-          uTime: { value: 0 },
-          uColor1: { value: new THREE.Color(color) },
-          uColor2: { value: new THREE.Color(color) },
-          uIntensity: { value: activeIntensity },
-          uTexture: { value: texture }
-        }}
-        transparent={true}
-        toneMapped={false}
-        depthWrite={false}
-      />
+      
+      {/* Conditionally switch materials identical to Model.tsx logic */}
+      {neonOn ? (
+        <shaderMaterial
+          ref={materialRef}
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+          uniforms={{
+            uTime: { value: 0 },
+            uColor1: { value: new THREE.Color(color) },
+            uColor2: { value: new THREE.Color(color) },
+            uIntensity: { value: activeIntensity },
+            uTexture: { value: texture }
+          }}
+          transparent={true}
+          toneMapped={false}
+          depthWrite={false}
+        />
+      ) : (
+        <meshPhysicalMaterial
+          map={texture}
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.35} 
+          roughness={0.25}
+          metalness={0.1}
+          clearcoat={1.0}
+          clearcoatRoughness={0.1}
+          transparent={true}
+          alphaTest={0.1}  // Discards the transparent background of the canvas
+          depthWrite={false}
+        />
+      )}
     </mesh>
   );
 }

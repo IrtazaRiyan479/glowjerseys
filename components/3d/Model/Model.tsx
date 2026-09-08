@@ -126,7 +126,7 @@ const Model = ({
         child.material = new THREE.MeshStandardMaterial({
           map: activeColorMap,          
           normalMap: activeNormalMap,   
-          normalScale: new THREE.Vector2(1.2, 1.2),
+          normalScale: new THREE.Vector2(0.1, 0.1),
           roughness: 0.85,
           metalness: 0.05,
           color: isDark ? '#888888' : '#ffffff',
@@ -134,31 +134,46 @@ const Model = ({
         child.material.needsUpdate = true;
       }
       
-      // ===== 2. NEON OUTLINE =====
-      else if (nameLower.includes('neon')) { 
-        if (!neonMaterialRef.current) {
-          neonMaterialRef.current = new THREE.ShaderMaterial({
-            vertexShader,
-            fragmentShader,
-            uniforms: {
-              uTime: { value: 0 },
-              uColor1: { value: new THREE.Color(outlineColor) },
-              uColor2: { value: new THREE.Color(outlineColor) },
-              uIntensity: { value: neonOn ? 8.0 : 0.6 },
-              uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }, 
-            },
-            transparent: true,
-            toneMapped: false, 
-          });
-        } else {
-          neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
-          neonMaterialRef.current.uniforms.uColor2.value.set(outlineColor);
-          neonMaterialRef.current.uniforms.uIntensity.value = neonOn ? 8.0 : 0.6;
-        }
-        
-        child.material = neonMaterialRef.current;
-        child.material.needsUpdate = true;
-      }
+     // ===== 2. NEON OUTLINE =====
+else if (nameLower.includes('neon')) { 
+  if (!neonOn) {
+    // When OFF: Vibrant physical silicone/plastic tube that stays visible in the dark
+    child.material = new THREE.MeshPhysicalMaterial({
+      color: outlineColor,
+      emissive: new THREE.Color(outlineColor),
+      emissiveIntensity: 0.35, 
+      roughness: 0.25,
+      metalness: 0.1,
+      clearcoat: 1.0,         
+      clearcoatRoughness: 0.1,
+      transparent: false,
+    });
+  } else {
+    // When ON: ShaderMaterial
+    if (!neonMaterialRef.current) {
+      neonMaterialRef.current = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uColor1: { value: new THREE.Color(outlineColor) },
+          uColor2: { value: new THREE.Color(outlineColor) },
+          uIntensity: { value: 8.0 },
+          uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }, 
+        },
+        transparent: true,
+        toneMapped: false, 
+      });
+    } else {
+      neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
+      neonMaterialRef.current.uniforms.uColor2.value.set(outlineColor);
+      neonMaterialRef.current.uniforms.uIntensity.value = 8.0;
+    }
+    
+    child.material = neonMaterialRef.current;
+  }
+  child.material.needsUpdate = true;
+}
 
       // ===== 3. HARDWARE (Chains, Wires, Cords) =====
       else if (nameLower.includes('chain') || nameLower.includes('wire') || nameLower.includes('cord') || nameLower.includes('cable')) {
@@ -180,29 +195,34 @@ const Model = ({
 
         if (isInnerMesh && !isClear) {
           // Inner Mesh: Solid colored fill
-          child.material = new THREE.MeshPhysicalMaterial({
-            color: backboardColor,
-            metalness: 0.1,
-            roughness: 0.3, // Slightly rougher for solid plastic look
-            transparent: true,
-            opacity: 0.95,
-            side: THREE.DoubleSide,
-          });
+   child.material = new THREE.MeshPhysicalMaterial({
+  color: isClear ? '#ffffff' : backboardColor, // Pure white for perfectly clear acrylic
+  metalness: 0.0,          // Drop metalness for pure plastic/acrylic
+  roughness: 0.0,          // Must be 0 to remove the blurry/frosted effect
+  transmission: 1.0,       // Full glass transmission
+  ior: 1.5,                // Standard index of refraction for acrylic/glass
+  thickness: 0.05,         // Gives realistic edge volume without extreme distortion
+  clearcoat: 1.0,          // Adds the sharp, glossy reflection on the front surface
+  clearcoatRoughness: 0.0, // Keeps the surface reflection razor sharp
+  transparent: true,
+  opacity: 1.0,          
+  side: THREE.DoubleSide,
+});
         } else {
           // Outer Mesh (or transparent inner): 100% Glass
-          child.material = new THREE.MeshPhysicalMaterial({
-            color: isClear ? '#ffffff' : backboardColor,
-            metalness: 0.1,
-            roughness: 0.0,
-            transmission: 1.0, 
-            ior: 1.5,
-            thickness: 0.01,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.0,
-            transparent: true,
-            opacity: 1.0,          
-            side: THREE.DoubleSide,
-          });
+      child.material = new THREE.MeshPhysicalMaterial({
+  color: isClear ? '#ffffff' : backboardColor, // Pure white for perfectly clear acrylic
+  metalness: 0.0,          // Drop metalness for pure plastic/acrylic
+  roughness: 0.0,          // Must be 0 to remove the blurry/frosted effect
+  transmission: 1.0,       // Full glass transmission
+  ior: 1.5,                // Standard index of refraction for acrylic/glass
+  thickness: 0.05,         // Gives realistic edge volume without extreme distortion
+  clearcoat: 1.0,          // Adds the sharp, glossy reflection on the front surface
+  clearcoatRoughness: 0.0, // Keeps the surface reflection razor sharp
+  transparent: true,
+  opacity: 1.0,          
+  side: THREE.DoubleSide,
+});
         }
         child.material.needsUpdate = true;
       }
@@ -241,7 +261,7 @@ const Model = ({
         </group>
       )}
 
-      {/* {name && (
+      {name && (
         <NeonText
           text={name}
           color={nameColor}
@@ -262,7 +282,7 @@ const Model = ({
           curve={false}
           neonOn={neonOn}
         />
-      )} */}
+      )}
     </group>
   );
 };

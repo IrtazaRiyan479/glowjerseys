@@ -106,6 +106,8 @@ const Experience = () => {
             far={1.5}
           />
 
+          
+
          <EffectComposer multisampling={2}>
             <Bloom
               kernelSize={KernelSize.SMALL}
@@ -115,9 +117,11 @@ const Experience = () => {
             <Bloom
               kernelSize={KernelSize.HUGE}
               luminanceThreshold={0.7}
-              intensity={1.0}
+              intensity={0.3}
             />
           </EffectComposer>
+
+          
         </Suspense>
       </Canvas>
     </div>
