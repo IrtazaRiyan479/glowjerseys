@@ -140,7 +140,6 @@ tex.minFilter = THREE.LinearMipmapLinearFilter;
     normalScale: new THREE.Vector2(0.12, 0.12),
     roughness: isTex2 ? 0.65 : 0.85,
     metalness: isTex2 ? 0.08 : 0.05,
-    // slight brighten only — no emissive (emissive turns the whole wall green)
     color: isTex2
       ? (isDark ? '#c8c8c8' : '#ffffff')
       : (isDark ? '#888888' : '#ffffff'),

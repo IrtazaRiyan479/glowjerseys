@@ -50,18 +50,15 @@ export default function NeonText({
     ? text.length <= 5 ? 140 : text.length <= 8 ? 120 : 100
     : text.length <= 5 ? 170 : text.length <= 8 ? 180 : 140;
 
-    // CHANGED: Added 'bold' to the font string
     ctx.font = `bold ${fontSize}px "Bondtique", "Arial Black", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
-    // CHANGED: Added native letter spacing for straight text
     ctx.letterSpacing = isNumber ? '0px' : '20px';
 
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
 
-    // CHANGED: Thicker line width for the hollow numbers
     ctx.lineWidth = isNumber ? 12 : 5; 
     ctx.strokeStyle = '#ffffff'; 
     ctx.fillStyle = '#ffffff';   
@@ -119,7 +116,6 @@ export default function NeonText({
 
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
-  // Higher default glow; softer for yellow / neutral white / white
 const softColors = ['#ffe800', '#fbeccb', '#ffffff'];
 const isSoft = softColors.includes(color.toLowerCase());
 const activeIntensity = neonOn ? (isSoft ? 3.2 : 9.0) : 0.35;
@@ -220,7 +216,7 @@ const fragmentShader = `
           clearcoat={1.0}
           clearcoatRoughness={0.1}
           transparent={true}
-          alphaTest={0.1}  // Discards the transparent background of the canvas
+          alphaTest={0.1} 
           depthWrite={false}
         />
       )}
