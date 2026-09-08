@@ -59,7 +59,7 @@ export default function NeonText({
     ctx.shadowBlur = 0;
 
     // CHANGED: Thicker line width for the hollow numbers
-    ctx.lineWidth = isNumber ? 18 : 12; 
+    ctx.lineWidth = isNumber ? 12 : 5; 
     ctx.strokeStyle = '#ffffff'; 
     ctx.fillStyle = '#ffffff';   
     ctx.lineCap = 'round';   
@@ -118,7 +118,7 @@ export default function NeonText({
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   // Synced exactly to Model_14.tsx outline intensity
-  const activeIntensity = 1.5; 
+  const activeIntensity = 5.0; 
 
   useFrame((_, delta) => {
     if (materialRef.current) {
@@ -137,17 +137,23 @@ export default function NeonText({
 
   const planeHeight = isNumber ? 0.45 : 0.35;
 
-  const vertexShader = `
+ const vertexShader = `
+    uniform vec3 uMouseWorld;
+    
     varying vec2 vUv;
     varying vec3 vPosition;
+    varying float vDistanceToMouse;
+
     void main() {
       vUv = uv;
+      vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+      vDistanceToMouse = distance(worldPosition, uMouseWorld);
       vPosition = position;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `;
 
-  const fragmentShader = `
+ const fragmentShader = `
     uniform vec3 uColor1;
     uniform vec3 uColor2;
     uniform float uTime;
@@ -156,16 +162,19 @@ export default function NeonText({
 
     varying vec2 vUv;
     varying vec3 vPosition;
+    varying float vDistanceToMouse;
 
     void main() {
       vec4 texColor = texture2D(uTexture, vUv);
       if (texColor.a < 0.1) discard; 
 
-      float wave = sin(vPosition.y * 10.0 + uTime * 2.5) * 0.5 + 0.5;
+      // Exactly mirroring the outline wave and pulse logic
+      float wave = sin(vPosition.y * 3.0 + uTime * 2.5) * 0.5 + 0.5;
       float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
-      
-      vec3 finalColor = mix(uColor1, uColor2, wave) * pulse * uIntensity;
-      gl_FragColor = vec4(finalColor, texColor.a);
+      float distanceFactor = 1.0 - smoothstep(0.0, 0.5, vDistanceToMouse);
+
+      vec3 color = mix(uColor1, uColor2, wave) * pulse * uIntensity * (1.0 + distanceFactor * 0.3);
+      gl_FragColor = vec4(color, texColor.a);
     }
   `;
 
@@ -179,12 +188,13 @@ export default function NeonText({
           ref={materialRef}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
-          uniforms={{
+         uniforms={{
             uTime: { value: 0 },
             uColor1: { value: new THREE.Color(color) },
             uColor2: { value: new THREE.Color(color) },
             uIntensity: { value: activeIntensity },
-            uTexture: { value: texture }
+            uTexture: { value: texture },
+            uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }
           }}
           transparent={true}
           toneMapped={false}

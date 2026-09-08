@@ -14,13 +14,28 @@ import Model from '../Model/Model';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { KernelSize } from 'postprocessing';
 
-const Experience = () => {
+interface ExperienceProps {
+  name: string;
+  number: string;
+  outlineColor: string;
+  nameColor: string;
+  numberColor: string;
+  backboardColor: string;
+}
+
+const Experience = ({
+  name,
+  number,
+  outlineColor,
+  nameColor,
+  numberColor,
+  backboardColor,
+}: ExperienceProps) => {
   const [isDark, setIsDark] = useState(true);
   const [neonOn, setNeonOn] = useState(true);
   // 1. ADDED: New state for toggling textures
   const [textureVariant, setTextureVariant] = useState<1 | 2>(1); 
 
-  const outlineColor = '#ff3300';
 
   return (
     <div className="relative h-full w-full bg-[#1a1a1a]">
@@ -89,18 +104,18 @@ const Experience = () => {
         )}
 
        <Suspense fallback={null}>
-          <group position={[0, 0.08, 0.08]} scale={0.8}>
+        <group position={[0, 0.08, 0.08]} scale={0.8}>
             <Model
               glbUrl="/3d/models/BlueSoccer.glb"
               outlineColor={outlineColor}
-              backboardColor="transparent"
-              name="BROWN"
-              number="7"
-              nameColor="#ffffff"
-              numberColor="#ffffff"
+              backboardColor={backboardColor}
+              name={name}
+              number={number}
+              nameColor={nameColor}
+              numberColor={numberColor}
               neonOn={neonOn}
               isDark={isDark} 
-              textureVariant={textureVariant} // 3. ADDED: Pass prop to model
+              textureVariant={textureVariant}
             />
           </group>
 
@@ -118,12 +133,12 @@ const Experience = () => {
             <Bloom
               kernelSize={KernelSize.SMALL}
               luminanceThreshold={0.9}
-              intensity={0.5}
+              intensity={0.1}
             />
             <Bloom
               kernelSize={KernelSize.HUGE}
               luminanceThreshold={0.7}
-              intensity={0.3}
+              intensity={0.2}
             />
           </EffectComposer>
 

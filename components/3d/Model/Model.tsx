@@ -187,34 +187,52 @@ else if (nameLower.includes('neon')) {
         child.material.needsUpdate = true;
       }
 
-      // ===== 4. THE BACKBOARD (Catch-all for the main shirt body) =====
-    else { 
+     // ===== 4. THE BACKBOARD (Catch-all for the main shirt body) =====
+      else { 
         const isInnerMesh = nameLower.includes('jersey');
         const isClear = backboardColor === 'transparent';
 
-        // Apply this exact material to BOTH your inner and outer mesh conditions
-        const acrylicMaterial = new THREE.MeshPhysicalMaterial({
-          color: isClear ? '#ffffff' : backboardColor,
-          metalness: 0.0,          // FIXED: Set to 0 to prevent gray tinting/dirty look
-          roughness: 0.0,          // FIXED: Set to 0 to remove frosted noise
+        // Always perfectly clear for the outer acrylic and for transparent mode
+        const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
+          color: '#ffffff',
+          metalness: 0.0,
+          roughness: 0.0,
           transmission: 1.0,       
           ior: 1.45,               
-          thickness: 0.02,         // FIXED: Lowered drastically to stop edge refraction ghosting
+          thickness: 0.02,         
           attenuationDistance: 2.0, 
           attenuationColor: new THREE.Color('#ffffff'), 
           clearcoat: 1.0,          
-          clearcoatRoughness: 0.0, // FIXED: Set to 0 for razor-sharp, pristine reflections
+          clearcoatRoughness: 0.0, 
           envMapIntensity: 2.0,    
           transparent: true,
           opacity: 1.0,          
           side: THREE.DoubleSide,
         });
 
+        // Solid, glossy plastic look for the inner backboard color
+     const solidColorMaterial = new THREE.MeshPhysicalMaterial({
+          color: backboardColor,
+          metalness: 0.1,
+          roughness: 0.05,
+          transmission: 0.85,      // CHANGED: High transmission for the "colored glass" look
+          ior: 1.45,
+          thickness: 0.02,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.0,
+          envMapIntensity: 2.0,
+          transparent: true,       // CHANGED: Allows it to be see-through
+          opacity: 1.0,          
+          side: THREE.DoubleSide,
+        });
+
+        // Apply the solid color strictly to the inner mesh when a color is selected
         if (isInnerMesh && !isClear) {
-          child.material = acrylicMaterial;
+          child.material = solidColorMaterial;
         } else {
-          child.material = acrylicMaterial;
+          child.material = clearAcrylicMaterial;
         }
+        
         child.material.needsUpdate = true;
       }
     });
@@ -231,6 +249,8 @@ else if (nameLower.includes('neon')) {
     [0, 0, -0.05],         // Center Core Fill
   ];
 
+  const dynamicBounceIntensity = backboardColor === 'transparent' ? 0.3 : 1.5;
+
   return (
     <group position={[0, -0.05, 0]} scale={1.15}>
       <primitive object={clonedScene} />
@@ -243,7 +263,7 @@ else if (nameLower.includes('neon')) {
               key={`bounce-${index}`}
               position={new THREE.Vector3(...pos)}
               color={outlineColor}
-              intensity={1.5} // Bright enough to hit the wall
+              intensity={dynamicBounceIntensity}
               distance={0.6}  // Prevents light from spilling across the whole room
               decay={2}       // Physically accurate inverse-square falloff
               castShadow={false} // Kept false to allow light to pass through the glass backboard smoothly
