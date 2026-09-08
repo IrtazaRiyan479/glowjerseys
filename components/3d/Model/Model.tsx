@@ -131,17 +131,24 @@ tex.minFilter = THREE.LinearMipmapLinearFilter;
       const nameLower = child.name.toLowerCase();
 
       
-      if (nameLower.includes('plane')) { 
-        child.material = new THREE.MeshStandardMaterial({
-          map: activeColorMap,          
-          normalMap: activeNormalMap,   
-          normalScale: new THREE.Vector2(0.1, 0.1),
-          roughness: 0.85,
-          metalness: 0.05,
-          color: isDark ? '#888888' : '#ffffff',
-        });
-        child.material.needsUpdate = true;
-      }
+  if (nameLower.includes('plane')) {
+  const isTex2 = textureVariant === 2;
+
+  child.material = new THREE.MeshStandardMaterial({
+    map: activeColorMap,
+    normalMap: activeNormalMap,
+    normalScale: new THREE.Vector2(0.12, 0.12),
+    roughness: isTex2 ? 0.65 : 0.85,
+    metalness: isTex2 ? 0.08 : 0.05,
+    // slight brighten only — no emissive (emissive turns the whole wall green)
+    color: isTex2
+      ? (isDark ? '#c8c8c8' : '#ffffff')
+      : (isDark ? '#888888' : '#ffffff'),
+    emissive: new THREE.Color('#000000'),
+    emissiveIntensity: 0,
+  });
+  child.material.needsUpdate = true;
+}
       
      
 else if (nameLower.includes('neon')) { 
@@ -248,20 +255,23 @@ else {
   child.material.needsUpdate = true;
 }
     });
-  }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap]);
+  }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap, textureVariant]);
 
-  
-  
+const isTex2 = textureVariant === 2;
+
 const bounceLights = neonOn
   ? [
-      [0, 0.15, -0.05],
-      [-0.15, 0.05, -0.05],
-      [0.15, 0.05, -0.05],
-      [0, -0.12, -0.05],
+      [0, 0.15, -0.06],
+      [-0.16, 0.04, -0.06],
+      [0.16, 0.04, -0.06],
+      [0, -0.12, -0.06],
     ]
   : [];
 
-  const dynamicBounceIntensity = backboardColor === 'transparent' ? 0.3 : 1.5;
+const dynamicBounceIntensity =
+  backboardColor === 'transparent' || backboardColor === 'Transparent'
+    ? isTex2 ? 0.9 : 0.3
+    : isTex2 ? 2.8 : 1.5;
 
   return (
     <group position={[0, -0.05, 0]} scale={1.15}>
@@ -270,15 +280,15 @@ const bounceLights = neonOn
       {neonOn && (
         <group>
           {bounceLights.map((pos, index) => (
-            <pointLight
-              key={`bounce-${index}`}
-              position={new THREE.Vector3(...pos)}
-              color={outlineColor}
-              intensity={dynamicBounceIntensity}
-              distance={0.6}  
-              decay={2}       
-              castShadow={false} 
-            />
+       <pointLight
+  key={`bounce-${index}`}
+  position={new THREE.Vector3(...pos)}
+  color={outlineColor}
+  intensity={dynamicBounceIntensity}
+  distance={isTex2 ? 1.0 : 0.6}
+  decay={2}
+  castShadow={false}
+/>
           ))}
         </group>
       )}

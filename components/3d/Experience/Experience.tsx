@@ -99,7 +99,6 @@ const Experience = ({
   <Canvas
   shadows={false}
   dpr={[1, 1.25]}
-  frameloop="demand"  
   camera={{
     position: [0, 0.05, 1.9],
     fov: 35,
@@ -120,16 +119,14 @@ const Experience = ({
             <ambientLight intensity={0.15} />
             <directionalLight position={[3, 4, 5]} intensity={0.35} />
             <directionalLight position={[-2, 2, 3]} intensity={0.2} />
-            
-            <Environment preset="city" environmentIntensity={0.15} />
+            <Environment preset="city" environmentIntensity={0.25} />
           </>
         ) : (
           <>
             <ambientLight intensity={0.55} />
             <directionalLight position={[4, 5, 6]} intensity={1.2} castShadow />
             <directionalLight position={[-3, 2, 4]} intensity={0.5} />
-                      
-            <Environment preset="city" environmentIntensity={0.8} />
+            <Environment preset="city" environmentIntensity={0.25} />
           </>
         )}
 
@@ -147,7 +144,6 @@ const Experience = ({
               isDark={isDark} 
               textureVariant={textureVariant}
             />
-            <Environment preset="city" environmentIntensity={0.35} />
           </group>
 
           <ContactShadows
