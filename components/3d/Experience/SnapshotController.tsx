@@ -8,17 +8,16 @@ type Props = {
 };
 
 export default function SnapshotController({ onReady }: Props) {
-  const { gl, scene, camera } = useThree();
+  const { gl } = useThree();
 
   const takeSnapshot = useCallback(async () => {
     try {
-      gl.render(scene, camera);
       return gl.domElement.toDataURL('image/png', 1.0);
     } catch (e) {
       console.error(e);
       return null;
     }
-  }, [gl, scene, camera]);
+  }, [gl]);
 
   useEffect(() => {
     onReady(takeSnapshot);
