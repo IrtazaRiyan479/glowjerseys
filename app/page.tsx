@@ -22,12 +22,23 @@ const Page = () => {
   const [isDark, setIsDark] = useState(true);
   const [neonOn, setNeonOn] = useState(true);
 
+  const SPORT_MODELS: Record<string, string> = {
+  Baseball: '/3d/models/Baseball.glb',
+  Basketball: '/3d/models/Basketball.glb',
+  Football: '/3d/models/Football.glb',
+  Soccer: '/3d/models/BlueSoccer.glb',
+  Hockey: '/3d/models/Hockey.glb',
+};
+
+const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb';
+
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-[#1a1a1a]">
       
     {/* LEFT SIDE: 3D — takes all remaining space */}
     <div className="relative h-full flex-1 min-w-0">
       <Experience
+      glbUrl={currentGlbUrl}
         name={name}
         number={number}
         outlineColor={outlineColor}

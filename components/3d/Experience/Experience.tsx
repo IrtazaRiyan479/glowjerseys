@@ -15,6 +15,7 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { KernelSize } from 'postprocessing';
 
 interface ExperienceProps {
+  glbUrl: string;
   name: string;
   number: string;
   outlineColor: string;
@@ -26,6 +27,7 @@ interface ExperienceProps {
 }
 
 const Experience = ({
+  glbUrl,
   name,
   number,
   outlineColor,
@@ -89,7 +91,7 @@ const Experience = ({
        <Suspense fallback={null}>
         <group position={[0, 0.08, 0.08]} scale={0.8}>
             <Model
-              glbUrl="/3d/models/BlueSoccer.glb"
+              glbUrl={glbUrl}
               outlineColor={outlineColor}
               backboardColor={backboardColor}
               name={name}
