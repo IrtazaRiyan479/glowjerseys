@@ -76,13 +76,13 @@ export default function NeonText({
 
       // CHANGED: Increased spacing factors to spread letters out beautifully
       if (len <= 5) {
-        spacingFactor = 0.12; radius = 1100;
+        spacingFactor = 0.10; radius = 1100;
       } else if (len <= 8) {
-        spacingFactor = 0.13; radius = 1150;
+        spacingFactor = 0.10; radius = 850;
       } else if (len <= 11) {
-        spacingFactor = 0.09; radius = 970;
+        spacingFactor = 0.08; radius = 700;
       } else {
-        spacingFactor = 0.075; radius = 950;
+        spacingFactor = 0.9; radius = 600;
       }
 
       const totalAngle = Math.min(len * spacingFactor, 1.05);
