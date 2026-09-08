@@ -29,7 +29,7 @@ export default function NeonText({
     document.fonts.ready.then(() => setFontLoaded(true));
   }, []);
 
-  const texture = useMemo(() => {
+ const texture = useMemo(() => {
     if (!text) return null;
 
     const canvas = document.createElement('canvas');
@@ -42,40 +42,47 @@ export default function NeonText({
 
     ctx.clearRect(0, 0, width, height);
 
+    // CHANGED: Increased font sizes overall
     const fontSize = isNumber
-      ? text.length === 1 ? 380 : 300
-      : text.length <= 5 ? 220 : text.length <= 8 ? 145 : 120;
+      ? text.length === 1 ? 300 : 340
+      : text.length <= 5 ? 160 : text.length <= 8 ? 180 : 140;
 
-    ctx.font = `normal ${fontSize}px "Bondtique", "Arial Black", sans-serif`;
+    // CHANGED: Added 'bold' to the font string
+    ctx.font = `bold ${fontSize}px "Bondtique", "Arial Black", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    
+    // CHANGED: Added native letter spacing for straight text
+    ctx.letterSpacing = isNumber ? '0px' : '20px';
+
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
 
-    // Formatting for the text
-    ctx.lineWidth = isNumber ? 16 : 12; 
-    ctx.strokeStyle = '#ffffff'; // For outlines
-    ctx.fillStyle = '#ffffff';   // For solid fills
+    // CHANGED: Thicker line width for the hollow numbers
+    ctx.lineWidth = isNumber ? 18 : 12; 
+    ctx.strokeStyle = '#ffffff'; 
+    ctx.fillStyle = '#ffffff';   
     ctx.lineCap = 'round';   
     ctx.lineJoin = 'round';  
 
     if (curve && !isNumber) {
       const centerX = width / 2;
-      const centerY = height / 2 + 8;
+      const centerY = height / 2 + 55;
       const characters = text.toUpperCase().split('');
       const len = characters.length;
 
       let spacingFactor: number;
       let radius: number;
 
+      // CHANGED: Increased spacing factors to spread letters out beautifully
       if (len <= 5) {
-        spacingFactor = 0.11; radius = 1100;
+        spacingFactor = 0.12; radius = 1100;
       } else if (len <= 8) {
-        spacingFactor = 0.115; radius = 1150;
+        spacingFactor = 0.13; radius = 1150;
       } else if (len <= 11) {
-        spacingFactor = 0.08; radius = 970;
+        spacingFactor = 0.09; radius = 970;
       } else {
-        spacingFactor = 0.068; radius = 950;
+        spacingFactor = 0.075; radius = 950;
       }
 
       const totalAngle = Math.min(len * spacingFactor, 1.05);
@@ -91,16 +98,13 @@ export default function NeonText({
         ctx.translate(x, y);
         ctx.rotate(angle * 0.4);
         
-        // Solid fill for the curved name
         ctx.fillText(char, 0, 0); 
         ctx.restore();
       });
     } else {
       if (isNumber) {
-        // Outline for the number
         ctx.strokeText(text.toUpperCase(), width / 2, height / 2); 
       } else {
-        // Solid fill for straight names
         ctx.fillText(text.toUpperCase(), width / 2, height / 2);
       }
     }
@@ -109,12 +113,12 @@ export default function NeonText({
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
     return tex;
-  }, [text, isNumber, curve, text.length, fontLoaded]); 
+  }, [text, isNumber, curve, text.length, fontLoaded]);
 
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   // Synced exactly to Model_14.tsx outline intensity
-  const activeIntensity = 2.0; 
+  const activeIntensity = 1.5; 
 
   useFrame((_, delta) => {
     if (materialRef.current) {
@@ -127,11 +131,11 @@ export default function NeonText({
 
   if (!texture || !text) return null;
 
-  const planeWidth = isNumber
-    ? text.length === 1 ? 0.38 : 0.65
-    : Math.min(0.62 + text.length * 0.038, 1.15);
+ const planeWidth = isNumber
+    ? text.length === 1 ? 0.45 : 0.75
+    : Math.min(0.75 + text.length * 0.05, 1.4);
 
-  const planeHeight = isNumber ? 0.37 : 0.26;
+  const planeHeight = isNumber ? 0.45 : 0.35;
 
   const vertexShader = `
     varying vec2 vUv;

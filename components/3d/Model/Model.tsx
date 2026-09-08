@@ -188,41 +188,32 @@ else if (nameLower.includes('neon')) {
       }
 
       // ===== 4. THE BACKBOARD (Catch-all for the main shirt body) =====
-      else { 
-        // NOTE: Replace 'inner' with the exact mesh name from your Blender outliner
+    else { 
         const isInnerMesh = nameLower.includes('jersey');
         const isClear = backboardColor === 'transparent';
 
+        // Apply this exact material to BOTH your inner and outer mesh conditions
+        const acrylicMaterial = new THREE.MeshPhysicalMaterial({
+          color: isClear ? '#ffffff' : backboardColor,
+          metalness: 0.0,          // FIXED: Set to 0 to prevent gray tinting/dirty look
+          roughness: 0.0,          // FIXED: Set to 0 to remove frosted noise
+          transmission: 1.0,       
+          ior: 1.45,               
+          thickness: 0.02,         // FIXED: Lowered drastically to stop edge refraction ghosting
+          attenuationDistance: 2.0, 
+          attenuationColor: new THREE.Color('#ffffff'), 
+          clearcoat: 1.0,          
+          clearcoatRoughness: 0.0, // FIXED: Set to 0 for razor-sharp, pristine reflections
+          envMapIntensity: 2.0,    
+          transparent: true,
+          opacity: 1.0,          
+          side: THREE.DoubleSide,
+        });
+
         if (isInnerMesh && !isClear) {
-          // Inner Mesh: Solid colored fill
-   child.material = new THREE.MeshPhysicalMaterial({
-  color: isClear ? '#ffffff' : backboardColor, // Pure white for perfectly clear acrylic
-  metalness: 0.0,          // Drop metalness for pure plastic/acrylic
-  roughness: 0.0,          // Must be 0 to remove the blurry/frosted effect
-  transmission: 1.0,       // Full glass transmission
-  ior: 1.5,                // Standard index of refraction for acrylic/glass
-  thickness: 0.05,         // Gives realistic edge volume without extreme distortion
-  clearcoat: 1.0,          // Adds the sharp, glossy reflection on the front surface
-  clearcoatRoughness: 0.0, // Keeps the surface reflection razor sharp
-  transparent: true,
-  opacity: 1.0,          
-  side: THREE.DoubleSide,
-});
+          child.material = acrylicMaterial;
         } else {
-          // Outer Mesh (or transparent inner): 100% Glass
-      child.material = new THREE.MeshPhysicalMaterial({
-  color: isClear ? '#ffffff' : backboardColor, // Pure white for perfectly clear acrylic
-  metalness: 0.0,          // Drop metalness for pure plastic/acrylic
-  roughness: 0.0,          // Must be 0 to remove the blurry/frosted effect
-  transmission: 1.0,       // Full glass transmission
-  ior: 1.5,                // Standard index of refraction for acrylic/glass
-  thickness: 0.05,         // Gives realistic edge volume without extreme distortion
-  clearcoat: 1.0,          // Adds the sharp, glossy reflection on the front surface
-  clearcoatRoughness: 0.0, // Keeps the surface reflection razor sharp
-  transparent: true,
-  opacity: 1.0,          
-  side: THREE.DoubleSide,
-});
+          child.material = acrylicMaterial;
         }
         child.material.needsUpdate = true;
       }

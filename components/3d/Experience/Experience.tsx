@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useLoader, useThree, useFrame } from '@react-three/fiber';
-import { PresentationControls, ContactShadows } from '@react-three/drei';
+import { ContactShadows, Environment } from '@react-three/drei';
 import {
   TextureLoader,
   RepeatWrapping,
@@ -68,17 +68,23 @@ const Experience = () => {
           powerPreference: 'high-performance',
         }}
       >
-        {isDark ? (
+       {isDark ? (
           <>
             <ambientLight intensity={0.15} />
             <directionalLight position={[3, 4, 5]} intensity={0.35} />
             <directionalLight position={[-2, 2, 3]} intensity={0.2} />
+            
+            {/* ADDED: Gives the glass subtle reflections in the dark */}
+            <Environment preset="city" environmentIntensity={0.15} />
           </>
         ) : (
           <>
             <ambientLight intensity={0.55} />
             <directionalLight position={[4, 5, 6]} intensity={1.2} castShadow />
             <directionalLight position={[-3, 2, 4]} intensity={0.5} />
+            
+            {/* ADDED: Gives the glass bright reflections in daylight */}
+            <Environment preset="city" environmentIntensity={0.8} />
           </>
         )}
 
