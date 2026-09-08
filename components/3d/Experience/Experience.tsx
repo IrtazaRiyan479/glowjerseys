@@ -45,7 +45,6 @@ const Experience = ({
   return (
     <div className="relative h-full w-full bg-[#1a1a1a]">
 
- {/* Texture swatch — bottom of shirt */}
 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2">
   <button
     type="button"
@@ -78,7 +77,6 @@ const Experience = ({
   </button>
 </div>
 
-{/* Neon toggle — top right */}
 <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
   <span className="text-white text-xs font-medium drop-shadow">Neon</span>
   <button
@@ -101,7 +99,7 @@ const Experience = ({
   <Canvas
   shadows={false}
   dpr={[1, 1.25]}
-  frameloop="demand"          // only re-render when something changes
+  frameloop="demand"  
   camera={{
     position: [0, 0.05, 1.9],
     fov: 35,
@@ -123,7 +121,6 @@ const Experience = ({
             <directionalLight position={[3, 4, 5]} intensity={0.35} />
             <directionalLight position={[-2, 2, 3]} intensity={0.2} />
             
-            {/* ADDED: Gives the glass subtle reflections in the dark */}
             <Environment preset="city" environmentIntensity={0.15} />
           </>
         ) : (
@@ -131,8 +128,7 @@ const Experience = ({
             <ambientLight intensity={0.55} />
             <directionalLight position={[4, 5, 6]} intensity={1.2} castShadow />
             <directionalLight position={[-3, 2, 4]} intensity={0.5} />
-            
-            {/* ADDED: Gives the glass bright reflections in daylight */}
+                      
             <Environment preset="city" environmentIntensity={0.8} />
           </>
         )}

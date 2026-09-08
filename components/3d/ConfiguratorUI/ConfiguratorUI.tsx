@@ -14,7 +14,6 @@ interface ConfiguratorUIProps {
   selectedSport: string;
   setSelectedSport: (v: string) => void;
 
-  // live 3D controls
   name: string;
   setName: (v: string) => void;
   number: string;
@@ -90,7 +89,6 @@ const ConfiguratorUI = ({
   const nameLen = name?.length ?? 0;
   const numberLen = number?.length ?? 0;
 
-  // Live-site active styles (light theme overrides from #gjcz)
   const segmentActive =
     'border-[#0b45ff] bg-[rgba(11,69,255,0.12)] text-[#0b45ff] shadow-[inset_0_0_0_1px_#0b45ff]';
   const segmentIdle =

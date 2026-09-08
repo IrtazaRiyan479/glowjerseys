@@ -1,15 +1,13 @@
 'use client';
 
-import Experience from '@/components/3d/Experience/Experience'; // Adjust path if needed
-import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI'; // Adjust path if needed
+import Experience from '@/components/3d/Experience/Experience';
+import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
 import React, { useState } from 'react';
 
-// Dummy data for the UI dropdowns/buttons
 const sizeOptionData = [{ value: 16, unit: 'in' }, { value: 20, unit: 'in' }, { value: 24, unit: 'in' }];
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
 
 const Page = () => {
-  // Master state for the 3D model
   const [sizeOptionValue, setSizeOptionValue] = useState(20);
   const [sportsTypeValue, setSportsTypeValue] = useState('Soccer');
   const [name, setName] = useState('BROWN');
@@ -35,7 +33,6 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-[#1a1a1a]">
       
-    {/* LEFT SIDE: 3D — takes all remaining space */}
     <div className="relative h-full flex-1 min-w-0">
       <Experience
       glbUrl={currentGlbUrl}
@@ -51,7 +48,6 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
       />
     </div>
 
-      {/* RIGHT SIDE: Configurator UI (Takes up 1/3 of the screen) */}
 <div className="h-full w-[580px] shrink-0 overflow-y-auto bg-white text-black shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10">
       <div className="p-5">
         <ConfiguratorUI
