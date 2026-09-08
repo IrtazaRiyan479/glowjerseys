@@ -44,8 +44,8 @@ export default function NeonText({
 
     // CHANGED: Increased font sizes overall
     const fontSize = isNumber
-      ? text.length === 1 ? 300 : 340
-      : text.length <= 5 ? 160 : text.length <= 8 ? 180 : 140;
+      ? text.length === 1 ? 300 : 300
+      : text.length <= 5 ? 170 : text.length <= 8 ? 180 : 140;
 
     // CHANGED: Added 'bold' to the font string
     ctx.font = `bold ${fontSize}px "Bondtique", "Arial Black", sans-serif`;
@@ -74,7 +74,6 @@ export default function NeonText({
       let spacingFactor: number;
       let radius: number;
 
-      // CHANGED: Increased spacing factors to spread letters out beautifully
       if (len <= 5) {
         spacingFactor = 0.10; radius = 1100;
       } else if (len <= 8) {
@@ -118,7 +117,7 @@ export default function NeonText({
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   // Synced exactly to Model_14.tsx outline intensity
-  const activeIntensity = 5.0; 
+  const activeIntensity = 2.0; 
 
   useFrame((_, delta) => {
     if (materialRef.current) {
@@ -153,7 +152,7 @@ export default function NeonText({
     }
   `;
 
- const fragmentShader = `
+const fragmentShader = `
     uniform vec3 uColor1;
     uniform vec3 uColor2;
     uniform float uTime;
@@ -167,13 +166,10 @@ export default function NeonText({
     void main() {
       vec4 texColor = texture2D(uTexture, vUv);
       if (texColor.a < 0.1) discard; 
-
-      // Exactly mirroring the outline wave and pulse logic
-      float wave = sin(vPosition.y * 3.0 + uTime * 2.5) * 0.5 + 0.5;
-      float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
       float distanceFactor = 1.0 - smoothstep(0.0, 0.5, vDistanceToMouse);
 
-      vec3 color = mix(uColor1, uColor2, wave) * pulse * uIntensity * (1.0 + distanceFactor * 0.3);
+      vec3 color = uColor1 * uIntensity * (1.0 + distanceFactor * 0.3);
+      
       gl_FragColor = vec4(color, texColor.a);
     }
   `;
