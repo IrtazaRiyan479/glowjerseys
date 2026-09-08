@@ -32,7 +32,7 @@ const Model = ({
   textureVariant = 1, // Add this line
 }: ModelProps) => {
  const { scene } = useGLTF(glbUrl);
-  const clonedScene = useMemo(() => scene.clone(true), [scene]);
+  const clonedScene = useMemo(() => scene.clone(true), [scene, glbUrl]);
 
   // Load ALL textures upfront
   const [c1, n1, c2, n2] = useLoader(THREE.TextureLoader, [
@@ -41,6 +41,13 @@ const Model = ({
     '/textures/wall/BrickWall02.jpg',
     '/textures/wall/BrickWall02_Normal.jpg',
   ]);
+
+  const sport =
+  glbUrl.includes('Basketball') ? 'Basketball' :
+  glbUrl.includes('BaseBall') || glbUrl.includes('Baseball') ? 'Baseball' :
+  glbUrl.includes('Football') ? 'Football' :
+  glbUrl.includes('Hockey') ? 'Hockey' :
+  'Soccer';
 
   // Exact shaders from reference project
   const vertexShader = `
@@ -189,53 +196,57 @@ else if (nameLower.includes('neon')) {
         child.material.needsUpdate = true;
       }
 
-     // ===== 4. THE BACKBOARD (Catch-all for the main shirt body) =====
-      else { 
-        const isInnerMesh = nameLower.includes('jersey');
-        const isClear = backboardColor === 'transparent';
+    // ===== 4. THE BACKBOARD =====
+else {
+  const isInnerMesh =
+    nameLower.includes('jersey');
 
-        // Always perfectly clear for the outer acrylic and for transparent mode
-        const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
-          color: '#ffffff',
-          metalness: 0.0,
-          roughness: 0.0,
-          transmission: 1.0,       
-          ior: 1.45,               
-          thickness: 0.02,         
-          attenuationDistance: 2.0, 
-          attenuationColor: new THREE.Color('#ffffff'), 
-          clearcoat: 1.0,          
-          clearcoatRoughness: 0.0, 
-          envMapIntensity: 2.0,    
-          transparent: true,
-          opacity: 1.0,          
-          side: THREE.DoubleSide,
-        });
+  const isClear =
+    backboardColor === 'transparent' ||
+    backboardColor === 'Transparent';
 
-        // Solid, glossy plastic look for the inner backboard color
-   const solidColorMaterial = new THREE.MeshPhysicalMaterial({
-  color: backboardColor,
-  metalness: 0.02,
-  roughness: 0.12,
-  transmission: 0.0,        // fully blocks the wall
-  thickness: 0.0,
+  const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
+  color: '#e8eef5',           // slight cool tint (real acrylic isn’t pure white)
+  metalness: 0.0,
+  roughness: 0.08,            // tiny micro-surface so it catches light
+  transmission: 0.98,         // still very clear, but not invisible
+  ior: 1.49,                  // acrylic IOR (~1.49), not water
+  thickness: 0.04,            // thicker = more visible edges / volume
+  attenuationDistance: 0.6,   // light fades a bit through the plate
+  attenuationColor: new THREE.Color('#dce6f0'), // soft blue-grey falloff
   clearcoat: 1.0,
-  clearcoatRoughness: 0.08,
-  envMapIntensity: 1.2,     // still gets environment reflections
-  transparent: false,
+  clearcoatRoughness: 0.05,   // glossy top surface
+  envMapIntensity: 2.5,       // stronger room reflections on the face
+  transparent: true,
   opacity: 1.0,
   side: THREE.DoubleSide,
+  depthWrite: false,          // avoids sorting glitches with neon/text
 });
 
-        // Apply the solid color strictly to the inner mesh when a color is selected
-        if (isInnerMesh && !isClear) {
-          child.material = solidColorMaterial;
-        } else {
-          child.material = clearAcrylicMaterial;
-        }
-        
-        child.material.needsUpdate = true;
-      }
+  const solidColorMaterial = new THREE.MeshPhysicalMaterial({
+    color: backboardColor,
+    metalness: 0.0,
+    roughness: 0.05,
+    transmission: 0.0,
+    thickness: 0.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.02,
+    envMapIntensity: 2.0,
+    reflectivity: 0.9,
+    transparent: false,
+    opacity: 1.0,
+    side: THREE.DoubleSide,
+  });
+
+  // Outer shell stays clear; inner jersey/glass plate gets the solid color
+  if (isInnerMesh && !isClear) {
+    child.material = solidColorMaterial;
+  } else {
+    child.material = clearAcrylicMaterial;
+  }
+
+  child.material.needsUpdate = true;
+}
     });
   }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap]);
 
@@ -281,6 +292,7 @@ const bounceLights = neonOn
           scale={1}
           curve={true}
           neonOn={neonOn}
+          sport={sport}
         />
       )}
 
@@ -293,6 +305,7 @@ const bounceLights = neonOn
           isNumber={true}
           curve={false}
           neonOn={neonOn}
+          sport={sport}
         />
       )}
     </group>

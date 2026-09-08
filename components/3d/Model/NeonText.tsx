@@ -12,6 +12,7 @@ interface NeonTextProps {
   isNumber?: boolean;
   curve?: boolean;
   neonOn?: boolean;
+  sport?: string;
 }
 
 export default function NeonText({
@@ -22,6 +23,7 @@ export default function NeonText({
   isNumber = false,
   curve = false,
   neonOn = true,
+  sport = 'Soccer',
 }: NeonTextProps) {
   
   const [fontLoaded, setFontLoaded] = useState(false);
@@ -42,10 +44,11 @@ export default function NeonText({
 
     ctx.clearRect(0, 0, width, height);
 
-    // CHANGED: Increased font sizes overall
-    const fontSize = isNumber
-      ? text.length === 1 ? 300 : 300
-      : text.length <= 5 ? 170 : text.length <= 8 ? 180 : 140;
+   const fontSize = isNumber
+  ? text.length === 1 ? (sport === 'Basketball' ? 240 : 300) : (sport === 'Basketball' ? 240 : 300)
+  : sport === 'Basketball'
+    ? text.length <= 5 ? 140 : text.length <= 8 ? 120 : 100
+    : text.length <= 5 ? 170 : text.length <= 8 ? 180 : 140;
 
     // CHANGED: Added 'bold' to the font string
     ctx.font = `bold ${fontSize}px "Bondtique", "Arial Black", sans-serif`;
@@ -112,7 +115,7 @@ export default function NeonText({
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
     return tex;
-  }, [text, isNumber, curve, text.length, fontLoaded]);
+  }, [text, isNumber, curve, text.length, fontLoaded, sport]);
 
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
@@ -132,11 +135,19 @@ const activeIntensity = neonOn ? (isSoft ? 3.2 : 9.0) : 0.35;
 
   if (!texture || !text) return null;
 
- const planeWidth = isNumber
-    ? text.length === 1 ? 0.45 : 0.75
+ const isBasketball = sport === 'Basketball';
+
+const planeWidth = isNumber
+  ? text.length === 1
+    ? isBasketball ? 0.32 : 0.45
+    : isBasketball ? 0.55 : 0.75
+  : isBasketball
+    ? Math.min(0.55 + text.length * 0.035, 1.0)
     : Math.min(0.75 + text.length * 0.05, 1.4);
 
-  const planeHeight = isNumber ? 0.45 : 0.35;
+const planeHeight = isNumber
+  ? isBasketball ? 0.32 : 0.45
+  : isBasketball ? 0.26 : 0.35;
 
  const vertexShader = `
     uniform vec3 uMouseWorld;

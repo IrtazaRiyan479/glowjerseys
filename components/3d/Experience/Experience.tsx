@@ -50,7 +50,7 @@ const Experience = ({
   <button
     type="button"
     onClick={() => setTextureVariant(1)}
-    className={`w-18 h-18 rounded-full overflow-hidden border-2 shadow-lg transition ${
+    className={`w-14 h-14 rounded-full overflow-hidden border-2 shadow-lg transition ${
       textureVariant === 1 ? 'border-white scale-110' : 'border-white/40 opacity-80 hover:opacity-100'
     }`}
     title="Brick texture 1"
@@ -65,7 +65,7 @@ const Experience = ({
   <button
     type="button"
     onClick={() => setTextureVariant(2)}
-    className={`w-18 h-18 rounded-full overflow-hidden border-2 shadow-lg transition ${
+    className={`w-14 h-14 rounded-full overflow-hidden border-2 shadow-lg transition ${
       textureVariant === 2 ? 'border-white scale-110' : 'border-white/40 opacity-80 hover:opacity-100'
     }`}
     title="Brick texture 2"
@@ -151,6 +151,7 @@ const Experience = ({
               isDark={isDark} 
               textureVariant={textureVariant}
             />
+            <Environment preset="city" environmentIntensity={0.35} />
           </group>
 
           <ContactShadows

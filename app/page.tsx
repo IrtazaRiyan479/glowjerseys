@@ -23,7 +23,7 @@ const Page = () => {
   const [neonOn, setNeonOn] = useState(true);
 
   const SPORT_MODELS: Record<string, string> = {
-  Baseball: '/3d/models/Baseball.glb',
+  Baseball: '/3d/models/BaseBall.glb',
   Basketball: '/3d/models/Basketball.glb',
   Football: '/3d/models/Football.glb',
   Soccer: '/3d/models/BlueSoccer.glb',
