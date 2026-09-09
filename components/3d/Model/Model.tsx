@@ -165,7 +165,13 @@ else if (nameLower.includes('neon')) {
       transparent: false,
     });
   } else {
-    
+    const softColors = [
+      '#FFE800', '#FBECCB', '#ffffff', '#ffff00', '#fff700',
+      '#ffee00', '#f5e6a3', '#f0e68c', '#fffacd', '#fff8dc'
+    ];
+    const isSoft = softColors.includes(outlineColor.toLowerCase());
+    const intensity = isSoft ? 1.2 : 5.0;
+
     if (!neonMaterialRef.current) {
       neonMaterialRef.current = new THREE.ShaderMaterial({
         vertexShader,
@@ -174,7 +180,7 @@ else if (nameLower.includes('neon')) {
           uTime: { value: 0 },
           uColor1: { value: new THREE.Color(outlineColor) },
           uColor2: { value: new THREE.Color(outlineColor) },
-          uIntensity: { value: 8.0 },
+          uIntensity: { value: intensity },
           uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }, 
         },
         transparent: false,
@@ -183,7 +189,7 @@ else if (nameLower.includes('neon')) {
     } else {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
       neonMaterialRef.current.uniforms.uColor2.value.set(outlineColor);
-      neonMaterialRef.current.uniforms.uIntensity.value = 8.0;
+      neonMaterialRef.current.uniforms.uIntensity.value = intensity;
     }
     
     child.material = neonMaterialRef.current;
@@ -268,7 +274,7 @@ const bounceLights = neonOn
     ]
   : [];
 
-const bounceIntensity = isTex2 ? 10.6 : 1.0;
+const bounceIntensity = isTex2 ? 3.6 : 1.0;
 
   return (
     <group position={[0, -0.05, 0]} scale={1.15}>
@@ -282,7 +288,7 @@ const bounceIntensity = isTex2 ? 10.6 : 1.0;
   position={new THREE.Vector3(...pos)}
   color={outlineColor}
   intensity={bounceIntensity}
-  distance={isTex2 ? 1.5 : 0.7}
+  distance={isTex2 ? 0.5 : 0.7}
   decay={2}
   castShadow={false}
 />
