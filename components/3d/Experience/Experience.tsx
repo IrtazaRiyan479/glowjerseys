@@ -123,7 +123,7 @@ const Experience = ({
     antialias: true,
     alpha: false,
     toneMapping: THREE.ACESFilmicToneMapping,
-    toneMappingExposure: 1.0,
+    toneMappingExposure: 1.05,
     outputColorSpace: THREE.SRGBColorSpace,
     powerPreference: 'high-performance',
     stencil: false,
@@ -174,12 +174,12 @@ const Experience = ({
 
           
 
-       <EffectComposer multisampling={0}>
+       <EffectComposer multisampling={4}>
   <Bloom
-    kernelSize={KernelSize.SMALL}
+    kernelSize={KernelSize.VERY_SMALL}
     luminanceThreshold={1.05}
-    intensity={0.22}
-    levels={3}
+    intensity={0.18}
+    levels={2}
     // mipmapBlur
   />
 </EffectComposer>

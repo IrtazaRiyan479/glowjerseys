@@ -221,22 +221,27 @@ else {
     backboardColor === 'transparent' ||
     backboardColor === 'Transparent';
 
+  child.geometry.computeVertexNormals();
+
   const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
-  color: '#e8eef5',         
+  color: '#e8eef5',
   metalness: 0.0,
-  roughness: 0.08,           
-  transmission: 0.98,        
-  ior: 1.49,                 
-  thickness: 0.04,           
-  attenuationDistance: 0.6,  
-  attenuationColor: new THREE.Color('#dce6f0'), 
+  roughness: 0.015,
+  transmission: 0.97,
+  ior: 1.5,
+  thickness: 0.025,
+  attenuationDistance: 0.8,
+  attenuationColor: new THREE.Color('#dce6f0'),
   clearcoat: 1.0,
-  clearcoatRoughness: 0.05,   
-  envMapIntensity: 2.5,       
+  clearcoatRoughness: 0.008,
+  envMapIntensity: 2.8,
   transparent: true,
   opacity: 1.0,
   side: THREE.DoubleSide,
-  depthWrite: false,          
+  depthWrite: false,
+  alphaToCoverage: true,
+  specularIntensity: 1.0,
+  reflectivity: 0.5,
 });
 
   const solidColorMaterial = new THREE.MeshPhysicalMaterial({
@@ -270,14 +275,14 @@ const isTex2 = textureVariant === 2;
 
 const bounceLights = neonOn
   ? [
-      [0, 0.15, -0.06],
-      [-0.16, 0.04, -0.06],
-      [0.16, 0.04, -0.06],
-      [0, -0.12, -0.06],
+      [0, 0.15, -0.05],
+      [-0.15, 0.05, -0.05],
+      [0.15, 0.05, -0.05],
+      [0, -0.12, -0.05],
     ]
   : [];
 
-const bounceIntensity = isTex2 ? 3.6 : 1.0;
+const bounceIntensity = isTex2 ? 4.2 : 1.4;
 
   return (
     <group position={[0, -0.05, 0]} scale={1.15}>
@@ -291,7 +296,7 @@ const bounceIntensity = isTex2 ? 3.6 : 1.0;
   position={new THREE.Vector3(...pos)}
   color={outlineColor}
   intensity={bounceIntensity}
-  distance={isTex2 ? 0.5 : 0.7}
+  distance={isTex2 ? 0.45 : 0.6}
   decay={2}
   castShadow={false}
 />
