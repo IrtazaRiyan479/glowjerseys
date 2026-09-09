@@ -187,7 +187,6 @@ const fragmentShader = `
     <mesh position={position} scale={scale}>
       <planeGeometry args={[planeWidth, planeHeight]} />
       
-      {/* Conditionally switch materials identical to Model.tsx logic */}
       {neonOn ? (
         <shaderMaterial
           ref={materialRef}
