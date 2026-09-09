@@ -112,7 +112,7 @@ const Experience = ({
 
   <Canvas
   shadows={false}
-  dpr={[1, Math.min(2)]}
+  dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 3) : 1}
   camera={{
     position: [0, 0.05, 1.95],
     fov: 32,
@@ -177,9 +177,10 @@ const Experience = ({
        <EffectComposer multisampling={0}>
   <Bloom
     kernelSize={KernelSize.SMALL}
-    luminanceThreshold={0.8}
-    intensity={0.4}
-    mipmapBlur
+    luminanceThreshold={1.05}
+    intensity={0.22}
+    levels={3}
+    // mipmapBlur
   />
 </EffectComposer>
           

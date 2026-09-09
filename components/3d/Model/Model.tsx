@@ -152,6 +152,7 @@ tex.minFilter = THREE.LinearMipmapLinearFilter;
       
      
 else if (nameLower.includes('neon')) { 
+  child.geometry.computeVertexNormals();
   if (!neonOn) {
     
     child.material = new THREE.MeshPhysicalMaterial({
@@ -185,6 +186,8 @@ else if (nameLower.includes('neon')) {
         },
         transparent: false,
         toneMapped: false,
+        depthWrite: true,
+        depthTest: true,
       });
     } else {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
