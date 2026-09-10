@@ -34,43 +34,51 @@ const Page = () => {
 
 const addItem = useCartStore((s) => s.addItem);
 const snapshotRef = useRef<(() => Promise<string | null>) | null>(null);
+const addingRef = useRef(false);
 
 const handleAddToCart = async () => {
-  let previewImageUrl: string | undefined;
-  const dataUrl = await snapshotRef.current?.();
-  if (dataUrl) {
-    try {
-      previewImageUrl = await uploadImage(dataUrl);
-    } catch {
-      previewImageUrl = dataUrl;
+  if (addingRef.current) return;
+  addingRef.current = true;
+  try {
+    let previewImageUrl: string | undefined;
+
+    const dataUrl = await snapshotRef.current?.();
+    if (dataUrl) {
+      try {
+        previewImageUrl = await uploadImage(dataUrl);
+      } catch {
+        previewImageUrl = dataUrl;
+      }
     }
+
+    const selectedOptions: JerseySelectedOptions = {
+      size: sizeOptionValue ?? 20,
+      sport: selectedSport,
+      name,
+      number,
+      jerseyColor: outlineColor,
+      nameColor,
+      numberColor,
+      backboardColor,
+      previewImageUrl,
+    };
+
+    addItem(selectedOptions, quantity);
+  } finally {
+    setTimeout(() => {
+      addingRef.current = false;
+    }, 800);
   }
-
-  const selectedOptions: JerseySelectedOptions = {
-    size: sizeOptionValue ?? 20,
-    sport: selectedSport,
-    name,
-    number,
-    jerseyColor: outlineColor,
-    nameColor,
-    numberColor,
-    backboardColor,
-    previewImageUrl,
-  };
-
-  addItem(selectedOptions, quantity);
-  console.log('Cart line', selectedOptions, 'qty', quantity);
 };
 
 const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb';
 
 
   return (
-    <div className="flex h-[100dvh] w-full overflow-hidden bg-[#1a1a1a]">
-      
-    <div className="relative h-full flex-1 min-w-0">
+  <div className="grid h-full min-h-0 w-full grid-cols-1 grid-rows-[minmax(0,40svh)_minmax(0,1fr)] bg-[#1a1a1a] lg:grid-cols-[minmax(0,1fr)_min(480px,38%)] lg:grid-rows-1">
+    <div className="relative min-h-0 min-w-0 overflow-hidden h-full">
       <Experience
-      glbUrl={currentGlbUrl}
+        glbUrl={currentGlbUrl}
         name={name}
         number={number}
         outlineColor={outlineColor}
@@ -81,13 +89,13 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
         neonOn={neonOn}
         setNeonOn={setNeonOn}
         onSnapshotReady={(fn) => {
-  snapshotRef.current = fn;
-}}
+          snapshotRef.current = fn;
+        }}
       />
     </div>
 
-<div className="h-full w-[580px] shrink-0 overflow-y-auto bg-white text-black shadow-[-10px_0_20px_rgba(0,0,0,0.2)] z-10">
-      <div className="p-5">
+    <div className="z-10 flex min-h-0 min-w-0 w-full flex-col overflow-y-auto overflow-x-hidden bg-white text-black shadow-[-10px_0_20px_rgba(0,0,0,0.12)]">
+      <div className="p-4 pb-8 md:p-5">
         <ConfiguratorUI
           sizeOptionData={sizeOptionData}
           sizeOptionValue={sizeOptionValue}
@@ -120,9 +128,8 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
         />
       </div>
     </div>
-
-    </div>
-  );
+  </div>
+);
 };
 
 export default Page;
