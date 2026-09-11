@@ -133,7 +133,6 @@ const closeSearch = () => setSearchOpen(false);
     const isCustom = item.label === 'Custom';
 const isJerseys = Boolean(item.children);
 const dimOthers = megaOpen && !isJerseys;
-const style = "font-family: Bayon, sans-serif;"
 const className = `${linkBase} ${extractedCSS} ${dimOthers ? 'text-black/40' : 'text-black/90'} ${
   isCustom && !megaOpen ? linkActive : ''
 } ${isJerseys && megaOpen ? linkActive : ''}`;
