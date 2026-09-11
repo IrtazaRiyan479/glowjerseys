@@ -1,7 +1,7 @@
 'use client';
 
 import { useGLTF } from '@react-three/drei';
-import { useLoader, useFrame } from '@react-three/fiber';
+import { useLoader } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import NeonText from './NeonText';
@@ -34,6 +34,17 @@ const Model = ({
  const { scene } = useGLTF(glbUrl);
   const clonedScene = useMemo(() => scene.clone(true), [scene, glbUrl]);
 
+  useEffect(() => {
+  return () => {
+    clonedScene.traverse((obj) => {
+      if (!(obj instanceof THREE.Mesh)) return;
+      obj.geometry?.dispose();
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      mats.forEach((m) => m?.dispose?.());
+    });
+  };
+}, [clonedScene]);
+
   
   const [c1, n1, c2, n2] = useLoader(THREE.TextureLoader, [
     '/textures/wall/BrickWall01.jpg',
@@ -51,62 +62,23 @@ const Model = ({
 
   
   const vertexShader = `
-      uniform vec3 uMouseWorld;
-      uniform float uTime;
-      
-      varying vec3 vPosition;
-      varying float vDistanceToMouse;
-  
-      void main() {
-          vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
-          float distanceToMouse = distance(worldPosition, uMouseWorld);
-        
-          float falloff = 1.0 - smoothstep(0.0, 0.7, distanceToMouse);
-          falloff = pow(falloff, 2.0);
-        
-          vec3 deformDirection = normalize(worldPosition - uMouseWorld);
-          
-          
-          
-          vec3 newPosition = position; 
-  
-          vPosition = newPosition;
-          vDistanceToMouse = distanceToMouse;
-        
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
-      }
-  `;
+  void main() {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-  const fragmentShader = `
-      uniform vec3 uColor1;
-      uniform vec3 uColor2;
-      uniform float uTime;
-      uniform float uIntensity;
-  
-      varying vec3 vPosition;
-      varying float vDistanceToMouse;
-  
-      void main() {
-          float wave = sin(vPosition.y * 3.0 + uTime * 2.5) * 0.5 + 0.5;
-          // float pulse = pow(abs(sin(uTime * 1.5)), 2.0) * 0.3 + 0.7;
-          float pulse = 1.0;
-        
-          float distanceFactor = 1.0 - smoothstep(0.0, 0.5, vDistanceToMouse);
-        
-          vec3 color = mix(uColor1, uColor2, wave) * pulse * uIntensity * (1.0 + distanceFactor * 0.3);
-          gl_FragColor = vec4(color, 1.0);
-      }
-  `;
+const fragmentShader = `
+  uniform vec3 uColor1;
+  uniform float uIntensity;
+  void main() {
+    float peak = max(max(uColor1.r, uColor1.g), uColor1.b);
+    vec3 hue = uColor1 / max(peak, 0.001);
+    gl_FragColor = vec4(hue * uIntensity, 1.0);
+  }
+`;
 
   
   const neonMaterialRef = useRef<THREE.ShaderMaterial | null>(null);
-
-  
-  useFrame((_, delta) => {
-    if (neonMaterialRef.current) {
-      neonMaterialRef.current.uniforms.uTime.value += delta;
-    }
-  });
 
   
   useEffect(() => {
@@ -120,7 +92,6 @@ tex.minFilter = THREE.LinearMipmapLinearFilter;
     c1.colorSpace = c2.colorSpace = THREE.SRGBColorSpace;
     n1.colorSpace = n2.colorSpace = THREE.LinearSRGBColorSpace;
   }, [c1, n1, c2, n2]);
-
   
   const activeColorMap = textureVariant === 1 ? c1 : c2;
   const activeNormalMap = textureVariant === 1 ? n1 : n2;
@@ -152,7 +123,11 @@ tex.minFilter = THREE.LinearMipmapLinearFilter;
       
      
 else if (nameLower.includes('neon')) { 
+
+  if (!child.geometry.userData.normalsReady) {
   child.geometry.computeVertexNormals();
+  child.geometry.userData.normalsReady = true;
+}
   if (!neonOn) {
     
     child.material = new THREE.MeshPhysicalMaterial({
@@ -170,8 +145,10 @@ else if (nameLower.includes('neon')) {
       '#FFE800', '#FBECCB', '#ffffff', '#ffff00', '#fff700',
       '#ffee00', '#f5e6a3', '#f0e68c', '#fffacd', '#fff8dc'
     ];
-    const isSoft = softColors.includes(outlineColor.toLowerCase());
-    const intensity = isSoft ? 1.2 : 5.0;
+    const isSoft = softColors.some(
+  (c) => c.toLowerCase() === outlineColor.toLowerCase()
+);
+const intensity = isSoft ? 1.15 : 2.4;
 
     if (!neonMaterialRef.current) {
       neonMaterialRef.current = new THREE.ShaderMaterial({
@@ -221,7 +198,10 @@ else {
     backboardColor === 'transparent' ||
     backboardColor === 'Transparent';
 
+  if (!child.geometry.userData.normalsReady) {
   child.geometry.computeVertexNormals();
+  child.geometry.userData.normalsReady = true;
+}
 
   const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
   color: '#e8eef5',
@@ -240,7 +220,7 @@ else {
   side: THREE.DoubleSide,
   depthWrite: false,
   alphaToCoverage: true,
-  specularIntensity: 1.0,
+  specularIntensity: 0,
   reflectivity: 0.5,
 });
 
@@ -272,37 +252,33 @@ else {
   }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap, textureVariant]);
 
 const isTex2 = textureVariant === 2;
+const wallMul = isTex2 ? 5.2 : 1.8;
 
 const bounceLights = neonOn
   ? [
-      [0, 0.15, -0.05],
-      [-0.15, 0.05, -0.05],
-      [0.15, 0.05, -0.05],
-      [0, -0.12, -0.05],
+      { pos: [0, 0.12, -0.05] as const, color: outlineColor, intensity: 1 * wallMul, distance: 0.65 },
+      { pos: [0, -0.08, -0.05] as const, color: outlineColor, intensity: 1 * wallMul, distance: 0.65 },
+      { pos: [0, 0.09, -0.06] as const, color: nameColor, intensity: 0.12 * wallMul, distance: 0.28 },
+      { pos: [0, -0.13, -0.06] as const, color: numberColor, intensity: 0.10 * wallMul, distance: 0.26 },
     ]
   : [];
 
-const bounceIntensity = isTex2 ? 4.2 : 1.4;
+return (
+  <group position={[0, -0.05, 0]} scale={1.15}>
+    <primitive object={clonedScene} />
 
-  return (
-    <group position={[0, -0.05, 0]} scale={1.15}>
-      <primitive object={clonedScene} />
-
-      {neonOn && (
-        <group>
-          {bounceLights.map((pos, index) => (
-       <pointLight
-  key={`bounce-${index}`}
-  position={new THREE.Vector3(...pos)}
-  color={outlineColor}
-  intensity={bounceIntensity}
-  distance={isTex2 ? 0.45 : 0.6}
-  decay={2}
-  castShadow={false}
-/>
-          ))}
-        </group>
-      )}
+    {neonOn &&
+      bounceLights.map((l, i) => (
+        <pointLight
+          key={i}
+          position={l.pos}
+          color={l.color}
+          intensity={l.intensity}
+          distance={l.distance}
+          decay={2}
+          castShadow={false}
+        />
+      ))}
 
       {name && (
         <NeonText
@@ -333,5 +309,9 @@ const bounceIntensity = isTex2 ? 4.2 : 1.4;
 };
 
 useGLTF.preload('/3d/models/Basketball.glb');
+useGLTF.preload('/3d/models/BaseBall.glb');
+useGLTF.preload('/3d/models/Football.glb');
+useGLTF.preload('/3d/models/BlueSoccer.glb');
+useGLTF.preload('/3d/models/Hockey.glb');
 
-export default Model;
+export default React.memo(Model);

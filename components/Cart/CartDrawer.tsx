@@ -1,6 +1,7 @@
 'use client';
 
 import { useCartStore } from '@/store/cartStore';
+import { useEffect, useState } from 'react';
 
 const RECS = [
   {
@@ -71,6 +72,7 @@ function CloseButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+
 export default function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
   const closeCart = useCartStore((s) => s.closeCart);
@@ -79,7 +81,23 @@ export default function CartDrawer() {
   const removeItem = useCartStore((s) => s.removeItem);
   const subtotal = useCartStore((s) => s.subtotal);
 
-  if (!isOpen) return null;
+    const [shown, setShown] = useState(isOpen);
+  const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShown(true);
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setEntered(true));
+      });
+      return () => cancelAnimationFrame(id);
+    }
+    setEntered(false);
+    const t = window.setTimeout(() => setShown(false), 320);
+    return () => window.clearTimeout(t);
+  }, [isOpen]);
+
+  if (!shown) return null;
 
   const total = subtotal();
   const isEmpty = carts.length === 0;
@@ -88,13 +106,21 @@ export default function CartDrawer() {
     <div className="fixed inset-0 z-[80]">
       <button
         type="button"
-        className="absolute right-0 top-5 inset-0 bg-black/50"
+        className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+          entered ? 'opacity-100' : 'opacity-0'
+        }`}
         aria-label="Close cart"
         onClick={closeCart}
       />
 
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-[100%] md:max-w-[56rem] bg-white shadow-2xl">
+      <aside
+        className={`absolute right-0 top-0 flex h-full w-full bg-white shadow-2xl
+          transition-transform duration-300 ease-out
+          ${isEmpty ? 'md:max-w-[31rem]' : 'md:max-w-[56rem]'}
+          ${entered ? 'translate-x-0' : 'translate-x-full'}`}
+      >
         <div className="flex h-full w-full flex-col md:flex-row">
+          {!isEmpty && (
           <div className="hidden md:flex md:w-[45%] md:flex-col border-r border-[#e5e5e5] overflow-y-auto">
             <div className="px-8 pt-8 pb-4">
               <div className="text-[13px] font-medium uppercase tracking-[0.28em] text-black">
@@ -130,7 +156,7 @@ export default function CartDrawer() {
               ))}
             </ul>
           </div>
-
+          )}
           {/* RIGHT — Cart panel */}
           <div className="flex h-full min-w-0 flex-1 flex-col">
             <div className="relative flex h-[64px] shrink-0 items-center justify-center border-b border-[#e5e5e5] px-4">

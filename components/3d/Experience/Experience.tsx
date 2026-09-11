@@ -1,13 +1,14 @@
 'use client';
 
 import { Canvas} from '@react-three/fiber';
-import { ContactShadows, Environment } from '@react-three/drei';
-import { Suspense, useState} from 'react';
+import { AdaptiveDpr, ContactShadows, Environment } from '@react-three/drei';
+import { memo, Suspense, useState } from 'react';
 import * as THREE from 'three';
 import Model from '../Model/Model';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import { KernelSize } from 'postprocessing';
 import SnapshotController from './SnapshotController';
+
+
 
 interface ExperienceProps {
   glbUrl: string;
@@ -110,84 +111,75 @@ const Experience = ({
   Test Snapshot
 </button>
 
-  <Canvas
-  shadows={false}
-  dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 3) : 1}
-  camera={{
-    position: [0, 0.05, 1.95],
-    fov: 32,
-    near: 0.1,
-    far: 40,
-  }}
-  gl={{
-    antialias: true,
-    alpha: false,
-    toneMapping: THREE.ACESFilmicToneMapping,
-    toneMappingExposure: 1.05,
-    outputColorSpace: THREE.SRGBColorSpace,
-    powerPreference: 'high-performance',
-    stencil: false,
-    depth: true,
-    preserveDrawingBuffer: true,
-  }}
->
-       {isDark ? (
-          <>
-            <ambientLight intensity={0.15} />
-            <directionalLight position={[3, 4, 5]} intensity={0.35} />
-            <directionalLight position={[-2, 2, 3]} intensity={0.2} />
-            <Environment preset="city" environmentIntensity={0.25} />
-          </>
-        ) : (
-          <>
-            <ambientLight intensity={0.55} />
-            <directionalLight position={[4, 5, 6]} intensity={1.2} castShadow />
-            <directionalLight position={[-3, 2, 4]} intensity={0.5} />
-            <Environment preset="city" environmentIntensity={0.25} />
-          </>
-        )}
+    <Canvas
+    shadows={false}
+    dpr={[1, 1.75]}
+    frameloop="always"
+    camera={{
+      position: [0, 0.05, 1.95],
+      fov: 32,
+      near: 0.1,
+      far: 20,
+    }}
+    gl={{
+      antialias: true,
+      alpha: false,
+      toneMapping: THREE.NeutralToneMapping,
+      toneMappingExposure: 1.0,
+      outputColorSpace: THREE.SRGBColorSpace,
+      powerPreference: 'high-performance',
+      stencil: false,
+      depth: true,
+      preserveDrawingBuffer: true,
+    }}
+  >
+    <AdaptiveDpr />
 
-       <Suspense fallback={null}>
-        <group position={[0, 0.08, 0.08]} scale={0.8}>
-            <Model
-              glbUrl={glbUrl}
-              outlineColor={outlineColor}
-              backboardColor={backboardColor}
-              name={name}
-              number={number}
-              nameColor={nameColor}
-              numberColor={numberColor}
-              neonOn={neonOn}
-              isDark={isDark} 
-              textureVariant={textureVariant}
-            />
-            {onSnapshotReady && <SnapshotController onReady={onSnapshotReady} />}
-          </group>
+    <ambientLight intensity={isDark ? 0.15 : 0.55} />
+    <directionalLight position={[3, 4, 5]} intensity={isDark ? 0.35 : 1.2} />
+    <directionalLight position={[-2, 2, 3]} intensity={isDark ? 0.2 : 0.5} />
+    <Environment preset="city" environmentIntensity={0.25} />
 
-          <ContactShadows
-            position={[0, -0.48, 0]}
-            opacity={0.25}
-            scale={5}
-            blur={2.5}
-            far={1.5}
-          />
+    <Suspense fallback={null}>
+      <group position={[0, 0.08, 0.08]} scale={0.8}>
+        <Model
+          glbUrl={glbUrl}
+          outlineColor={outlineColor}
+          backboardColor={backboardColor}
+          name={name}
+          number={number}
+          nameColor={nameColor}
+          numberColor={numberColor}
+          neonOn={neonOn}
+          isDark={isDark}
+          textureVariant={textureVariant}
+        />
+        {onSnapshotReady && <SnapshotController onReady={onSnapshotReady} />}
+      </group>
 
-          
+      <ContactShadows
+        position={[0, -0.48, 0]}
+        opacity={0.22}
+        scale={5}
+        blur={1.8}
+        far={1.5}
+        resolution={256}
+        frames={1}
+      />
 
-       <EffectComposer multisampling={4}>
-  <Bloom
-    kernelSize={KernelSize.VERY_SMALL}
-    luminanceThreshold={1.05}
-    intensity={0.28}
-    levels={2}
-    // mipmapBlur
-  />
-</EffectComposer>
-          
-        </Suspense>
-      </Canvas>
+      <EffectComposer multisampling={0} enableNormalPass={false}>
+        <Bloom
+          mipmapBlur
+          luminanceThreshold={1.05}
+          intensity={0.32}
+          levels={4}
+          radius={0.35}
+        />
+      </EffectComposer>
+    </Suspense>
+  </Canvas>
     </div>
   );
 };
 
-export default Experience;
+export default memo(Experience);

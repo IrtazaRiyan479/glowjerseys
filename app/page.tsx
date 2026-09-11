@@ -2,13 +2,21 @@
 
 import Experience from '@/components/3d/Experience/Experience';
 import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
 import type { JerseySelectedOptions } from '@/data';
 
 const sizeOptionData = [{ value: 16, unit: 'in' }, { value: 20, unit: 'in' }, { value: 24, unit: 'in' }];
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
+
+const SPORT_MODELS: Record<string, string> = {
+  Baseball: '/3d/models/BaseBall.glb',
+  Basketball: '/3d/models/Basketball.glb',
+  Football: '/3d/models/Football.glb',
+  Soccer: '/3d/models/BlueSoccer.glb',
+  Hockey: '/3d/models/Hockey.glb',
+};
 
 const Page = () => {
   const [sizeOptionValue, setSizeOptionValue] = useState(20);
@@ -24,21 +32,18 @@ const Page = () => {
   const [neonOn, setNeonOn] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
-  const SPORT_MODELS: Record<string, string> = {
-  Baseball: '/3d/models/BaseBall.glb',
-  Basketball: '/3d/models/Basketball.glb',
-  Football: '/3d/models/Football.glb',
-  Soccer: '/3d/models/BlueSoccer.glb',
-  Hockey: '/3d/models/Hockey.glb',
-};
 
 const addItem = useCartStore((s) => s.addItem);
 const snapshotRef = useRef<(() => Promise<string | null>) | null>(null);
-const addingRef = useRef(false);
+const [addingToCart, setAddingToCart] = useState(false);
+
+const onSnapshotReady = useCallback((fn: () => Promise<string | null>) => {
+  snapshotRef.current = fn;
+}, []);
 
 const handleAddToCart = async () => {
-  if (addingRef.current) return;
-  addingRef.current = true;
+  if (addingToCart) return;
+  setAddingToCart(true);
   try {
     let previewImageUrl: string | undefined;
 
@@ -65,9 +70,7 @@ const handleAddToCart = async () => {
 
     addItem(selectedOptions, quantity);
   } finally {
-    setTimeout(() => {
-      addingRef.current = false;
-    }, 800);
+    setAddingToCart(false);
   }
 };
 
@@ -88,9 +91,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
         isDark={isDark}
         neonOn={neonOn}
         setNeonOn={setNeonOn}
-        onSnapshotReady={(fn) => {
-          snapshotRef.current = fn;
-        }}
+        onSnapshotReady={onSnapshotReady}
       />
     </div>
 
@@ -125,6 +126,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
           quantity={quantity}
           setQuantity={setQuantity}
           onAddToCart={handleAddToCart}
+          addingToCart={addingToCart}
         />
       </div>
     </div>

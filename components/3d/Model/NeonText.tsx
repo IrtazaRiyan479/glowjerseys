@@ -17,8 +17,8 @@ import {
  * DEBUG SWITCHES
  * ═══════════════════════════════════════════════════════════════════════════ */
 const DEBUG = {
-  orbit: true,
-  panel: true,
+  orbit: false,
+  panel: false,
   pivot: false,
 };
 
@@ -59,8 +59,8 @@ const DEFAULTS = {
   nameBevelSize: 0.0042,
   numberBevelThickness: 0.013,
   numberBevelSize: 0.0050,
-  bevelSegments: 8,
-  curveSegments: 24,
+  bevelSegments: 4,
+  curveSegments: 12,
 
   /* ── basketball name arc (constant radius + constant gap) */
   curveRadius: 0.98,
@@ -86,7 +86,7 @@ const DEFAULTS = {
   intensity: 9.2,
   softIntensity: 5.2,
   offIntensity: 0.28,
-  coreWhite: 0.42,
+  coreWhite: 0.18,
   fresnelPow: 2.4,
   rimBoost: 1.15,
   physicalEmissive: 0.32,
@@ -173,8 +173,10 @@ const fragmentShader = `
     float ndv = abs(dot(n, v));
     float fresnel = pow(1.0 - clamp(ndv, 0.0, 1.0), uFresnelPow);
 
-    // Hot filament core + coloured neon rim (drives Bloom in Experience)
-    vec3 hot = mix(uColor, vec3(1.0), uCore);
+    float peak = max(max(uColor.r, uColor.g), uColor.b);
+    vec3 sameHueHot = uColor / max(peak, 0.001);
+    vec3 hot = mix(uColor, sameHueHot, uCore);
+
     vec3 col = hot * uIntensity + uColor * fresnel * uRim * uIntensity;
     gl_FragColor = vec4(col, 1.0);
   }
@@ -544,13 +546,14 @@ export default function NeonText({
   }, [color, isSoft, t.physicalEmissive]);
 
   useFrame(() => {
-    if (!neonMaterial.uniforms) return;
-    neonMaterial.uniforms.uColor.value.set(color);
-    neonMaterial.uniforms.uIntensity.value = activeIntensity;
-    neonMaterial.uniforms.uCore.value = t.coreWhite;
-    neonMaterial.uniforms.uFresnelPow.value = t.fresnelPow;
-    neonMaterial.uniforms.uRim.value = t.rimBoost;
-  });
+  const u = neonMaterial.uniforms;
+  if (!u) return;
+  if (u.uIntensity.value !== activeIntensity) u.uIntensity.value = activeIntensity;
+  if (u.uCore.value !== t.coreWhite) u.uCore.value = t.coreWhite;
+  if (u.uFresnelPow.value !== t.fresnelPow) u.uFresnelPow.value = t.fresnelPow;
+  if (u.uRim.value !== t.rimBoost) u.uRim.value = t.rimBoost;
+  neonMaterial.uniforms.uColor.value.set(color);
+});
 
   const mat = neonOn ? neonMaterial : physicalMaterial;
 

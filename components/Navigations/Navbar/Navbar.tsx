@@ -20,6 +20,8 @@ const NAV = [
   { label: 'Athletes', href: 'https://glowjerseys.com/pages/athletes' },
 ];
 
+const extractedCSS = 'width: 3.677rem; height: 1.688rem; background: linear-gradient(to top, rgb(2, 2, 2) 0px, rgb(2, 2, 2) 0px) no-repeat scroll 0% 100% / 100% 1px, rgba(0, 0, 0, 0) linear-gradient(to top, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 0px) no-repeat scroll 0% 100% / 100% 0.063rem; olor: rgba(14, 15, 17, 0.7);font-size: 0.94rem;font-family: Bayon, sans-serif;line-height: 1.688rem;transition: background-size 0.25s;background-image: linear-gradient(to top, rgb(2, 2, 2) 0px, rgb(2, 2, 2) 0px), linear-gradient(to top, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 0px);'
+
 function IconClose() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
@@ -131,8 +133,8 @@ const closeSearch = () => setSearchOpen(false);
     const isCustom = item.label === 'Custom';
 const isJerseys = Boolean(item.children);
 const dimOthers = megaOpen && !isJerseys;
-
-const className = `${linkBase} ${dimOthers ? 'text-black/40' : 'text-black/90'} ${
+const style = "font-family: Bayon, sans-serif;"
+const className = `${linkBase} ${extractedCSS} ${dimOthers ? 'text-black/40' : 'text-black/90'} ${
   isCustom && !megaOpen ? linkActive : ''
 } ${isJerseys && megaOpen ? linkActive : ''}`;
 
