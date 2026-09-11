@@ -2,9 +2,198 @@
 
 import { useGLTF } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 import * as THREE from 'three';
 import NeonText from './NeonText';
+
+const MODEL_DEBUG = { panel: false };
+
+const MODEL_DEFAULTS = {
+  groupX: 0, groupY: -0.05, groupZ: 0, groupScale: 1.15,
+  nameX: 0, nameY: 0.09, nameZ: 0.02,
+  numX: 0, numY: -0.13, numZ: 0.02,
+
+  wallRepeatX: 3, wallRepeatY: 2, wallNormal: 0.12,
+  wallRough1: 0.85, wallRough2: 0.65,
+  wallMetal1: 0.05, wallMetal2: 0.08,
+
+  neonIntensitySoft: 1.15,
+  neonIntensityHard: 2.4,
+  neonOffEmissive: 0.35,
+
+  glassOpacity: 0.08, glassRough: 0.35,
+  acrylicOpacity: 0.12, acrylicRough: 0.25,
+
+  bounceTopY: 0.12, bounceBotY: -0.08, bounceZ: -0.05,
+  bounceNameY: 0.09, bounceNumberY: -0.13, bounceTextZ: -0.06,
+
+  w1OutlineGlow: 1, w1OutlineReach: 0.65,
+  w1NameGlow: 0.12, w1NameReach: 0.28,
+  w1NumberGlow: 0.1, w1NumberReach: 0.26,
+  w1Multiply: 1.8, w1Falloff: 2,
+
+  w2OutlineGlow: 1, w2OutlineReach: 1.43,
+  w2NameGlow: 0.12, w2NameReach: 0.62,
+  w2NumberGlow: 0.1, w2NumberReach: 0.57,
+  w2Multiply: 5.2, w2Falloff: 1,
+};
+
+type ModelTweakState = typeof MODEL_DEFAULTS;
+let modelTweaks: ModelTweakState = { ...MODEL_DEFAULTS };
+const modelListeners = new Set<(s: ModelTweakState) => void>();
+
+function patchModelTweaks(partial: Partial<ModelTweakState>) {
+  modelTweaks = { ...modelTweaks, ...partial };
+  modelListeners.forEach((fn) => fn(modelTweaks));
+}
+
+function useModelTweaks(): ModelTweakState {
+  const [s, set] = useState(modelTweaks);
+  useEffect(() => {
+    modelListeners.add(set);
+    return () => { modelListeners.delete(set); };
+  }, []);
+  return s;
+}
+
+function serializeModelDefaults(t: ModelTweakState): string {
+  const kv = (k: keyof ModelTweakState) =>
+    `${k}: ${typeof t[k] === 'number' ? parseFloat((t[k] as number).toFixed(6)) : JSON.stringify(t[k])}`;
+  return `const MODEL_DEFAULTS = {\n  ${Object.keys(MODEL_DEFAULTS).map((k) => kv(k as keyof ModelTweakState)).join(',\n  ')}\n};`;
+}
+
+const SOFT_OUTLINE = [
+  '#FFE800', '#FBECCB', '#ffffff', '#ffff00', '#fff700',
+  '#ffee00', '#f5e6a3', '#f0e68c', '#fffacd', '#fff8dc',
+];
+
+function ModelDebugPanel() {
+  const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.getElementById('model-debug-panel')?.remove();
+    const host = document.createElement('div');
+    host.id = 'model-debug-panel';
+    document.body.appendChild(host);
+    const root: Root = createRoot(host);
+
+    const slider = (
+      label: string,
+      key: keyof ModelTweakState,
+      min: number,
+      max: number,
+      step: number,
+      values: ModelTweakState,
+    ) => (
+      <label key={key} style={{ display: 'grid', gridTemplateColumns: '1fr 58px', gap: 6, alignItems: 'center', fontSize: 11, marginBottom: 4, color: '#d8d8d8' }}>
+        <span>
+          {label}
+          <input type="range" min={min} max={max} step={step} value={values[key] as number}
+            onChange={(e) => patchModelTweaks({ [key]: parseFloat(e.target.value) })}
+            style={{ width: '100%', display: 'block' }} />
+        </span>
+        <input type="number" step={step} value={Number(values[key])}
+          onChange={(e) => patchModelTweaks({ [key]: parseFloat(e.target.value) })}
+          style={{ width: 58, fontSize: 11, background: '#111', color: '#fff', border: '1px solid #333', borderRadius: 4, padding: '2px 4px' }} />
+      </label>
+    );
+
+    const renderPanel = (values: ModelTweakState, openVal: boolean) => {
+      root.render(
+        <div style={{ position: 'fixed', top: 48, right: 8, zIndex: 99999, width: 260, maxHeight: '92vh', overflow: 'auto', background: 'rgba(12,12,14,0.92)', color: '#fff', border: '1px solid #333', borderRadius: 10, padding: 10, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', boxShadow: '0 8px 32px rgba(0,0,0,0.45)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700 }}>MODEL TWEAKS</span>
+            <button type="button" onClick={() => setOpen((v) => !v)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}>{openVal ? 'hide' : 'show'}</button>
+          </div>
+          {openVal && (
+            <>
+              <details open style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Group</summary>
+                {slider('group X', 'groupX', -1, 1, 0.001, values)}
+                {slider('group Y', 'groupY', -1, 1, 0.001, values)}
+                {slider('group Z', 'groupZ', -1, 1, 0.001, values)}
+                {slider('group scale', 'groupScale', 0.4, 2.5, 0.01, values)}
+              </details>
+              <details open style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Name / Number origin</summary>
+                {slider('name X', 'nameX', -0.5, 0.5, 0.001, values)}
+                {slider('name Y', 'nameY', -0.5, 0.5, 0.001, values)}
+                {slider('name Z', 'nameZ', -0.2, 0.2, 0.001, values)}
+                {slider('number X', 'numX', -0.5, 0.5, 0.001, values)}
+                {slider('number Y', 'numY', -0.5, 0.5, 0.001, values)}
+                {slider('number Z', 'numZ', -0.2, 0.2, 0.001, values)}
+              </details>
+              <details style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Wall</summary>
+                {slider('repeat X', 'wallRepeatX', 1, 8, 0.1, values)}
+                {slider('repeat Y', 'wallRepeatY', 1, 8, 0.1, values)}
+                {slider('normal', 'wallNormal', 0, 1, 0.01, values)}
+                {slider('rough tex1', 'wallRough1', 0, 1, 0.01, values)}
+                {slider('rough tex2', 'wallRough2', 0, 1, 0.01, values)}
+                {slider('metal tex1', 'wallMetal1', 0, 1, 0.01, values)}
+                {slider('metal tex2', 'wallMetal2', 0, 1, 0.01, values)}
+              </details>
+              <details open style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Neon / glass</summary>
+                {slider('neon soft', 'neonIntensitySoft', 0, 6, 0.05, values)}
+                {slider('neon hard', 'neonIntensityHard', 0, 8, 0.05, values)}
+                {slider('off emissive', 'neonOffEmissive', 0, 2, 0.01, values)}
+                {slider('glass opacity', 'glassOpacity', 0, 0.4, 0.005, values)}
+                {slider('glass rough', 'glassRough', 0, 1, 0.01, values)}
+                {slider('acrylic opacity', 'acrylicOpacity', 0, 0.5, 0.005, values)}
+                {slider('acrylic rough', 'acrylicRough', 0, 1, 0.01, values)}
+              </details>
+              <details open style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Light positions</summary>
+                {slider('Outline top Y', 'bounceTopY', -0.4, 0.4, 0.001, values)}
+                {slider('Outline bottom Y', 'bounceBotY', -0.4, 0.4, 0.001, values)}
+                {slider('Outline Z', 'bounceZ', -0.3, 0.1, 0.001, values)}
+                {slider('Name light Y', 'bounceNameY', -0.4, 0.4, 0.001, values)}
+                {slider('Number light Y', 'bounceNumberY', -0.4, 0.4, 0.001, values)}
+                {slider('Name/Number Z', 'bounceTextZ', -0.3, 0.1, 0.001, values)}
+              </details>
+              <details open style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Brick 1 bounce</summary>
+                {slider('Outline glow', 'w1OutlineGlow', 0, 6, 0.05, values)}
+                {slider('Outline reach', 'w1OutlineReach', 0.05, 3, 0.01, values)}
+                {slider('Name glow', 'w1NameGlow', 0, 2, 0.01, values)}
+                {slider('Name reach', 'w1NameReach', 0.05, 2, 0.01, values)}
+                {slider('Number glow', 'w1NumberGlow', 0, 2, 0.01, values)}
+                {slider('Number reach', 'w1NumberReach', 0.05, 2, 0.01, values)}
+                {slider('Wall multiply', 'w1Multiply', 0, 10, 0.1, values)}
+                {slider('Light falloff', 'w1Falloff', 0.5, 3, 0.1, values)}
+              </details>
+              <details open style={{ marginBottom: 8 }}>
+                <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Brick 2 bounce</summary>
+                {slider('Outline glow', 'w2OutlineGlow', 0, 6, 0.05, values)}
+                {slider('Outline reach', 'w2OutlineReach', 0.05, 3, 0.01, values)}
+                {slider('Name glow', 'w2NameGlow', 0, 2, 0.01, values)}
+                {slider('Name reach', 'w2NameReach', 0.05, 2, 0.01, values)}
+                {slider('Number glow', 'w2NumberGlow', 0, 2, 0.01, values)}
+                {slider('Number reach', 'w2NumberReach', 0.05, 2, 0.01, values)}
+                {slider('Wall multiply', 'w2Multiply', 0, 10, 0.1, values)}
+                {slider('Light falloff', 'w2Falloff', 0.5, 3, 0.1, values)}
+              </details>
+              <button type="button" onClick={() => { const src = serializeModelDefaults(modelTweaks); console.log('[MODEL_DEFAULTS]\n', src); navigator.clipboard?.writeText(src); }}
+                style={{ width: '100%', marginTop: 8, padding: '6px 8px', background: '#0b45ff', color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                COPY MODEL TWEAKS
+              </button>
+            </>
+          )}
+        </div>,
+      );
+    };
+
+    renderPanel(modelTweaks, open);
+    const unsub = (s: ModelTweakState) => renderPanel(s, open);
+    modelListeners.add(unsub);
+    return () => { modelListeners.delete(unsub); root.unmount(); host.remove(); };
+  }, [open]);
+
+  return null;
+}
 
 interface ModelProps {
   glbUrl: string;
@@ -31,6 +220,7 @@ const Model = ({
   isDark = true,
   textureVariant = 1, 
 }: ModelProps) => {
+  const t = useModelTweaks();
  const { scene } = useGLTF(glbUrl);
   const clonedScene = useMemo(() => scene.clone(true), [scene, glbUrl]);
 
@@ -84,17 +274,23 @@ const fragmentShader = `
   useEffect(() => {
     [c1, n1, c2, n2].forEach((tex) => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-     tex.repeat.set(3, 2);   
+     tex.repeat.set(t.wallRepeatX, t.wallRepeatY);   
 tex.anisotropy = 2;     
 tex.generateMipmaps = true;
 tex.minFilter = THREE.LinearMipmapLinearFilter;
+tex.needsUpdate = true;
     });
     c1.colorSpace = c2.colorSpace = THREE.SRGBColorSpace;
     n1.colorSpace = n2.colorSpace = THREE.LinearSRGBColorSpace;
-  }, [c1, n1, c2, n2]);
+  }, [c1, n1, c2, n2, t.wallRepeatX, t.wallRepeatY]);
   
   const activeColorMap = textureVariant === 1 ? c1 : c2;
   const activeNormalMap = textureVariant === 1 ? n1 : n2;
+
+  const isSoftOutline = SOFT_OUTLINE.some(
+    (c) => c.toLowerCase() === outlineColor.toLowerCase()
+  );
+  const neonIntensity = isSoftOutline ? t.neonIntensitySoft : t.neonIntensityHard;
 
  useEffect(() => {
     clonedScene.traverse((child) => {
@@ -109,9 +305,9 @@ tex.minFilter = THREE.LinearMipmapLinearFilter;
   child.material = new THREE.MeshStandardMaterial({
     map: activeColorMap,
     normalMap: activeNormalMap,
-    normalScale: new THREE.Vector2(0.12, 0.12),
-    roughness: isTex2 ? 0.65 : 0.85,
-    metalness: isTex2 ? 0.08 : 0.05,
+    normalScale: new THREE.Vector2(t.wallNormal, t.wallNormal),
+    roughness: isTex2 ? t.wallRough2 : t.wallRough1,
+    metalness: isTex2 ? t.wallMetal2 : t.wallMetal1,
     color: isTex2
       ? (isDark ? '#c8c8c8' : '#ffffff')
       : (isDark ? '#888888' : '#ffffff'),
@@ -133,7 +329,7 @@ else if (nameLower.includes('neon')) {
     child.material = new THREE.MeshPhysicalMaterial({
       color: outlineColor,
       emissive: new THREE.Color(outlineColor),
-      emissiveIntensity: 0.35, 
+      emissiveIntensity: t.neonOffEmissive, 
       roughness: 0.25,
       metalness: 0.1,
       clearcoat: 1.0,         
@@ -141,15 +337,6 @@ else if (nameLower.includes('neon')) {
       transparent: false,
     });
   } else {
-    const softColors = [
-      '#FFE800', '#FBECCB', '#ffffff', '#ffff00', '#fff700',
-      '#ffee00', '#f5e6a3', '#f0e68c', '#fffacd', '#fff8dc'
-    ];
-    const isSoft = softColors.some(
-  (c) => c.toLowerCase() === outlineColor.toLowerCase()
-);
-const intensity = isSoft ? 1.15 : 2.4;
-
     if (!neonMaterialRef.current) {
             neonMaterialRef.current = new THREE.ShaderMaterial({
         vertexShader,
@@ -158,7 +345,7 @@ const intensity = isSoft ? 1.15 : 2.4;
           uTime: { value: 0 },
           uColor1: { value: new THREE.Color(outlineColor) },
           uColor2: { value: new THREE.Color(outlineColor) },
-          uIntensity: { value: intensity },
+          uIntensity: { value: neonIntensity },
           uMouseWorld: { value: new THREE.Vector3(999, 999, 999) },
         },
         transparent: false,
@@ -170,7 +357,7 @@ const intensity = isSoft ? 1.15 : 2.4;
     } else {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
       neonMaterialRef.current.uniforms.uColor2.value.set(outlineColor);
-      neonMaterialRef.current.uniforms.uIntensity.value = intensity;
+      neonMaterialRef.current.uniforms.uIntensity.value = neonIntensity;
     }
     
     child.material = neonMaterialRef.current;
@@ -207,10 +394,10 @@ const intensity = isSoft ? 1.15 : 2.4;
           child.material = new THREE.MeshPhysicalMaterial({
             color: '#e8eef5',
             metalness: 0,
-            roughness: 0.35,
+            roughness: t.glassRough,
             transmission: 0,
             transparent: true,
-            opacity: 0.08,
+            opacity: t.glassOpacity,
             depthWrite: false,
             side: THREE.FrontSide,
             envMapIntensity: 0,
@@ -236,7 +423,7 @@ const intensity = isSoft ? 1.15 : 2.4;
         const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
           color: '#e8eef5',
           metalness: 0.0,
-          roughness: 0.25,
+          roughness: t.acrylicRough,
           transmission: 0,
           ior: 1.5,
           thickness: 0,
@@ -244,7 +431,7 @@ const intensity = isSoft ? 1.15 : 2.4;
           clearcoatRoughness: 1,
           envMapIntensity: 0,
           transparent: true,
-          opacity: 0.12,
+          opacity: t.acrylicOpacity,
           side: THREE.FrontSide,
           depthWrite: false,
           specularIntensity: 0,
@@ -275,22 +462,38 @@ const intensity = isSoft ? 1.15 : 2.4;
         child.material.needsUpdate = true;
       }
     });
-  }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap, textureVariant]);
+  }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap, textureVariant, t, neonIntensity, vertexShader, fragmentShader]);
+
+  useEffect(() => {
+    const mat = neonMaterialRef.current;
+    if (!mat?.uniforms) return;
+    mat.uniforms.uIntensity.value = neonIntensity;
+    mat.uniforms.uColor1.value.set(outlineColor);
+    mat.uniforms.uColor2.value.set(outlineColor);
+  }, [neonIntensity, outlineColor]);
 
 const isTex2 = textureVariant === 2;
-const wallMul = isTex2 ? 5.2 : 1.8;
+const mul = isTex2 ? t.w2Multiply : t.w1Multiply;
+const decay = isTex2 ? t.w2Falloff : t.w1Falloff;
+const outlineGlow = isTex2 ? t.w2OutlineGlow : t.w1OutlineGlow;
+const outlineReach = isTex2 ? t.w2OutlineReach : t.w1OutlineReach;
+const nameGlow = isTex2 ? t.w2NameGlow : t.w1NameGlow;
+const nameReach = isTex2 ? t.w2NameReach : t.w1NameReach;
+const numberGlow = isTex2 ? t.w2NumberGlow : t.w1NumberGlow;
+const numberReach = isTex2 ? t.w2NumberReach : t.w1NumberReach;
 
 const bounceLights = neonOn
   ? [
-      { pos: [0, 0.12, -0.05] as const, color: outlineColor, intensity: 1 * wallMul, distance: 0.65 },
-      { pos: [0, -0.08, -0.05] as const, color: outlineColor, intensity: 1 * wallMul, distance: 0.65 },
-      { pos: [0, 0.09, -0.06] as const, color: nameColor, intensity: 0.12 * wallMul, distance: 0.28 },
-      { pos: [0, -0.13, -0.06] as const, color: numberColor, intensity: 0.10 * wallMul, distance: 0.26 },
+      { pos: [0, t.bounceTopY, t.bounceZ] as const, color: outlineColor, intensity: outlineGlow * mul, distance: outlineReach },
+      { pos: [0, t.bounceBotY, t.bounceZ] as const, color: outlineColor, intensity: outlineGlow * mul, distance: outlineReach },
+      { pos: [0, t.bounceNameY, t.bounceTextZ] as const, color: nameColor, intensity: nameGlow * mul, distance: nameReach },
+      { pos: [0, t.bounceNumberY, t.bounceTextZ] as const, color: numberColor, intensity: numberGlow * mul, distance: numberReach },
     ]
   : [];
 
 return (
-  <group position={[0, -0.05, 0]} scale={1.15}>
+  <group position={[t.groupX, t.groupY, t.groupZ]} scale={t.groupScale}>
+    {MODEL_DEBUG.panel && <ModelDebugPanel />}
     <primitive object={clonedScene} />
 
     {neonOn &&
@@ -301,7 +504,7 @@ return (
           color={l.color}
           intensity={l.intensity}
           distance={l.distance}
-          decay={2}
+          decay={decay}
           castShadow={false}
         />
       ))}
@@ -310,7 +513,7 @@ return (
         <NeonText
           text={name}
           color={nameColor}
-          position={[0, 0.09, 0.02]}
+          position={[t.nameX, t.nameY, t.nameZ]}
           scale={1}
           curve={true}
           neonOn={neonOn}
@@ -322,7 +525,7 @@ return (
         <NeonText
           text={number}
           color={numberColor}
-          position={[0, -0.13, 0.02]}
+          position={[t.numX, t.numY, t.numZ]}
           scale={1}
           isNumber={true}
           curve={false}

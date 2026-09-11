@@ -31,55 +31,62 @@ const DEFAULTS = {
   fontPathNumber: '/fonts/Mayfair.json',
 
   /* ── name size ── */
-  nameSizeShort: 0.152, // 1–5
-  nameSizeMid: 0.132, // 6–8
-  nameSizeLong: 0.112, // 9–11
-  nameSizeXLong: 0.094, // 12+
-  bbNameSizeShort: 0.128,
-  bbNameSizeMid: 0.112,
-  bbNameSizeLong: 0.096,
-  bbNameSizeXLong: 0.082,
+  nameSizeShort: 0.152,
+  nameSizeMid: 0.132,
+  nameSizeLong: 0.112,
+  nameSizeXLong: 0.094,
+  bbNameSizeShort: 0.053,
+  bbNameSizeMid: 0.046,
+  bbNameSizeLong: 0.04,
+  bbNameSizeXLong: 0.031,
 
   /* ── number size ─── */
   numberSize1: 0.268,
   numberSize2: 0.248,
-  numberSize3: 0.210,
-  bbNumberSize1: 0.228,
-  bbNumberSize2: 0.208,
-  bbNumberSize3: 0.176,
+  numberSize3: 0.21,
+  numberSize4: 0.18,
+  bbNumberSize1: 0.185,
+  bbNumberSize2: 0.175,
+  bbNumberSize3: 0.108,
+  bbNumberSize4: 0.09,
 
   /* ── constant gap  */
-  nameLetterSpacing: 0.018,
-  numberLetterSpacing: 0.028,
+  nameLetterSpacing: 0,
+  numberLetterSpacing: 0,
 
   /* ── extrusion / tube profile ─── */
   nameExtrusion: 0.036,
-  numberExtrusion: 0.040,
+  numberExtrusion: 0.04,
   nameBevelThickness: 0.011,
   nameBevelSize: 0.0042,
   numberBevelThickness: 0.013,
-  numberBevelSize: 0.0050,
+  numberBevelSize: 0.005,
   bevelSegments: 4,
   curveSegments: 12,
 
   /* ── basketball name arc */
-  curveRadiusShort: 0.98, curveSagShort: 1.0, curveTiltShort: 1.0, curveXShort: 0, curveYShort: 0.012, curveZShort: 0,
-  curveRadiusMid: 1.10, curveSagMid: 1.0, curveTiltMid: 1.0, curveXMid: 0, curveYMid: 0.012, curveZMid: 0,
-  curveRadiusLong: 1.25, curveSagLong: 1.0, curveTiltLong: 1.0, curveXLong: 0, curveYLong: 0.012, curveZLong: 0,
-  curveRadiusXLong: 1.40, curveSagXLong: 1.0, curveTiltXLong: 1.0, curveXXLong: 0, curveYXLong: 0.012, curveZXLong: 0,
-  maxNameWidthBB: 0.74,
+  curveRadiusShort: 0.17, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.003, curveYShort: -0.001, curveZShort: -0.002,
+  curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: 0.017, curveZMid: 0,
+  curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: 0.025, curveZLong: 0,
+  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.004, curveYXLong: 0.035, curveZXLong: 0.001,
+  maxNameWidthBB: 0.7,
   maxNameWidthOther: 0.82,
   fitToWidth: true,
 
-  /* ── Position / Scale (dynamic) ── */
-  nameXShort: 0, nameYShort: 0, nameZShort: 0, nameScaleShort: 1,
-  nameXMid: 0, nameYMid: 0, nameZMid: 0, nameScaleMid: 1,
-  nameXLong: 0, nameYLong: 0, nameZLong: 0, nameScaleLong: 1,
-  nameXXLong: 0, nameYXLong: 0, nameZXLong: 0, nameScaleXLong: 1,
+  /* ── Position offsets ── */
+  nameXShort: 0, nameYShort: 0, nameZShort: 0,
+  nameXMid: 0, nameYMid: 0, nameZMid: 0,
+  nameXLong: 0, nameYLong: 0, nameZLong: 0,
+  nameXXLong: 0, nameYXLong: 0, nameZXLong: 0,
 
-  numX1: 0, numY1: 0, numZ1: 0, numScale1: 1,
-  numX2: 0, numY2: 0, numZ2: 0, numScale2: 1,
-  numX3: 0, numY3: 0, numZ3: 0, numScale3: 1,
+  numX1: 0, numY1: 0, numZ1: 0,
+  numX2: -0.049, numY2: 0, numZ2: 0,
+  numX3: 0, numY3: 0, numZ3: 0,
+  numX4: 0, numY4: 0, numZ4: 0,
+  bbNumX1: 0.013, bbNumY1: 0.018, bbNumZ1: 0,
+  bbNumX2: -0.054, bbNumY2: 0.003, bbNumZ2: 0,
+  bbNumX3: -0.07, bbNumY3: 0.059, bbNumZ3: 0,
+  bbNumX4: 0, bbNumY4: 0, bbNumZ4: 0,
 
   /* ── glow ─── */
   intensity: 9.2,
@@ -103,17 +110,34 @@ function curveParamsForName(len: number, t: TweakState) {
   return { radius: t.curveRadiusXLong, sag: t.curveSagXLong, tilt: t.curveTiltXLong, cx: t.curveXXLong, cy: t.curveYXLong, cz: t.curveZXLong };
 }
 
-function offsetParamsForName(len: number, t: TweakState) {
-  if (len <= 5) return { ox: t.nameXShort, oy: t.nameYShort, oz: t.nameZShort, scale: t.nameScaleShort };
-  if (len <= 8) return { ox: t.nameXMid, oy: t.nameYMid, oz: t.nameZMid, scale: t.nameScaleMid };
-  if (len <= 11) return { ox: t.nameXLong, oy: t.nameYLong, oz: t.nameZLong, scale: t.nameScaleLong };
-  return { ox: t.nameXXLong, oy: t.nameYXLong, oz: t.nameZXLong, scale: t.nameScaleXLong };
+function offsetParamsForName(len: number, sport: string, t: TweakState) {
+  if (sport === 'Basketball') return { ox: 0, oy: 0, oz: 0, scale: 1 };
+  if (len <= 5) return { ox: t.nameXShort, oy: t.nameYShort, oz: t.nameZShort, scale: 1 };
+  if (len <= 8) return { ox: t.nameXMid, oy: t.nameYMid, oz: t.nameZMid, scale: 1 };
+  if (len <= 11) return { ox: t.nameXLong, oy: t.nameYLong, oz: t.nameZLong, scale: 1 };
+  return { ox: t.nameXXLong, oy: t.nameYXLong, oz: t.nameZXLong, scale: 1 };
 }
 
-function offsetParamsForNumber(len: number, t: TweakState) {
-  if (len <= 1) return { ox: t.numX1, oy: t.numY1, oz: t.numZ1, scale: t.numScale1 };
-  if (len <= 2) return { ox: t.numX2, oy: t.numY2, oz: t.numZ2, scale: t.numScale2 };
-  return { ox: t.numX3, oy: t.numY3, oz: t.numZ3, scale: t.numScale3 };
+function offsetParamsForNumber(len: number, sport: string, t: TweakState) {
+  const bb = sport === 'Basketball';
+  if (len <= 1) {
+    return bb
+      ? { ox: t.bbNumX1, oy: t.bbNumY1, oz: t.bbNumZ1, scale: 1 }
+      : { ox: t.numX1, oy: t.numY1, oz: t.numZ1, scale: 1 };
+  }
+  if (len <= 2) {
+    return bb
+      ? { ox: t.bbNumX2, oy: t.bbNumY2, oz: t.bbNumZ2, scale: 1 }
+      : { ox: t.numX2, oy: t.numY2, oz: t.numZ2, scale: 1 };
+  }
+  if (len <= 3) {
+    return bb
+      ? { ox: t.bbNumX3, oy: t.bbNumY3, oz: t.bbNumZ3, scale: 1 }
+      : { ox: t.numX3, oy: t.numY3, oz: t.numZ3, scale: 1 };
+  }
+  return bb
+    ? { ox: t.bbNumX4, oy: t.bbNumY4, oz: t.bbNumZ4, scale: 1 }
+    : { ox: t.numX4, oy: t.numY4, oz: t.numZ4, scale: 1 };
 }
 
 type TweakState = typeof DEFAULTS;
@@ -210,7 +234,8 @@ function sizeForNumber(len: number, sport: string, t: TweakState) {
   const bb = sport === 'Basketball';
   if (len <= 1) return bb ? t.bbNumberSize1 : t.numberSize1;
   if (len <= 2) return bb ? t.bbNumberSize2 : t.numberSize2;
-  return bb ? t.bbNumberSize3 : t.numberSize3;
+  if (len <= 3) return bb ? t.bbNumberSize3 : t.numberSize3;
+  return bb ? t.bbNumberSize4 : t.numberSize4;
 }
 
 function glyphAdvance(
@@ -263,9 +288,11 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${kv('numberSize1')},
   ${kv('numberSize2')},
   ${kv('numberSize3')},
+  ${kv('numberSize4')},
   ${kv('bbNumberSize1')},
   ${kv('bbNumberSize2')},
   ${kv('bbNumberSize3')},
+  ${kv('bbNumberSize4')},
 
   /* ── constant gap  */
   ${kv('nameLetterSpacing')},
@@ -290,15 +317,20 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${kv('maxNameWidthOther')},
   ${kv('fitToWidth')},
 
-  /* ── Position / Scale (dynamic) ── */
-  ${row(['nameXShort', 'nameYShort', 'nameZShort', 'nameScaleShort'])},
-  ${row(['nameXMid', 'nameYMid', 'nameZMid', 'nameScaleMid'])},
-  ${row(['nameXLong', 'nameYLong', 'nameZLong', 'nameScaleLong'])},
-  ${row(['nameXXLong', 'nameYXLong', 'nameZXLong', 'nameScaleXLong'])},
+  /* ── Position offsets ── */
+  ${row(['nameXShort', 'nameYShort', 'nameZShort'])},
+  ${row(['nameXMid', 'nameYMid', 'nameZMid'])},
+  ${row(['nameXLong', 'nameYLong', 'nameZLong'])},
+  ${row(['nameXXLong', 'nameYXLong', 'nameZXLong'])},
 
-  ${row(['numX1', 'numY1', 'numZ1', 'numScale1'])},
-  ${row(['numX2', 'numY2', 'numZ2', 'numScale2'])},
-  ${row(['numX3', 'numY3', 'numZ3', 'numScale3'])},
+  ${row(['numX1', 'numY1', 'numZ1'])},
+  ${row(['numX2', 'numY2', 'numZ2'])},
+  ${row(['numX3', 'numY3', 'numZ3'])},
+  ${row(['numX4', 'numY4', 'numZ4'])},
+  ${row(['bbNumX1', 'bbNumY1', 'bbNumZ1'])},
+  ${row(['bbNumX2', 'bbNumY2', 'bbNumZ2'])},
+  ${row(['bbNumX3', 'bbNumY3', 'bbNumZ3'])},
+  ${row(['bbNumX4', 'bbNumY4', 'bbNumZ4'])},
 
   /* ── glow ─── */
   ${kv('intensity')},
@@ -337,6 +369,31 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
     host.id = 'neon-text-debug-panel';
     document.body.appendChild(host);
     const root: Root = createRoot(host);
+
+        const checkbox = (
+      label: string,
+      key: keyof TweakState,
+      values: TweakState,
+    ) => (
+      <label
+        key={key}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 11,
+          marginBottom: 6,
+          color: '#d8d8d8',
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={Boolean(values[key])}
+          onChange={(e) => patchTweaks({ [key]: e.target.checked })}
+        />
+        {label}
+      </label>
+    );
 
     const slider = (
       label: string,
@@ -419,7 +476,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
             }}
           >
             <span style={{ fontSize: 12, letterSpacing: 0.4, fontWeight: 700 }}>
-              3D NEON TWEAKS · {sport}
+              3D NEON TEXT TWEAKS · {sport}
             </span>
             <button
               type="button"
@@ -455,10 +512,12 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
               <Section title="Number size (by length)">
                 {slider('other 1 digit', 'numberSize1', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('other 2 digit', 'numberSize2', 0.06, 0.45, 0.001, values, setOpen, openVal)}
-                {slider('other 3+ digit', 'numberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
+                {slider('other 3 digit', 'numberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
+                {slider('other 4 digit', 'numberSize4', 0.04, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 1 digit', 'bbNumberSize1', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 2 digit', 'bbNumberSize2', 0.06, 0.45, 0.001, values, setOpen, openVal)}
-                {slider('bb 3+ digit', 'bbNumberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
+                {slider('bb 3 digit', 'bbNumberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
+                {slider('bb 4 digit', 'bbNumberSize4', 0.04, 0.45, 0.001, values, setOpen, openVal)}
               </Section>
               <Section title="Constant letter gap">
                 {slider('name spacing', 'nameLetterSpacing', 0, 0.08, 0.001, values, setOpen, openVal)}
@@ -477,7 +536,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
               <Section title="Basketball curve">
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Short (1-5 chars)</summary>
-                  {slider('radius', 'curveRadiusShort', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {slider('radius', 'curveRadiusShort', 0.0, 5.4, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagShort', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltShort', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -486,7 +545,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 </details>
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Mid (6-8 chars)</summary>
-                  {slider('radius', 'curveRadiusMid', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {slider('radius', 'curveRadiusMid', 0.0, 5.4, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagMid', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltMid', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -495,7 +554,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 </details>
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Long (9-11 chars)</summary>
-                  {slider('radius', 'curveRadiusLong', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {slider('radius', 'curveRadiusLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagLong', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltLong', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -504,7 +563,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 </details>
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>XLong (12+ chars)</summary>
-                  {slider('radius', 'curveRadiusXLong', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {slider('radius', 'curveRadiusXLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagXLong', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltXLong', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -513,38 +572,35 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 </details>
                 
                 <div style={{ marginTop: 8 }}>
+                  {checkbox('fit to max width', 'fitToWidth', values)}
                   {slider('max width BB', 'maxNameWidthBB', 0.3, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('max width other', 'maxNameWidthOther', 0.3, 1.4, 0.01, values, setOpen, openVal)}
                 </div>
               </Section>
-              <Section title="Position / scale offsets">
+              <Section title="Position offsets">
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Short (1-5 chars)</summary>
                   {slider('name X', 'nameXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Y', 'nameYShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Z', 'nameZShort', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                  {slider('name scale', 'nameScaleShort', 0.4, 2, 0.01, values, setOpen, openVal)}
                 </details>
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Mid (6-8 chars)</summary>
                   {slider('name X', 'nameXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Y', 'nameYMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Z', 'nameZMid', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                  {slider('name scale', 'nameScaleMid', 0.4, 2, 0.01, values, setOpen, openVal)}
                 </details>
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Long (9-11 chars)</summary>
                   {slider('name X', 'nameXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Y', 'nameYLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Z', 'nameZLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                  {slider('name scale', 'nameScaleLong', 0.4, 2, 0.01, values, setOpen, openVal)}
                 </details>
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name XLong (12+ chars)</summary>
                   {slider('name X', 'nameXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Y', 'nameYXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('name Z', 'nameZXLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                  {slider('name scale', 'nameScaleXLong', 0.4, 2, 0.01, values, setOpen, openVal)}
                 </details>
 
                 <div style={{ marginTop: 12 }}>
@@ -553,25 +609,52 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                     {slider('number X', 'numX1', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                     {slider('number Y', 'numY1', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                     {slider('number Z', 'numZ1', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                    {slider('number scale', 'numScale1', 0.4, 2, 0.01, values, setOpen, openVal)}
                   </details>
                   <details style={{ marginLeft: 8, marginBottom: 6 }}>
                     <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (2 digits)</summary>
                     {slider('number X', 'numX2', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                     {slider('number Y', 'numY2', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                     {slider('number Z', 'numZ2', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                    {slider('number scale', 'numScale2', 0.4, 2, 0.01, values, setOpen, openVal)}
                   </details>
                   <details style={{ marginLeft: 8, marginBottom: 6 }}>
-                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (3+ digits)</summary>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (3 digits)</summary>
                     {slider('number X', 'numX3', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                     {slider('number Y', 'numY3', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                     {slider('number Z', 'numZ3', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                    {slider('number scale', 'numScale3', 0.4, 2, 0.01, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (4 digits)</summary>
+                    {slider('number X', 'numX4', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Y', 'numY4', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Z', 'numZ4', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>BB Number (1 digit)</summary>
+                    {slider('bb number X', 'bbNumX1', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Y', 'bbNumY1', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Z', 'bbNumZ1', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>BB Number (2 digits)</summary>
+                    {slider('bb number X', 'bbNumX2', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Y', 'bbNumY2', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Z', 'bbNumZ2', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>BB Number (3 digits)</summary>
+                    {slider('bb number X', 'bbNumX3', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Y', 'bbNumY3', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Z', 'bbNumZ3', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>BB Number (4 digits)</summary>
+                    {slider('bb number X', 'bbNumX4', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Y', 'bbNumY4', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('bb number Z', 'bbNumZ4', -0.2, 0.2, 0.001, values, setOpen, openVal)}
                   </details>
                 </div>
               </Section>
-              <Section title="Glow">
+              <Section title="Glow (TEXT)">
                 {slider('intensity', 'intensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('soft intensity', 'softIntensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('off intensity', 'offIntensity', 0, 2, 0.01, values, setOpen, openVal)}
@@ -745,7 +828,7 @@ export default function NeonText({
 
   const mat = neonOn ? neonMaterial : physicalMaterial;
 
-  const offsets = isNumber ? offsetParamsForNumber(len, t) : offsetParamsForName(len, t);
+        const offsets = isNumber ? offsetParamsForNumber(len, sport, t) : offsetParamsForName(len, sport, t);
 
   const ox = offsets.ox;
   const oy = offsets.oy;
@@ -765,8 +848,19 @@ export default function NeonText({
     material: mat,
   } as const;
 
-  const renderCurved = () => {
+    const renderCurved = () => {
+    const res = fontData?.resolution || 1000;
     const widths = chars.map((c) => glyphAdvance(fontData, c, size));
+    const xMids = chars.map((c) => {
+      const g =
+        fontData?.glyphs?.[c] ||
+        fontData?.glyphs?.[c.toUpperCase()] ||
+        fontData?.glyphs?.['?'];
+      const xMin = g?.x_min ?? 0;
+      const xMax = g?.x_max ?? (g?.ha ?? 700);
+      return (((xMin + xMax) / 2) / res) * size;
+    });
+
     const centers: number[] = [];
     let cursor = 0;
     for (let i = 0; i < len; i++) {
@@ -774,14 +868,14 @@ export default function NeonText({
       cursor += widths[i] + (i < len - 1 ? extraGap : 0);
     }
     const mid = cursor / 2;
-    
+
     const { radius: rawRadius, sag, tilt, cx, cy, cz } = curveParamsForName(len, t);
     const radius = Math.max(0.15, rawRadius);
 
     return chars.map((ch, i) => {
-      const s = centers[i] - mid;
-      const angle = s / radius;
-      
+      const arc = centers[i] - mid;
+      const angle = arc / radius;
+
       const x = Math.sin(angle) * radius + cx;
       const y = (Math.cos(angle) - 1) * radius * sag + cy;
       const z = cz;
@@ -789,11 +883,11 @@ export default function NeonText({
 
       return (
         <group key={`${ch}-${i}`} position={[x, y, z]} rotation={[0, 0, rotZ]}>
-          <Center>
+          <group position={[-xMids[i], 0, 0]}>
             <Text3D {...common} size={size}>
               {ch}
             </Text3D>
-          </Center>
+          </group>
         </group>
       );
     });
