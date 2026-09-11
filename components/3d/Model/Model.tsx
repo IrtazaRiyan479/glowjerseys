@@ -151,7 +151,7 @@ else if (nameLower.includes('neon')) {
 const intensity = isSoft ? 1.15 : 2.4;
 
     if (!neonMaterialRef.current) {
-      neonMaterialRef.current = new THREE.ShaderMaterial({
+            neonMaterialRef.current = new THREE.ShaderMaterial({
         vertexShader,
         fragmentShader,
         uniforms: {
@@ -159,12 +159,13 @@ const intensity = isSoft ? 1.15 : 2.4;
           uColor1: { value: new THREE.Color(outlineColor) },
           uColor2: { value: new THREE.Color(outlineColor) },
           uIntensity: { value: intensity },
-          uMouseWorld: { value: new THREE.Vector3(999, 999, 999) }, 
+          uMouseWorld: { value: new THREE.Vector3(999, 999, 999) },
         },
         transparent: false,
         toneMapped: false,
         depthWrite: true,
         depthTest: true,
+        side: THREE.FrontSide,
       });
     } else {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
@@ -190,64 +191,89 @@ const intensity = isSoft ? 1.15 : 2.4;
       }
 
     
-else {
-  const isInnerMesh =
-    nameLower.includes('jersey');
+      else if (nameLower.includes('glass')) {
+        const isClear =
+          backboardColor === 'transparent' ||
+          backboardColor === 'Transparent';
 
-  const isClear =
-    backboardColor === 'transparent' ||
-    backboardColor === 'Transparent';
+        if (!isClear) {
+          child.visible = false;
+          child.material = new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity: 0,
+          });
+        } else {
+          child.visible = true;
+          child.material = new THREE.MeshPhysicalMaterial({
+            color: '#e8eef5',
+            metalness: 0,
+            roughness: 0.35,
+            transmission: 0,
+            transparent: true,
+            opacity: 0.08,
+            depthWrite: false,
+            side: THREE.FrontSide,
+            envMapIntensity: 0,
+            clearcoat: 0,
+            reflectivity: 0,
+            specularIntensity: 0,
+          });
+        }
+        child.material.needsUpdate = true;
+      }
 
-  if (!child.geometry.userData.normalsReady) {
-  child.geometry.computeVertexNormals();
-  child.geometry.userData.normalsReady = true;
-}
+      else {
+        const isInnerMesh = nameLower.includes('jersey');
+        const isClear =
+          backboardColor === 'transparent' ||
+          backboardColor === 'Transparent';
 
-  const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
-  color: '#e8eef5',
-  metalness: 0.0,
-  roughness: 0.015,
-  transmission: 0.97,
-  ior: 1.5,
-  thickness: 0.025,
-  attenuationDistance: 0.8,
-  attenuationColor: new THREE.Color('#dce6f0'),
-  clearcoat: 1.0,
-  clearcoatRoughness: 0.008,
-  envMapIntensity: 2.8,
-  transparent: true,
-  opacity: 1.0,
-  side: THREE.DoubleSide,
-  depthWrite: false,
-  alphaToCoverage: true,
-  specularIntensity: 0,
-  reflectivity: 0.5,
-});
+        if (!child.geometry.userData.normalsReady) {
+          child.geometry.computeVertexNormals();
+          child.geometry.userData.normalsReady = true;
+        }
 
-  const solidColorMaterial = new THREE.MeshPhysicalMaterial({
-    color: backboardColor,
-    metalness: 0.0,
-    roughness: 0.05,
-    transmission: 0.0,
-    thickness: 0.0,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.02,
-    envMapIntensity: 2.0,
-    reflectivity: 0.9,
-    transparent: false,
-    opacity: 1.0,
-    side: THREE.DoubleSide,
-  });
+        const clearAcrylicMaterial = new THREE.MeshPhysicalMaterial({
+          color: '#e8eef5',
+          metalness: 0.0,
+          roughness: 0.25,
+          transmission: 0,
+          ior: 1.5,
+          thickness: 0,
+          clearcoat: 0,
+          clearcoatRoughness: 1,
+          envMapIntensity: 0,
+          transparent: true,
+          opacity: 0.12,
+          side: THREE.FrontSide,
+          depthWrite: false,
+          specularIntensity: 0,
+          reflectivity: 0,
+        });
 
-  
-  if (isInnerMesh && !isClear) {
-    child.material = solidColorMaterial;
-  } else {
-    child.material = clearAcrylicMaterial;
-  }
+        const solidColorMaterial = new THREE.MeshPhysicalMaterial({
+          color: backboardColor,
+          metalness: 0.0,
+          roughness: 0.2,
+          transmission: 0.0,
+          thickness: 0.0,
+          clearcoat: 0.15,
+          clearcoatRoughness: 0.45,
+          envMapIntensity: 0.25,
+          reflectivity: 0.06,
+          transparent: false,
+          opacity: 1.0,
+          side: THREE.FrontSide,
+        });
 
-  child.material.needsUpdate = true;
-}
+        if (isInnerMesh && !isClear) {
+          child.material = solidColorMaterial;
+        } else {
+          child.material = clearAcrylicMaterial;
+        }
+
+        child.material.needsUpdate = true;
+      }
     });
   }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap, textureVariant]);
 

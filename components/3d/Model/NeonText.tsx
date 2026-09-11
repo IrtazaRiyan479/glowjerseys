@@ -13,24 +13,24 @@ import {
 } from '@react-three/drei';
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * DEBUG SWITCHES
- * ═══════════════════════════════════════════════════════════════════════════ */
+/* ===========================================================================
+ - DEBUG SWITCHES
+ - =========================================================================== */
 const DEBUG = {
   orbit: false,
   panel: false,
   pivot: false,
 };
 
-/* ═══════════════════════════════════════════════════════════════════════════
- * DEFAULTS  —  live panel writes on top of these
- * ═══════════════════════════════════════════════════════════════════════════ */
+/* ===========================================================================
+ - DEFAULTS 
+ - =========================================================================== */
 const DEFAULTS = {
-  /* ── font ─────────────────────────────────────────────── */
+  /* ── font ─── */
   fontPathName: '/fonts/Avante.json',
   fontPathNumber: '/fonts/Mayfair.json',
 
-  /* ── name size (world units). Length only changes SIZE, never gap. */
+  /* ── name size ── */
   nameSizeShort: 0.152, // 1–5
   nameSizeMid: 0.132, // 6–8
   nameSizeLong: 0.112, // 9–11
@@ -40,7 +40,7 @@ const DEFAULTS = {
   bbNameSizeLong: 0.096,
   bbNameSizeXLong: 0.082,
 
-  /* ── number size ──────────────────────────────────────── */
+  /* ── number size ─── */
   numberSize1: 0.268,
   numberSize2: 0.248,
   numberSize3: 0.210,
@@ -48,11 +48,11 @@ const DEFAULTS = {
   bbNumberSize2: 0.208,
   bbNumberSize3: 0.176,
 
-  /* ── constant extra gap added after each glyph (NOT length-based) */
+  /* ── constant gap  */
   nameLetterSpacing: 0.018,
   numberLetterSpacing: 0.028,
 
-  /* ── extrusion / tube profile ─────────────────────────── */
+  /* ── extrusion / tube profile ─── */
   nameExtrusion: 0.036,
   numberExtrusion: 0.040,
   nameBevelThickness: 0.011,
@@ -62,44 +62,62 @@ const DEFAULTS = {
   bevelSegments: 4,
   curveSegments: 12,
 
-  /* ── basketball name arc (constant radius + constant gap) */
-  curveRadius: 0.98,
-  curveSag: 0.46, // 1 = true circle (ends drop more); lower = flatter
-  curveTilt: 0.95, // 1 = letters fully tangent to the arc
-  curveY: 0.012,
-  curveZ: 0,
+  /* ── basketball name arc */
+  curveRadiusShort: 0.98, curveSagShort: 1.0, curveTiltShort: 1.0, curveXShort: 0, curveYShort: 0.012, curveZShort: 0,
+  curveRadiusMid: 1.10, curveSagMid: 1.0, curveTiltMid: 1.0, curveXMid: 0, curveYMid: 0.012, curveZMid: 0,
+  curveRadiusLong: 1.25, curveSagLong: 1.0, curveTiltLong: 1.0, curveXLong: 0, curveYLong: 0.012, curveZLong: 0,
+  curveRadiusXLong: 1.40, curveSagXLong: 1.0, curveTiltXLong: 1.0, curveXXLong: 0, curveYXLong: 0.012, curveZXLong: 0,
   maxNameWidthBB: 0.74,
   maxNameWidthOther: 0.82,
   fitToWidth: true,
 
-  /* ── extra offsets on top of the position prop from Model.tsx */
-  nameX: 0,
-  nameY: 0,
-  nameZ: 0,
-  numberX: 0,
-  numberY: 0,
-  numberZ: 0,
-  nameScale: 1,
-  numberScale: 1,
+  /* ── Position / Scale (dynamic) ── */
+  nameXShort: 0, nameYShort: 0, nameZShort: 0, nameScaleShort: 1,
+  nameXMid: 0, nameYMid: 0, nameZMid: 0, nameScaleMid: 1,
+  nameXLong: 0, nameYLong: 0, nameZLong: 0, nameScaleLong: 1,
+  nameXXLong: 0, nameYXLong: 0, nameZXLong: 0, nameScaleXLong: 1,
 
-  /* ── glow ─────────────────────────────────────────────── */
+  numX1: 0, numY1: 0, numZ1: 0, numScale1: 1,
+  numX2: 0, numY2: 0, numZ2: 0, numScale2: 1,
+  numX3: 0, numY3: 0, numZ3: 0, numScale3: 1,
+
+  /* ── glow ─── */
   intensity: 9.2,
   softIntensity: 5.2,
-  offIntensity: 0.28,
-  coreWhite: 0.18,
+  offIntensity: 0,
+  coreWhite: 0,
   fresnelPow: 2.4,
   rimBoost: 1.15,
   physicalEmissive: 0.32,
 
-  /* ── orbit ────────────────────────────────────────────── */
+  /* ── orbit ─── */
   orbitMin: 0.45,
   orbitMax: 6,
   orbitDamping: true,
 };
 
+function curveParamsForName(len: number, t: TweakState) {
+  if (len <= 5) return { radius: t.curveRadiusShort, sag: t.curveSagShort, tilt: t.curveTiltShort, cx: t.curveXShort, cy: t.curveYShort, cz: t.curveZShort };
+  if (len <= 8) return { radius: t.curveRadiusMid, sag: t.curveSagMid, tilt: t.curveTiltMid, cx: t.curveXMid, cy: t.curveYMid, cz: t.curveZMid };
+  if (len <= 11) return { radius: t.curveRadiusLong, sag: t.curveSagLong, tilt: t.curveTiltLong, cx: t.curveXLong, cy: t.curveYLong, cz: t.curveZLong };
+  return { radius: t.curveRadiusXLong, sag: t.curveSagXLong, tilt: t.curveTiltXLong, cx: t.curveXXLong, cy: t.curveYXLong, cz: t.curveZXLong };
+}
+
+function offsetParamsForName(len: number, t: TweakState) {
+  if (len <= 5) return { ox: t.nameXShort, oy: t.nameYShort, oz: t.nameZShort, scale: t.nameScaleShort };
+  if (len <= 8) return { ox: t.nameXMid, oy: t.nameYMid, oz: t.nameZMid, scale: t.nameScaleMid };
+  if (len <= 11) return { ox: t.nameXLong, oy: t.nameYLong, oz: t.nameZLong, scale: t.nameScaleLong };
+  return { ox: t.nameXXLong, oy: t.nameYXLong, oz: t.nameZXLong, scale: t.nameScaleXLong };
+}
+
+function offsetParamsForNumber(len: number, t: TweakState) {
+  if (len <= 1) return { ox: t.numX1, oy: t.numY1, oz: t.numZ1, scale: t.numScale1 };
+  if (len <= 2) return { ox: t.numX2, oy: t.numY2, oz: t.numZ2, scale: t.numScale2 };
+  return { ox: t.numX3, oy: t.numY3, oz: t.numZ3, scale: t.numScale3 };
+}
+
 type TweakState = typeof DEFAULTS;
 
-/* ── tiny store so NAME + NUMBER share the same live values ─────────────── */
 let tweaks: TweakState = { ...DEFAULTS };
 const listeners = new Set<(s: TweakState) => void>();
 
@@ -119,15 +137,13 @@ function useTweaks(): TweakState {
   return s;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
 interface NeonTextProps {
   text: string;
   color?: string;
   position?: [number, number, number];
   scale?: number;
   isNumber?: boolean;
-  curve?: boolean; // ignored — basketball names always curve
+  curve?: boolean;
   neonOn?: boolean;
   sport?: string;
 }
@@ -211,7 +227,104 @@ function glyphAdvance(
   return (ha / res) * size;
 }
 
-/* ── live slider panel (DOM, outside the canvas) ─────────────────────────── */
+function fmtTweak(v: unknown): string {
+  if (typeof v === 'string') return `'${v.replace(/'/g, "\\'")}'`;
+  if (typeof v === 'boolean') return v ? 'true' : 'false';
+  if (typeof v === 'number') {
+    if (Number.isInteger(v)) return String(v);
+    return String(parseFloat(v.toFixed(6)));
+  }
+  return JSON.stringify(v);
+}
+
+function serializeTweaksAsDefaults(t: TweakState): string {
+  const used = new Set<string>();
+  const kv = (k: keyof TweakState) => {
+    used.add(k as string);
+    return `${k}: ${fmtTweak(t[k])}`;
+  };
+  const row = (keys: (keyof TweakState)[]) => keys.map(kv).join(', ');
+
+  const body = `  /* ── font ─── */
+  ${kv('fontPathName')},
+  ${kv('fontPathNumber')},
+
+  /* ── name size ── */
+  ${kv('nameSizeShort')},
+  ${kv('nameSizeMid')},
+  ${kv('nameSizeLong')},
+  ${kv('nameSizeXLong')},
+  ${kv('bbNameSizeShort')},
+  ${kv('bbNameSizeMid')},
+  ${kv('bbNameSizeLong')},
+  ${kv('bbNameSizeXLong')},
+
+  /* ── number size ─── */
+  ${kv('numberSize1')},
+  ${kv('numberSize2')},
+  ${kv('numberSize3')},
+  ${kv('bbNumberSize1')},
+  ${kv('bbNumberSize2')},
+  ${kv('bbNumberSize3')},
+
+  /* ── constant gap  */
+  ${kv('nameLetterSpacing')},
+  ${kv('numberLetterSpacing')},
+
+  /* ── extrusion / tube profile ─── */
+  ${kv('nameExtrusion')},
+  ${kv('numberExtrusion')},
+  ${kv('nameBevelThickness')},
+  ${kv('nameBevelSize')},
+  ${kv('numberBevelThickness')},
+  ${kv('numberBevelSize')},
+  ${kv('bevelSegments')},
+  ${kv('curveSegments')},
+
+  /* ── basketball name arc */
+  ${row(['curveRadiusShort', 'curveSagShort', 'curveTiltShort', 'curveXShort', 'curveYShort', 'curveZShort'])},
+  ${row(['curveRadiusMid', 'curveSagMid', 'curveTiltMid', 'curveXMid', 'curveYMid', 'curveZMid'])},
+  ${row(['curveRadiusLong', 'curveSagLong', 'curveTiltLong', 'curveXLong', 'curveYLong', 'curveZLong'])},
+  ${row(['curveRadiusXLong', 'curveSagXLong', 'curveTiltXLong', 'curveXXLong', 'curveYXLong', 'curveZXLong'])},
+  ${kv('maxNameWidthBB')},
+  ${kv('maxNameWidthOther')},
+  ${kv('fitToWidth')},
+
+  /* ── Position / Scale (dynamic) ── */
+  ${row(['nameXShort', 'nameYShort', 'nameZShort', 'nameScaleShort'])},
+  ${row(['nameXMid', 'nameYMid', 'nameZMid', 'nameScaleMid'])},
+  ${row(['nameXLong', 'nameYLong', 'nameZLong', 'nameScaleLong'])},
+  ${row(['nameXXLong', 'nameYXLong', 'nameZXLong', 'nameScaleXLong'])},
+
+  ${row(['numX1', 'numY1', 'numZ1', 'numScale1'])},
+  ${row(['numX2', 'numY2', 'numZ2', 'numScale2'])},
+  ${row(['numX3', 'numY3', 'numZ3', 'numScale3'])},
+
+  /* ── glow ─── */
+  ${kv('intensity')},
+  ${kv('softIntensity')},
+  ${kv('offIntensity')},
+  ${kv('coreWhite')},
+  ${kv('fresnelPow')},
+  ${kv('rimBoost')},
+  ${kv('physicalEmissive')},
+
+  /* ── orbit ─── */
+  ${kv('orbitMin')},
+  ${kv('orbitMax')},
+  ${kv('orbitDamping')},`;
+
+  const missing = (Object.keys(DEFAULTS) as (keyof TweakState)[]).filter(
+    (k) => !used.has(k as string),
+  );
+  const extra = missing.length
+    ? `\n\n  /* ── extra ── */\n` +
+      missing.map((k) => `  ${kv(k)},`).join('\n')
+    : '';
+
+  return `const DEFAULTS = {\n${body}${extra}\n};`;
+}
+
 function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
   const t = useTweaks();
   const [open, setOpen] = useState(true);
@@ -329,7 +442,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 Curve = basketball names only. Letter gap is constant. Copy values
                 into DEFAULTS when done.
               </p>
-              {/* <Section title="Name size (by length)">
+              <Section title="Name size (by length)">
                 {slider('other ≤5', 'nameSizeShort', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('other 6–8', 'nameSizeMid', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('other 9–11', 'nameSizeLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
@@ -338,57 +451,135 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('bb 6–8', 'bbNameSizeMid', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('bb 9–11', 'bbNameSizeLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('bb 12+', 'bbNameSizeXLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
-              </Section> */}
-              {/* <Section title="Number size">
+              </Section>
+              <Section title="Number size (by length)">
                 {slider('other 1 digit', 'numberSize1', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('other 2 digit', 'numberSize2', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('other 3+ digit', 'numberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 1 digit', 'bbNumberSize1', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 2 digit', 'bbNumberSize2', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 3+ digit', 'bbNumberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
-              </Section> */}
-              <Section title="Constant letter gap">
-                {slider('name gap', 'nameLetterSpacing', 0, 0.08, 0.001, values, setOpen, openVal)}
-                {slider('number gap', 'numberLetterSpacing', 0, 0.1, 0.001, values, setOpen, openVal)}
               </Section>
-              {/* <Section title="Extrusion / bevel (tube)">
+              <Section title="Constant letter gap">
+                {slider('name spacing', 'nameLetterSpacing', 0, 0.08, 0.001, values, setOpen, openVal)}
+                {slider('number spacing', 'numberLetterSpacing', 0, 0.1, 0.001, values, setOpen, openVal)}
+              </Section>
+              <Section title="Extrusion / bevel (tube)">
                 {slider('name extrusion', 'nameExtrusion', 0.004, 0.12, 0.001, values, setOpen, openVal)}
                 {slider('number extrusion', 'numberExtrusion', 0.004, 0.12, 0.001, values, setOpen, openVal)}
                 {slider('name bevel thick', 'nameBevelThickness', 0, 0.04, 0.0005, values, setOpen, openVal)}
                 {slider('name bevel size', 'nameBevelSize', 0, 0.02, 0.0002, values, setOpen, openVal)}
                 {slider('num bevel thick', 'numberBevelThickness', 0, 0.04, 0.0005, values, setOpen, openVal)}
                 {slider('num bevel size', 'numberBevelSize', 0, 0.02, 0.0002, values, setOpen, openVal)}
-                {slider('bevel segments', 'bevelSegments', 1, 12, 1, values, setOpen, openVal)}
-                {slider('curve segments', 'curveSegments', 4, 32, 1, values, setOpen, openVal)}
-              </Section> */}
-              <Section title="Basketball curve">
-                {slider('radius', 'curveRadius', 0.3, 2.4, 0.01, values, setOpen, openVal)}
-                {slider('sag', 'curveSag', 0, 1.4, 0.01, values, setOpen, openVal)}
-                {slider('letter tilt', 'curveTilt', 0, 1.4, 0.01, values, setOpen, openVal)}
-                {slider('curve Y', 'curveY', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                {slider('curve Z', 'curveZ', -0.1, 0.1, 0.001, values, setOpen, openVal)}
-                {slider('max width BB', 'maxNameWidthBB', 0.3, 1.4, 0.01, values, setOpen, openVal)}
-                {slider('max width other', 'maxNameWidthOther', 0.3, 1.4, 0.01, values, setOpen, openVal)}
+                {/* {slider('bevel segments', 'bevelSegments', 1, 12, 1, values, setOpen, openVal)}
+                {slider('curve segments', 'curveSegments', 4, 32, 1, values, setOpen, openVal)} */}
               </Section>
-              {/* <Section title="Position / scale offsets">
-                {slider('name X', 'nameX', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                {slider('name Y', 'nameY', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                {slider('name Z', 'nameZ', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                {slider('number X', 'numberX', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                {slider('number Y', 'numberY', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                {slider('number Z', 'numberZ', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                {slider('name scale', 'nameScale', 0.4, 2, 0.01, values, setOpen, openVal)}
-                {slider('number scale', 'numberScale', 0.4, 2, 0.01, values, setOpen, openVal)}
-              </Section> */}
-              {/* <Section title="Glow">
+              <Section title="Basketball curve">
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Short (1-5 chars)</summary>
+                  {slider('radius', 'curveRadiusShort', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {/* {slider('sag', 'curveSagShort', 0, 1.4, 0.01, values, setOpen, openVal)}
+                  {slider('tilt', 'curveTiltShort', 0, 1.4, 0.01, values, setOpen, openVal)} */}
+                  {slider('curve X', 'curveXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'curveYShort', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'curveZShort', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Mid (6-8 chars)</summary>
+                  {slider('radius', 'curveRadiusMid', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {/* {slider('sag', 'curveSagMid', 0, 1.4, 0.01, values, setOpen, openVal)}
+                  {slider('tilt', 'curveTiltMid', 0, 1.4, 0.01, values, setOpen, openVal)} */}
+                  {slider('curve X', 'curveXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'curveYMid', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'curveZMid', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Long (9-11 chars)</summary>
+                  {slider('radius', 'curveRadiusLong', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {/* {slider('sag', 'curveSagLong', 0, 1.4, 0.01, values, setOpen, openVal)}
+                  {slider('tilt', 'curveTiltLong', 0, 1.4, 0.01, values, setOpen, openVal)} */}
+                  {slider('curve X', 'curveXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'curveYLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'curveZLong', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>XLong (12+ chars)</summary>
+                  {slider('radius', 'curveRadiusXLong', 0.3, 2.4, 0.01, values, setOpen, openVal)}
+                  {/* {slider('sag', 'curveSagXLong', 0, 1.4, 0.01, values, setOpen, openVal)}
+                  {slider('tilt', 'curveTiltXLong', 0, 1.4, 0.01, values, setOpen, openVal)} */}
+                  {slider('curve X', 'curveXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'curveYXLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'curveZXLong', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                
+                <div style={{ marginTop: 8 }}>
+                  {slider('max width BB', 'maxNameWidthBB', 0.3, 1.4, 0.01, values, setOpen, openVal)}
+                  {slider('max width other', 'maxNameWidthOther', 0.3, 1.4, 0.01, values, setOpen, openVal)}
+                </div>
+              </Section>
+              <Section title="Position / scale offsets">
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Short (1-5 chars)</summary>
+                  {slider('name X', 'nameXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Y', 'nameYShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Z', 'nameZShort', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('name scale', 'nameScaleShort', 0.4, 2, 0.01, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Mid (6-8 chars)</summary>
+                  {slider('name X', 'nameXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Y', 'nameYMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Z', 'nameZMid', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('name scale', 'nameScaleMid', 0.4, 2, 0.01, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Long (9-11 chars)</summary>
+                  {slider('name X', 'nameXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Y', 'nameYLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Z', 'nameZLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('name scale', 'nameScaleLong', 0.4, 2, 0.01, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name XLong (12+ chars)</summary>
+                  {slider('name X', 'nameXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Y', 'nameYXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('name Z', 'nameZXLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('name scale', 'nameScaleXLong', 0.4, 2, 0.01, values, setOpen, openVal)}
+                </details>
+
+                <div style={{ marginTop: 12 }}>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (1 digit)</summary>
+                    {slider('number X', 'numX1', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Y', 'numY1', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Z', 'numZ1', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                    {slider('number scale', 'numScale1', 0.4, 2, 0.01, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (2 digits)</summary>
+                    {slider('number X', 'numX2', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Y', 'numY2', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Z', 'numZ2', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                    {slider('number scale', 'numScale2', 0.4, 2, 0.01, values, setOpen, openVal)}
+                  </details>
+                  <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                    <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (3+ digits)</summary>
+                    {slider('number X', 'numX3', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Y', 'numY3', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                    {slider('number Z', 'numZ3', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                    {slider('number scale', 'numScale3', 0.4, 2, 0.01, values, setOpen, openVal)}
+                  </details>
+                </div>
+              </Section>
+              <Section title="Glow">
                 {slider('intensity', 'intensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('soft intensity', 'softIntensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('off intensity', 'offIntensity', 0, 2, 0.01, values, setOpen, openVal)}
-                {slider('core white', 'coreWhite', 0, 1, 0.01, values, setOpen, openVal)}
-                {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values, setOpen, openVal)}
+                {/* {slider('core white', 'coreWhite', 0, 1, 0.01, values, setOpen, openVal)}
+                {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values, setOpen, openVal)} */}
                 {slider('rim boost', 'rimBoost', 0, 4, 0.05, values, setOpen, openVal)}
                 {slider('physical emissive', 'physicalEmissive', 0, 2, 0.01, values, setOpen, openVal)}
-              </Section> */}
+              </Section>
               <Section title="Orbit">
                 {slider('min dist', 'orbitMin', 0.1, 3, 0.05, values, setOpen, openVal)}
                 {slider('max dist', 'orbitMax', 1, 12, 0.1, values, setOpen, openVal)}
@@ -396,9 +587,10 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
               <button
                 type="button"
                 onClick={() => {
-                  console.log('[3DNeonText DEFAULTS]', tweaks);
-                  navigator.clipboard?.writeText(JSON.stringify(tweaks, null, 2));
-                }}
+  const src = serializeTweaksAsDefaults(tweaks);
+  console.log('[3DNeonText DEFAULTS]\n', src);
+  navigator.clipboard?.writeText(src);
+}}
                 style={{
                   width: '100%',
                   marginTop: 8,
@@ -431,7 +623,6 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
     };
   }, [isNumber, sport, open]);
 
-  // Critical: return null so R3F never sees DOM nodes
   return null;
 }
 
@@ -490,7 +681,6 @@ export default function NeonText({
   const bevelThickness = isNumber ? t.numberBevelThickness : t.nameBevelThickness;
   const bevelSize = isNumber ? t.numberBevelSize : t.nameBevelSize;
 
-  /* Fit-to-width: shrink SIZE only, keep the same extra gap */
   const size = useMemo(() => {
     if (!len) return baseSize;
     const maxW = isBasketball ? t.maxNameWidthBB : t.maxNameWidthOther;
@@ -524,10 +714,8 @@ export default function NeonText({
       toneMapped: false,
       depthWrite: true,
       depthTest: true,
-      side: THREE.DoubleSide,
+      side: THREE.FrontSide,
     });
-    // uniforms are updated in useFrame
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const physicalMaterial = useMemo(() => {
@@ -541,7 +729,7 @@ export default function NeonText({
       clearcoatRoughness: 0.08,
       transparent: false,
       depthWrite: true,
-      side: THREE.DoubleSide,
+      side: THREE.FrontSide,
     });
   }, [color, isSoft, t.physicalEmissive]);
 
@@ -557,10 +745,12 @@ export default function NeonText({
 
   const mat = neonOn ? neonMaterial : physicalMaterial;
 
-  const ox = isNumber ? t.numberX : t.nameX;
-  const oy = isNumber ? t.numberY : t.nameY;
-  const oz = isNumber ? t.numberZ : t.nameZ;
-  const sc = scale * (isNumber ? t.numberScale : t.nameScale);
+  const offsets = isNumber ? offsetParamsForNumber(len, t) : offsetParamsForName(len, t);
+
+  const ox = offsets.ox;
+  const oy = offsets.oy;
+  const oz = offsets.oz;
+  const sc = scale * offsets.scale;
 
   if (!raw) return null;
 
@@ -584,15 +774,18 @@ export default function NeonText({
       cursor += widths[i] + (i < len - 1 ? extraGap : 0);
     }
     const mid = cursor / 2;
-    const radius = Math.max(0.15, t.curveRadius);
+    
+    const { radius: rawRadius, sag, tilt, cx, cy, cz } = curveParamsForName(len, t);
+    const radius = Math.max(0.15, rawRadius);
 
     return chars.map((ch, i) => {
       const s = centers[i] - mid;
       const angle = s / radius;
-      const x = Math.sin(angle) * radius;
-      const y = (Math.cos(angle) - 1) * radius * t.curveSag + t.curveY;
-      const z = t.curveZ;
-      const rotZ = -angle * t.curveTilt;
+      
+      const x = Math.sin(angle) * radius + cx;
+      const y = (Math.cos(angle) - 1) * radius * sag + cy;
+      const z = cz;
+      const rotZ = -angle * tilt;
 
       return (
         <group key={`${ch}-${i}`} position={[x, y, z]} rotation={[0, 0, rotZ]}>
