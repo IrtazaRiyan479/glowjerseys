@@ -176,10 +176,10 @@ function ModelDebugPanel() {
                 {slider('Wall multiply', 'w2Multiply', 0, 10, 0.1, values)}
                 {slider('Light falloff', 'w2Falloff', 0.5, 3, 0.1, values)}
               </details>
-              <button type="button" onClick={() => { const src = serializeModelDefaults(modelTweaks); console.log('[MODEL_DEFAULTS]\n', src); navigator.clipboard?.writeText(src); }}
-                style={{ width: '100%', marginTop: 8, padding: '6px 8px', background: '#0b45ff', color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-                COPY MODEL TWEAKS
-              </button>
+            <AnimatedCopyButton 
+            label="COPY MODEL TWEAKS" 
+            onCopy={() => serializeModelDefaults(modelTweaks)} 
+          />
             </>
           )}
         </div>,
@@ -195,6 +195,56 @@ function ModelDebugPanel() {
   return null;
 }
 
+function AnimatedCopyButton({ label, onCopy }: { label: string; onCopy: () => string }) {
+  const [isCopying, setIsCopying] = useState(false);
+
+  return (
+    <button
+      type="button"
+      disabled={isCopying}
+      onClick={async () => {
+        setIsCopying(true);
+        try {
+          const src = onCopy();
+          console.log('[TWEAKS DEFAULTS]\n', src);
+          await navigator.clipboard?.writeText(src);
+          // 400ms delay so the loading animation is actually visible to the user
+          await new Promise((r) => setTimeout(r, 400));
+          alert('Tweaks successfully copied to clipboard!');
+        } catch (err) {
+          alert('Failed to copy tweaks.');
+        } finally {
+          setIsCopying(false);
+        }
+      }}
+      style={{
+        width: '100%',
+        marginTop: 8,
+        padding: '6px 8px',
+        background: '#0b45ff',
+        color: '#fff',
+        border: 'none',
+        borderRadius: 6,
+        fontSize: 11,
+        fontWeight: 700,
+        cursor: isCopying ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '8px',
+        opacity: isCopying ? 0.8 : 1,
+      }}
+    >
+      {isCopying && (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+        </svg>
+      )}
+      {isCopying ? 'COPYING...' : label}
+    </button>
+  );
+}
 interface ModelProps {
   glbUrl: string;
   outlineColor?: string;
