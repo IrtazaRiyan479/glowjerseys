@@ -9,6 +9,22 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Mayfair';
+  src: url('/fonts/Mayfair.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avante';
+  src: url('/fonts/Avante.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

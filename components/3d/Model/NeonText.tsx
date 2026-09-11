@@ -12,6 +12,7 @@ import {
   useFont,
 } from '@react-three/drei';
 
+
 /* ═══════════════════════════════════════════════════════════════════════════
  * DEBUG SWITCHES
  * ═══════════════════════════════════════════════════════════════════════════ */
@@ -26,7 +27,8 @@ const DEBUG = {
  * ═══════════════════════════════════════════════════════════════════════════ */
 const DEFAULTS = {
   /* ── font ─────────────────────────────────────────────── */
-  fontPath: '/fonts/Bondtique.json',
+  fontPathName: '/fonts/Avante.json',
+  fontPathNumber: '/fonts/Mayfair.json',
 
   /* ── name size (world units). Length only changes SIZE, never gap. */
   nameSizeShort: 0.152, // 1–5
@@ -325,7 +327,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 Curve = basketball names only. Letter gap is constant. Copy values
                 into DEFAULTS when done.
               </p>
-              <Section title="Name size (by length)">
+              {/* <Section title="Name size (by length)">
                 {slider('other ≤5', 'nameSizeShort', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('other 6–8', 'nameSizeMid', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('other 9–11', 'nameSizeLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
@@ -334,20 +336,20 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('bb 6–8', 'bbNameSizeMid', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('bb 9–11', 'bbNameSizeLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('bb 12+', 'bbNameSizeXLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
-              </Section>
-              <Section title="Number size">
+              </Section> */}
+              {/* <Section title="Number size">
                 {slider('other 1 digit', 'numberSize1', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('other 2 digit', 'numberSize2', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('other 3+ digit', 'numberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 1 digit', 'bbNumberSize1', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 2 digit', 'bbNumberSize2', 0.06, 0.45, 0.001, values, setOpen, openVal)}
                 {slider('bb 3+ digit', 'bbNumberSize3', 0.06, 0.45, 0.001, values, setOpen, openVal)}
-              </Section>
+              </Section> */}
               <Section title="Constant letter gap">
                 {slider('name gap', 'nameLetterSpacing', 0, 0.08, 0.001, values, setOpen, openVal)}
                 {slider('number gap', 'numberLetterSpacing', 0, 0.1, 0.001, values, setOpen, openVal)}
               </Section>
-              <Section title="Extrusion / bevel (tube)">
+              {/* <Section title="Extrusion / bevel (tube)">
                 {slider('name extrusion', 'nameExtrusion', 0.004, 0.12, 0.001, values, setOpen, openVal)}
                 {slider('number extrusion', 'numberExtrusion', 0.004, 0.12, 0.001, values, setOpen, openVal)}
                 {slider('name bevel thick', 'nameBevelThickness', 0, 0.04, 0.0005, values, setOpen, openVal)}
@@ -356,7 +358,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('num bevel size', 'numberBevelSize', 0, 0.02, 0.0002, values, setOpen, openVal)}
                 {slider('bevel segments', 'bevelSegments', 1, 12, 1, values, setOpen, openVal)}
                 {slider('curve segments', 'curveSegments', 4, 32, 1, values, setOpen, openVal)}
-              </Section>
+              </Section> */}
               <Section title="Basketball curve">
                 {slider('radius', 'curveRadius', 0.3, 2.4, 0.01, values, setOpen, openVal)}
                 {slider('sag', 'curveSag', 0, 1.4, 0.01, values, setOpen, openVal)}
@@ -366,7 +368,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('max width BB', 'maxNameWidthBB', 0.3, 1.4, 0.01, values, setOpen, openVal)}
                 {slider('max width other', 'maxNameWidthOther', 0.3, 1.4, 0.01, values, setOpen, openVal)}
               </Section>
-              <Section title="Position / scale offsets">
+              {/* <Section title="Position / scale offsets">
                 {slider('name X', 'nameX', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                 {slider('name Y', 'nameY', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                 {slider('name Z', 'nameZ', -0.2, 0.2, 0.001, values, setOpen, openVal)}
@@ -375,8 +377,8 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('number Z', 'numberZ', -0.2, 0.2, 0.001, values, setOpen, openVal)}
                 {slider('name scale', 'nameScale', 0.4, 2, 0.01, values, setOpen, openVal)}
                 {slider('number scale', 'numberScale', 0.4, 2, 0.01, values, setOpen, openVal)}
-              </Section>
-              <Section title="Glow">
+              </Section> */}
+              {/* <Section title="Glow">
                 {slider('intensity', 'intensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('soft intensity', 'softIntensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('off intensity', 'offIntensity', 0, 2, 0.01, values, setOpen, openVal)}
@@ -384,7 +386,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values, setOpen, openVal)}
                 {slider('rim boost', 'rimBoost', 0, 4, 0.05, values, setOpen, openVal)}
                 {slider('physical emissive', 'physicalEmissive', 0, 2, 0.01, values, setOpen, openVal)}
-              </Section>
+              </Section> */}
               <Section title="Orbit">
                 {slider('min dist', 'orbitMin', 0.1, 3, 0.05, values, setOpen, openVal)}
                 {slider('max dist', 'orbitMax', 1, 12, 0.1, values, setOpen, openVal)}
@@ -466,7 +468,8 @@ export default function NeonText({
   sport = 'Soccer',
 }: NeonTextProps) {
   const t = useTweaks();
-  const font = useFont(t.fontPath);
+  const fontPath = isNumber ? t.fontPathNumber : t.fontPathName;
+  const font = useFont(fontPath);
   const fontData = (font as any)?.data;
 
   const raw = (text ?? '').toUpperCase();
@@ -559,7 +562,7 @@ export default function NeonText({
   if (!raw) return null;
 
   const common = {
-    font: t.fontPath,
+    font: fontPath,
     height: extrusion,
     curveSegments: Math.max(1, Math.round(t.curveSegments)),
     bevelEnabled: true,
