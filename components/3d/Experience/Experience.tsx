@@ -178,7 +178,7 @@ const Experience = ({
   <Bloom
     kernelSize={KernelSize.VERY_SMALL}
     luminanceThreshold={1.05}
-    intensity={0.18}
+    intensity={0.28}
     levels={2}
     // mipmapBlur
   />

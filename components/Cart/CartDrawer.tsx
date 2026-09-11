@@ -29,6 +29,32 @@ const RECS = [
   },
 ];
 
+const COLOR_MAP: Record<string, string> = {
+  '#FFE800': 'Yellow',
+  '#FF8A00': 'Orange',
+  '#2CC5F5': 'Ice Blue',
+  '#17D63A': 'Green',
+  '#FF1A15': 'Red',
+  '#0A46FF': 'Blue',
+  '#8A16FF': 'Purple',
+  '#FF2E9A': 'Pink',
+  '#FBECCB': 'Neutral White',
+  '#FFFFFF': 'White',
+  '#111111': 'Black',
+  transparent: 'Transparent',
+  Transparent: 'Transparent',
+};
+
+function getColorName(hexOrName: string | undefined): string {
+  if (!hexOrName) return '—';
+  const key = hexOrName.trim();
+  if (COLOR_MAP[key]) return COLOR_MAP[key];
+  const found = Object.entries(COLOR_MAP).find(
+    ([k]) => k.toLowerCase() === key.toLowerCase()
+  );
+  return found ? found[1] : key;
+}
+
 function CloseButton({ onClick }: { onClick: () => void }) {
   return (
     <button
@@ -183,12 +209,21 @@ export default function CartDrawer() {
                           </div>
 
                           <div className="min-w-0 flex-1 pr-8">
-                            <div className="text-[15px] font-medium uppercase tracking-[0.04em] text-black">
-                              {title}
-                            </div>
-                            <div className="mt-1 text-[13px] text-neutral-500">
-                              Size: {o.size} inches
-                            </div>
+  <div className="text-[15px] font-medium uppercase tracking-[0.04em] text-black">
+    {title}
+  </div>
+
+  <div className="mt-1.5 space-y-0.5 text-[13px] text-neutral-500 leading-snug">
+    <div>SIZE: {o.size} inch</div>
+    <div>Backboard: {getColorName(o.backboardColor)}</div>
+    <div>Sport: {o.sport}</div>
+    <div>
+      Custom Name &amp; Number: {o.name ? `${o.name} #${o.number}` : '—'}
+    </div>
+    <div>Jersey Color: {getColorName(o.jerseyColor)}</div>
+    <div>Name Color: {getColorName(o.nameColor)}</div>
+    <div>Number Color: {getColorName(o.numberColor)}</div>
+  </div>
 
                             <div className="mt-3 flex items-end justify-between">
                               <div className="inline-flex items-center border border-[#ccc] rounded-sm">

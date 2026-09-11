@@ -57,23 +57,38 @@ export default function NeonText({
   
   const vertexShader = `
     uniform vec3 uMouseWorld;
+    
+    varying vec2 vUv;
+    varying vec3 vPosition;
     varying float vDistanceToMouse;
 
     void main() {
+      vUv = uv;
       vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
       vDistanceToMouse = distance(worldPosition, uMouseWorld);
+      vPosition = position;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `;
 
   const fragmentShader = `
     uniform vec3 uColor1;
+    uniform vec3 uColor2;
+    uniform float uTime;
     uniform float uIntensity;
+    uniform sampler2D uTexture;
+
+    varying vec2 vUv;
+    varying vec3 vPosition;
     varying float vDistanceToMouse;
 
     void main() {
+      vec4 texColor = texture2D(uTexture, vUv);
+      if (texColor.a < 0.1) discard; 
       float distanceFactor = 1.0 - smoothstep(0.0, 0.5, vDistanceToMouse);
+
       vec3 color = uColor1 * uIntensity * (1.0 + distanceFactor * 0.3);
+      
       gl_FragColor = vec4(color, 1.0);
     }
   `;
