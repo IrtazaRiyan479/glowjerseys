@@ -47,7 +47,7 @@ function CircleClose({ onClick, className = '' }: { onClick: () => void; classNa
 }
 
 const linkBase =
-  'relative px-2.5 py-2 text-[12px] font-semibold uppercase tracking-[0.18em] transition-colors after:absolute after:left-2.5 after:right-2.5 after:bottom-1 after:h-[1px] after:bg-black after:opacity-0 after:transition-opacity hover:text-black hover:after:opacity-100';
+  'relative px-2.5 py-2 text-[14px] font-semibold font-bayon uppercase tracking-[0.18em] transition-colors after:absolute after:left-2.5 after:right-2.5 after:bottom-1 after:h-[1px] after:bg-black after:opacity-0 after:transition-opacity hover:text-black hover:after:opacity-100';
 
 const linkActive = 'text-black after:opacity-100';
 
