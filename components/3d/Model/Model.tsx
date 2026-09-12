@@ -7,38 +7,59 @@ import { createRoot, type Root } from 'react-dom/client';
 import * as THREE from 'three';
 import NeonText from './NeonText';
 
-const MODEL_DEBUG = { panel: true };
+const MODEL_DEBUG = { panel: false };
 
 const MODEL_DEFAULTS = {
-  groupX: 0, groupY: -0.05, groupZ: 0, groupScale: 1.15,
-  nameX: 0, nameY: 0.09, nameZ: 0.02,
-  numX: 0, numY: -0.13, numZ: 0.02,
-
-  wallRepeatX: 3, wallRepeatY: 2, wallNormal: 0.12,
-  wallRough1: 0.85, wallRough2: 0.65,
-  wallMetal1: 0.05, wallMetal2: 0.08,
-
+  groupX: 0,
+  groupY: -0.05,
+  groupZ: 0,
+  groupScale: 1.15,
+  nameX: 0,
+  nameY: 0.09,
+  nameZ: 0.02,
+  numX: 0,
+  numY: -0.13,
+  numZ: 0.02,
+  wallRepeatX: 3,
+  wallRepeatY: 2,
+  wallNormal1: 0.12,
+  wallNormal2: 0.65,
+  wallRough1: 0.85,
+  wallRough2: 0.65,
+  wallMetal1: 0.05,
+  wallMetal2: 0.08,
   neonIntensitySoft: 1.15,
   neonIntensityHard: 2.4,
   neonOffEmissive: 0.35,
-  fresnelPow: 2.4,
-  rimBoost: 0.28,
-
-  glassOpacity: 0.08, glassRough: 0.35,
-  acrylicOpacity: 0.12, acrylicRough: 0.25,
-
-  bounceTopY: 0.12, bounceBotY: -0.08, bounceZ: -0.05,
-  bounceNameY: 0.09, bounceNumberY: -0.13, bounceTextZ: -0.06,
-
-  w1OutlineGlow: 1, w1OutlineReach: 0.65,
-  w1NameGlow: 0.12, w1NameReach: 0.28,
-  w1NumberGlow: 0.1, w1NumberReach: 0.26,
-  w1Multiply: 1.8, w1Falloff: 2,
-
-  w2OutlineGlow: 1, w2OutlineReach: 1.43,
-  w2NameGlow: 0.12, w2NameReach: 0.62,
-  w2NumberGlow: 0.1, w2NumberReach: 0.57,
-  w2Multiply: 5.2, w2Falloff: 1,
+  fresnelPow: 6,
+  rimBoost: 4,
+  neonFlatten: 0.62,
+  glassOpacity: 0.305,
+  glassRough: 0.35,
+  acrylicOpacity: 0.095,
+  acrylicRough: 0.17,
+  bounceTopY: 0.12,
+  bounceBotY: -0.08,
+  bounceZ: -0.05,
+  bounceNameY: -0.215,
+  bounceNumberY: 0.266,
+  bounceTextZ: -0.183,
+  w1OutlineGlow: 1,
+  w1OutlineReach: 0.65,
+  w1NameGlow: 0.08,
+  w1NameReach: 0.28,
+  w1NumberGlow: 0.04,
+  w1NumberReach: 0.26,
+  w1Multiply: 1.8,
+  w1Falloff: 2,
+  w2OutlineGlow: 0.85,
+  w2OutlineReach: 0.83,
+  w2NameGlow: 0.16,
+  w2NameReach: 0.21,
+  w2NumberGlow: 0.1,
+  w2NumberReach: 0.57,
+  w2Multiply: 4.9,
+  w2Falloff: 1
 };
 
 type ModelTweakState = typeof MODEL_DEFAULTS;
@@ -131,7 +152,8 @@ function ModelDebugPanel() {
                 <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Wall</summary>
                 {slider('repeat X', 'wallRepeatX', 1, 8, 0.1, values)}
                 {slider('repeat Y', 'wallRepeatY', 1, 8, 0.1, values)}
-                {slider('normal', 'wallNormal', 0, 1, 0.01, values)}
+                {slider('normal tex1', 'wallNormal1', 0, 1, 0.01, values)}
+                {slider('normal tex2', 'wallNormal2', 0, 1, 0.01, values)}
                 {slider('rough tex1', 'wallRough1', 0, 1, 0.01, values)}
                 {slider('rough tex2', 'wallRough2', 0, 1, 0.01, values)}
                 {slider('metal tex1', 'wallMetal1', 0, 1, 0.01, values)}
@@ -148,6 +170,7 @@ function ModelDebugPanel() {
                 {slider('acrylic rough', 'acrylicRough', 0, 1, 0.01, values)}
                 {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values)}
                 {slider('rim boost', 'rimBoost', 0, 4, 0.05, values)}
+                {slider('tube flatten', 'neonFlatten', 0, 1, 0.01, values)}
               </details>
               <details open style={{ marginBottom: 8 }}>
                 <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Light positions</summary>
@@ -322,6 +345,7 @@ const fragmentShader = `
   uniform float uIntensity;
   uniform float uFresnelPow;
   uniform float uRim;
+  uniform float uFlatten;
 
   varying vec3 vWorldNormal;
   varying vec3 vViewDir;
@@ -332,7 +356,10 @@ const fragmentShader = `
 
     vec3 n = normalize(vWorldNormal);
     vec3 v = normalize(vViewDir);
-    float fresnel = pow(1.0 - clamp(abs(dot(n, v)), 0.0, 1.0), uFresnelPow);
+    vec3 nFlat = normalize(mix(n, v * sign(dot(n, v) + 1e-5), uFlatten));
+
+    float ndv = abs(dot(nFlat, v));
+    float fresnel = pow(1.0 - clamp(ndv, 0.0, 1.0), uFresnelPow);
 
     vec3 col = hue * uIntensity * (1.0 + fresnel * uRim);
     gl_FragColor = vec4(col, 1.0);
@@ -377,7 +404,10 @@ tex.needsUpdate = true;
   child.material = new THREE.MeshStandardMaterial({
     map: activeColorMap,
     normalMap: activeNormalMap,
-    normalScale: new THREE.Vector2(t.wallNormal, t.wallNormal),
+    normalScale: new THREE.Vector2(
+      isTex2 ? t.wallNormal2 : t.wallNormal1,
+      isTex2 ? t.wallNormal2 : t.wallNormal1,
+    ),
     roughness: isTex2 ? t.wallRough2 : t.wallRough1,
     metalness: isTex2 ? t.wallMetal2 : t.wallMetal1,
     color: isTex2
@@ -421,12 +451,13 @@ else if (nameLower.includes('neon')) {
           uFresnelPow: { value: t.fresnelPow },
           uRim: { value: t.rimBoost },
           uMouseWorld: { value: new THREE.Vector3(999, 999, 999) },
+          uFlatten: { value: t.neonFlatten },
         },
         transparent: false,
         toneMapped: false,
         depthWrite: true,
         depthTest: true,
-        side: THREE.FrontSide,
+        side: THREE.DoubleSide,
       });
     } else {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
@@ -434,6 +465,7 @@ else if (nameLower.includes('neon')) {
       neonMaterialRef.current.uniforms.uIntensity.value = neonIntensity;
       neonMaterialRef.current.uniforms.uFresnelPow.value = t.fresnelPow;
       neonMaterialRef.current.uniforms.uRim.value = t.rimBoost;
+      neonMaterialRef.current.uniforms.uFlatten.value = t.neonFlatten;
     }
     
     child.material = neonMaterialRef.current;
@@ -455,33 +487,21 @@ else if (nameLower.includes('neon')) {
 
     
       else if (nameLower.includes('glass')) {
-        const isClear =
-          backboardColor === 'transparent' ||
-          backboardColor === 'Transparent';
-
-        if (!isClear) {
-          child.visible = false;
-          child.material = new THREE.MeshBasicMaterial({
-            transparent: true,
-            opacity: 0,
-          });
-        } else {
-          child.visible = true;
-          child.material = new THREE.MeshPhysicalMaterial({
-            color: '#e8eef5',
-            metalness: 0,
-            roughness: t.glassRough,
-            transmission: 0,
-            transparent: true,
-            opacity: t.glassOpacity,
-            depthWrite: false,
-            side: THREE.FrontSide,
-            envMapIntensity: 0,
-            clearcoat: 0,
-            reflectivity: 0,
-            specularIntensity: 0,
-          });
-        }
+        child.visible = true;
+        child.material = new THREE.MeshPhysicalMaterial({
+          color: '#e8eef5',
+          metalness: 0,
+          roughness: t.glassRough,
+          transmission: 0,
+          transparent: true,
+          opacity: t.glassOpacity,
+          depthWrite: false,
+          side: THREE.FrontSide,
+          envMapIntensity: 0,
+          clearcoat: 0,
+          reflectivity: 0,
+          specularIntensity: 0,
+        });
         child.material.needsUpdate = true;
       }
 
@@ -548,7 +568,8 @@ else if (nameLower.includes('neon')) {
     mat.uniforms.uColor2.value.set(outlineColor);
     if (mat.uniforms.uFresnelPow) mat.uniforms.uFresnelPow.value = t.fresnelPow;
     if (mat.uniforms.uRim) mat.uniforms.uRim.value = t.rimBoost;
-  }, [neonIntensity, outlineColor, t.fresnelPow, t.rimBoost]);
+    if (mat.uniforms.uFlatten) mat.uniforms.uFlatten.value = t.neonFlatten;
+  }, [neonIntensity, outlineColor, t.fresnelPow, t.rimBoost, t.neonFlatten]);
 
 const isTex2 = textureVariant === 2;
 const mul = isTex2 ? t.w2Multiply : t.w1Multiply;

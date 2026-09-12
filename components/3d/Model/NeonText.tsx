@@ -17,8 +17,8 @@ import {
  - DEBUG SWITCHES
  - =========================================================================== */
 const DEBUG = {
-  orbit: true,
-  panel: true,
+  orbit: false,
+  panel: false,
   pivot: false,
 };
 
@@ -31,23 +31,23 @@ const DEFAULTS = {
   fontPathNumber: '/fonts/Mayfair.json',
 
   /* ── name size ── */
-  nameSizeShort: 0.152,
-  nameSizeMid: 0.132,
-  nameSizeLong: 0.112,
-  nameSizeXLong: 0.094,
-  bbNameSizeShort: 0.053,
+  nameSizeShort: 0.07,
+  nameSizeMid: 0.058,
+  nameSizeLong: 0.048,
+  nameSizeXLong: 0.039,
+  bbNameSizeShort: 0.058,
   bbNameSizeMid: 0.046,
-  bbNameSizeLong: 0.04,
-  bbNameSizeXLong: 0.031,
+  bbNameSizeLong: 0.038,
+  bbNameSizeXLong: 0.034,
 
   /* ── number size ─── */
-  numberSize1: 0.268,
-  numberSize2: 0.248,
-  numberSize3: 0.21,
-  numberSize4: 0.18,
+  numberSize1: 0.179,
+  numberSize2: 0.149,
+  numberSize3: 0.12,
+  numberSize4: 0.091,
   bbNumberSize1: 0.185,
-  bbNumberSize2: 0.175,
-  bbNumberSize3: 0.108,
+  bbNumberSize2: 0.156,
+  bbNumberSize3: 0.12,
   bbNumberSize4: 0.09,
 
   /* ── constant gap  */
@@ -55,47 +55,49 @@ const DEFAULTS = {
   numberLetterSpacing: 0,
 
   /* ── extrusion / tube profile ─── */
-  nameExtrusion: 0.036,
-  numberExtrusion: 0.04,
+  nameExtrusion: 0.009,
+  numberExtrusion: 0.009,
   nameBevelThickness: 0.011,
   nameBevelSize: 0.0042,
   numberBevelThickness: 0.013,
   numberBevelSize: 0.005,
   bevelSegments: 4,
   curveSegments: 12,
+  nameLineWidth: -0.001,
+  numberLineWidth: -0.0018,
 
   /* ── basketball name arc */
-  curveRadiusShort: 0.17, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.003, curveYShort: -0.001, curveZShort: -0.002,
+  curveRadiusShort: 0, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.003, curveYShort: -0.001, curveZShort: -0.005,
   curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: 0.017, curveZMid: 0,
   curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: 0.025, curveZLong: 0,
-  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.004, curveYXLong: 0.035, curveZXLong: 0.001,
+  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.006, curveYXLong: 0.035, curveZXLong: 0.001,
   maxNameWidthBB: 0.7,
   maxNameWidthOther: 0.82,
   fitToWidth: true,
 
   /* ── Position offsets ── */
-  nameXShort: 0, nameYShort: 0, nameZShort: 0,
-  nameXMid: 0, nameYMid: 0, nameZMid: 0,
-  nameXLong: 0, nameYLong: 0, nameZLong: 0,
-  nameXXLong: 0, nameYXLong: 0, nameZXLong: 0,
+  nameXShort: -0.001, nameYShort: 0.069, nameZShort: 0,
+  nameXMid: -0.013, nameYMid: 0.07, nameZMid: 0,
+  nameXLong: -0.059, nameYLong: 0.076, nameZLong: 0,
+  nameXXLong: -0.046, nameYXLong: 0.08, nameZXLong: 0,
 
-  numX1: 0, numY1: 0, numZ1: 0,
-  numX2: -0.049, numY2: 0, numZ2: 0,
-  numX3: 0, numY3: 0, numZ3: 0,
-  numX4: 0, numY4: 0, numZ4: 0,
-  bbNumX1: 0.013, bbNumY1: 0.018, bbNumZ1: 0,
-  bbNumX2: -0.054, bbNumY2: 0.003, bbNumZ2: 0,
-  bbNumX3: -0.07, bbNumY3: 0.059, bbNumZ3: 0,
-  bbNumX4: 0, bbNumY4: 0, bbNumZ4: 0,
+  numX1: 0.012, numY1: 0.031, numZ1: 0,
+  numX2: -0.044, numY2: 0.048, numZ2: 0,
+  numX3: -0.064, numY3: 0.056, numZ3: 0,
+  numX4: -0.067, numY4: 0.065, numZ4: 0,
+  bbNumX1: 0, bbNumY1: 0, bbNumZ1: 0,
+  bbNumX2: -0.049, bbNumY2: 0.006, bbNumZ2: 0,
+  bbNumX3: -0.07, bbNumY3: 0.024, bbNumZ3: 0,
+  bbNumX4: -0.067, bbNumY4: 0.029, bbNumZ4: 0,
 
   /* ── glow ─── */
-  intensity: 2.4,
-  softIntensity: 1.15,
-  offIntensity: 0,
-  coreWhite: 0,
-  fresnelPow: 2.4,
+  intensity: 2.2,
+  softIntensity: 1.6,
+  offIntensity: 0.75,
+  coreWhite: 0.01,
+  fresnelPow: 0.3,
   rimBoost: 0.28,
-  physicalEmissive: 0.32,
+  physicalEmissive: 0.64,
 
   /* ── orbit ─── */
   orbitMin: 0.45,
@@ -305,6 +307,8 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${kv('numberBevelSize')},
   ${kv('bevelSegments')},
   ${kv('curveSegments')},
+  ${kv('nameLineWidth')},
+  ${kv('numberLineWidth')},
 
   /* ── basketball name arc */
   ${row(['curveRadiusShort', 'curveSagShort', 'curveTiltShort', 'curveXShort', 'curveYShort', 'curveZShort'])},
@@ -528,6 +532,8 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('name bevel size', 'nameBevelSize', 0, 0.02, 0.0002, values, setOpen, openVal)}
                 {slider('num bevel thick', 'numberBevelThickness', 0, 0.04, 0.0005, values, setOpen, openVal)}
                 {slider('num bevel size', 'numberBevelSize', 0, 0.02, 0.0002, values, setOpen, openVal)}
+                {slider('name boldness', 'nameLineWidth', -0.01, 0.03, 0.0002, values, setOpen, openVal)}
+                {slider('number boldness', 'numberLineWidth', -0.01, 0.03, 0.0002, values, setOpen, openVal)}
                 {/* {slider('bevel segments', 'bevelSegments', 1, 12, 1, values, setOpen, openVal)}
                 {slider('curve segments', 'curveSegments', 4, 32, 1, values, setOpen, openVal)} */}
               </Section>
@@ -794,6 +800,7 @@ export default function NeonText({
   const extrusion = isNumber ? t.numberExtrusion : t.nameExtrusion;
   const bevelThickness = isNumber ? t.numberBevelThickness : t.nameBevelThickness;
   const bevelSize = isNumber ? t.numberBevelSize : t.nameBevelSize;
+  const lineWidth = isNumber ? t.numberLineWidth : t.nameLineWidth;
 
   const size = useMemo(() => {
     if (!len) return baseSize;
@@ -875,6 +882,7 @@ export default function NeonText({
     bevelEnabled: true,
     bevelThickness,
     bevelSize,
+    bevelOffset: lineWidth,
     bevelSegments: Math.max(1, Math.round(t.bevelSegments)),
     material: mat,
   } as const;
