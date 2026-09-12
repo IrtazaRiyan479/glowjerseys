@@ -16,7 +16,7 @@ import {
  - DEBUG SWITCHES
  - =========================================================================== */
 const DEBUG = {
-  orbit: false,
+  orbit: true,
   panel: false,
   pivot: false,
 };

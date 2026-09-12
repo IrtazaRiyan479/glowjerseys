@@ -38,6 +38,13 @@ const MODEL_DEFAULTS = {
   glassRough: 0.35,
   acrylicOpacity: 0.095,
   acrylicRough: 0.17,
+  solidRough: 0.045,
+  solidClearcoatRough: 0.03,
+  solidEnv: 3.2,
+  solidEmissive: 0.22,
+  coverRough: 0.02,
+  coverEnv: 4.5,
+  coverIor: 1.5,
   bounceTopY: 0.12,
   bounceBotY: -0.08,
   bounceZ: -0.05,
@@ -168,6 +175,13 @@ function ModelDebugPanel() {
                 {slider('glass rough', 'glassRough', 0, 1, 0.01, values)}
                 {slider('acrylic opacity', 'acrylicOpacity', 0, 0.5, 0.005, values)}
                 {slider('acrylic rough', 'acrylicRough', 0, 1, 0.01, values)}
+                {slider('solid rough', 'solidRough', 0, 0.4, 0.005, values)}
+                {slider('solid coat rough', 'solidClearcoatRough', 0, 0.3, 0.005, values)}
+                {slider('solid env', 'solidEnv', 0, 8, 0.05, values)}
+                {slider('solid emissive', 'solidEmissive', 0, 1, 0.01, values)}
+                {slider('cover rough', 'coverRough', 0, 0.3, 0.005, values)}
+                {slider('cover env', 'coverEnv', 0, 10, 0.05, values)}
+                {slider('cover ior', 'coverIor', 1.2, 2.3, 0.01, values)}
                 {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values)}
                 {slider('rim boost', 'rimBoost', 0, 4, 0.05, values)}
                 {slider('tube flatten', 'neonFlatten', 0, 1, 0.01, values)}
@@ -487,23 +501,45 @@ else if (nameLower.includes('neon')) {
 
     
       else if (nameLower.includes('glass')) {
-        child.visible = true;
-        child.material = new THREE.MeshPhysicalMaterial({
-          color: '#e8eef5',
-          metalness: 0,
-          roughness: t.glassRough,
-          transmission: 0,
-          transparent: true,
-          opacity: t.glassOpacity,
-          depthWrite: false,
-          side: THREE.FrontSide,
-          envMapIntensity: 0,
-          clearcoat: 0,
-          reflectivity: 0,
-          specularIntensity: 0,
-        });
-        child.material.needsUpdate = true;
-      }
+  const isClear =
+    backboardColor === 'transparent' ||
+    backboardColor === 'Transparent';
+
+  child.visible = true;
+  child.material = isClear
+    ? new THREE.MeshPhysicalMaterial({
+        color: '#e8eef5',
+        metalness: 0,
+        roughness: t.glassRough,
+        transmission: 0,
+        transparent: true,
+        opacity: t.glassOpacity,
+        depthWrite: false,
+        side: THREE.FrontSide,
+        envMapIntensity: 0,
+        clearcoat: 0,
+        reflectivity: 0,
+        specularIntensity: 0,
+      })
+    : new THREE.MeshPhysicalMaterial({
+        color: '#ffffff',
+        metalness: 0,
+        roughness: t.coverRough,
+        transmission: 1,
+        thickness: 0.02,
+        ior: t.coverIor,
+        transparent: true,
+        opacity: 1,
+        depthWrite: true,
+        side: THREE.DoubleSide,
+        envMapIntensity: t.coverEnv,
+        clearcoat: 1,
+        clearcoatRoughness: 0.02,
+        reflectivity: 1,
+        specularIntensity: 1,
+      });
+  child.material.needsUpdate = true;
+}
 
       else {
         const isInnerMesh = nameLower.includes('jersey');
