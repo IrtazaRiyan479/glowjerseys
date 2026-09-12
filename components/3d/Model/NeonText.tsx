@@ -17,7 +17,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: true,
-  panel: false,
+  panel: true,
   pivot: false,
 };
 
@@ -37,8 +37,8 @@ const DEFAULTS = {
   nameSize5: 0.083,
   nameSize6: 0.076,
   nameSize7: 0.064,
-  nameSize8: 0.052,
-  nameSize9: 0.056,
+  nameSize8: 0.054,
+  nameSize9: 0.054,
   nameSize10: 0.048,
   nameSize11: 0.047,
   nameSize12: 0.039,
@@ -84,19 +84,19 @@ const DEFAULTS = {
   fitToWidth: true,
 
   /* ── Position offsets ── */
-  nameX1: 0.001, nameY1: -0.007, nameZ1: 0,
-  nameX2: 0.002, nameY2: 0.012, nameZ2: 0,
-  nameX3: 0.002, nameY3: 0.007, nameZ3: 0,
-  nameX4: 0.002, nameY4: 0.021, nameZ4: 0,
-  nameX5: 0, nameY5: 0.03, nameZ5: 0,
-  nameX6: 0, nameY6: 0.03, nameZ6: 0,
-  nameX7: 0, nameY7: 0.035, nameZ7: 0,
-  nameX8: 0, nameY8: 0.039, nameZ8: 0,
-  nameX9: 0, nameY9: 0.044, nameZ9: 0,
-  nameX10: 0, nameY10: 0.044, nameZ10: 0,
-  nameX11: 0, nameY11: 0.049, nameZ11: 0,
-  nameX12: 0, nameY12: 0.049, nameZ12: 0,
-  nameX13: 0.002, nameY13: 0.044, nameZ13: 0,
+  nameX1: 0, nameY1: 0, nameZ1: 0.011,
+  nameX2: 0.002, nameY2: 0.001, nameZ2: 0.01,
+  nameX3: 0.002, nameY3: 0.002, nameZ3: 0.01,
+  nameX4: 0.002, nameY4: 0.009, nameZ4: 0.01,
+  nameX5: 0, nameY5: 0.01, nameZ5: 0.01,
+  nameX6: 0.001, nameY6: 0.014, nameZ6: 0.01,
+  nameX7: 0, nameY7: 0.018, nameZ7: 0.01,
+  nameX8: 0, nameY8: 0.023, nameZ8: 0.01,
+  nameX9: 0, nameY9: 0.023, nameZ9: 0.01,
+  nameX10: 0, nameY10: 0.027, nameZ10: 0.01,
+  nameX11: 0, nameY11: 0.028, nameZ11: 0.01,
+  nameX12: 0, nameY12: 0.032, nameZ12: 0.01,
+  nameX13: 0, nameY13: 0.032, nameZ13: 0.01,
 
   numX1: 0.012, numY1: -0.039, numZ1: 0,
   numX2: 0.002, numY2: -0.025, numZ2: 0,
@@ -112,8 +112,8 @@ const DEFAULTS = {
   softIntensity: 1.6,
   offIntensity: 0.75,
   coreWhite: 0.01,
-  fresnelPow: 0.3,
-  rimBoost: 0.28,
+  fresnelPow: 0,
+  rimBoost: 0,
   physicalEmissive: 0.64,
 
   /* ── orbit ─── */
