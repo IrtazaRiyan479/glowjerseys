@@ -208,7 +208,7 @@
 .gj-theme .header__right { display: flex; grid-area: icons; justify-self: end; margin-inline-end: -15px; align-items: center; }
 @media screen and (min-width: 990px) {
   .gj-theme .header__left { display: contents; }
-  .gj-theme .header > .header__inline-menu { grid-column: 1; grid-row: 1; justify-self: start; margin: 0; }
+  .gj-theme .header > .header__inline-menu { grid-column: 1; grid-row: 1; justify-self: start; margin: 3px; }
   .gj-theme .header__heading-link { grid-column: 2; grid-row: 1; justify-self: center; }
   .gj-theme .header__right { grid-column: 3; grid-row: 1; justify-self: end; }
 }
