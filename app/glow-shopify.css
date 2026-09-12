@@ -180,7 +180,7 @@
 /* Header */
 .gj-theme.shopify-section-header { position: relative; z-index: 20; flex-shrink: 0; width: 100%; background: #fff; }
 .gj-theme .header-wrapper { display: block; position: relative; z-index: 20; background: var(--gradient-header-background); }
-.gj-theme .header-wrapper--border-bottom { box-shadow: 0 1px rgba(var(--color-header-border), 0.3); }
+.gj-theme .header-wrapper--border-bottom { box-shadow: none; }
 .gj-theme .header {
   display: grid;
   grid-template-areas: "left-icon heading icons";
