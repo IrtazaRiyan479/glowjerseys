@@ -258,7 +258,7 @@ const Experience = ({
   </button>
 </div>
 
-<div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+<div className="absolute top-4 right-4 z-10 flex items-center gap-2">
   <span className="text-white text-xs font-medium drop-shadow">Neon</span>
   <button
     type="button"

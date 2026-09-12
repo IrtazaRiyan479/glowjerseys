@@ -178,8 +178,9 @@
 .gj-theme .link-with-icon .icon { width: 18px; height: 18px; margin-inline-end: 10px; }
 
 /* Header */
-.gj-theme.shopify-section-header { position: relative; z-index: 20; flex-shrink: 0; width: 100%; background: #fff; }
-.gj-theme .header-wrapper { display: block; position: relative; z-index: 20; background: var(--gradient-header-background); }
+.gj-theme.shopify-section-header { position: relative; z-index: 100; flex-shrink: 0; width: 100%; background: #fff; }
+.gj-theme .header-wrapper { display: block; position: relative; z-index: 100; background: var(--gradient-header-background); }
+.gj-theme .players-mega { z-index: 101; }
 .gj-theme .header-wrapper--border-bottom { box-shadow: none; }
 .gj-theme .header {
   display: grid;
