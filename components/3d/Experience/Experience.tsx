@@ -1,12 +1,13 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { AdaptiveDpr, ContactShadows, Environment } from '@react-three/drei';
+import { ContactShadows, Environment } from '@react-three/drei';
 import { memo, Suspense, useEffect, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import * as THREE from 'three';
 import Model from '../Model/Model';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, SMAA } from '@react-three/postprocessing';
+import { EdgeDetectionMode, SMAAPreset } from 'postprocessing';
 import SnapshotController from './SnapshotController';
 
 
@@ -309,7 +310,7 @@ const Experience = ({
 
     <Canvas
     shadows={false}
-    dpr={[1, 1.75]}
+    dpr={2}
     frameloop="always"
        camera={{
       position: [t.camX, t.camY, t.camZ],
@@ -318,7 +319,7 @@ const Experience = ({
       far: 20,
     }}
     gl={{
-      antialias: true,
+      antialias: false,
       alpha: false,
       toneMapping: THREE.NeutralToneMapping,
       toneMappingExposure: t.exposure,
@@ -329,7 +330,6 @@ const Experience = ({
       preserveDrawingBuffer: true,
     }}
   >
-    <AdaptiveDpr />
 
     <ambientLight intensity={isDark ? t.ambientDark : t.ambientLit} />
     <directionalLight position={[3, 4, 5]} intensity={isDark ? t.dir1Dark : t.dir1Lit} />
@@ -363,13 +363,22 @@ const Experience = ({
         frames={1}
       />
 
-      <EffectComposer multisampling={0} enableNormalPass={false}>
-                <Bloom
+      <EffectComposer
+        multisampling={8}
+        enableNormalPass={false}
+        frameBufferType={THREE.HalfFloatType}
+      >
+        <Bloom
           mipmapBlur
           luminanceThreshold={t.bloomThreshold}
+          luminanceSmoothing={0.025}
           intensity={t.bloomIntensity}
           levels={t.bloomLevels}
           radius={t.bloomRadius}
+        />
+        <SMAA
+          preset={SMAAPreset.ULTRA}
+          edgeDetectionMode={EdgeDetectionMode.COLOR}
         />
       </EffectComposer>
     </Suspense>

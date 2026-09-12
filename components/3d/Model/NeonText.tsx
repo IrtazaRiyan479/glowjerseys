@@ -16,7 +16,7 @@ import {
  - DEBUG SWITCHES
  - =========================================================================== */
 const DEBUG = {
-  orbit: false,
+  orbit: true,
   panel: false,
   pivot: false,
 };
@@ -69,8 +69,8 @@ const DEFAULTS = {
   nameBevelSize: 0.0042,
   numberBevelThickness: 0.013,
   numberBevelSize: 0.005,
-  bevelSegments: 4,
-  curveSegments: 12,
+  bevelSegments: 8,
+  curveSegments: 32,
   nameLineWidth: -0.001,
   numberLineWidth: -0.0018,
 
@@ -263,9 +263,17 @@ const fragmentShader = `
 
     vec3 n = normalize(vWorldNormal);
     vec3 v = normalize(vViewDir);
-    float fresnel = pow(1.0 - clamp(abs(dot(n, v)), 0.0, 1.0), uFresnelPow);
+    float ndv = abs(dot(n, v));
+    float w = fwidth(ndv);
+    float ndvAA = mix(ndv, smoothstep(-w, w, ndv), 0.35);
+    float fresnel = pow(1.0 - clamp(ndvAA, 0.0, 1.0), uFresnelPow);
 
     vec3 col = hue * uIntensity * (1.0 + fresnel * uRim);
+
+    float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+    float dither = (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
+    col += dither * max(luma, 1.0);
+
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -886,6 +894,7 @@ export default function NeonText({
       depthWrite: true,
       depthTest: true,
       side: THREE.FrontSide,
+      dithering: true,
     });
   }, []);
 
