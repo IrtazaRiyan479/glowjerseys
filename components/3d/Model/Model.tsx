@@ -534,20 +534,11 @@ else if (nameLower.includes('neon')) {
           reflectivity: 0,
         });
 
-        const solidColorMaterial = new THREE.MeshPhysicalMaterial({
-          color: backboardColor,
-          metalness: 0.0,
-          roughness: 0.2,
-          transmission: 0.0,
-          thickness: 0.0,
-          clearcoat: 0.15,
-          clearcoatRoughness: 0.45,
-          envMapIntensity: 0.25,
-          reflectivity: 0.06,
-          transparent: false,
-          opacity: 1.0,
-          side: THREE.FrontSide,
-        });
+       const solidColorMaterial = new THREE.MeshBasicMaterial({
+  color: backboardColor,
+  toneMapped: false,
+  side: THREE.FrontSide,
+});
 
         if (isInnerMesh && !isClear) {
           child.material = solidColorMaterial;
@@ -610,14 +601,14 @@ return (
 
       {name && (
         <NeonText
-          text={name}
-          color={nameColor}
-          position={[t.nameX, t.nameY, t.nameZ]}
-          scale={1}
-          curve={true}
-          neonOn={neonOn}
-          sport={sport}
-        />
+  text={name}
+  color={nameColor}
+  position={[t.nameX, t.nameY, t.nameZ]}
+  scale={1}
+  curve={true}
+  neonOn={neonOn}
+  sport={sport}
+/>
       )}
 
       {number && (

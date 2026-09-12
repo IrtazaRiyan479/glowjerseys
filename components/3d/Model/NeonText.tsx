@@ -6,7 +6,6 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import {
   Text3D,
-  Center,
   OrbitControls,
   PivotControls,
   useFont,
@@ -31,10 +30,19 @@ const DEFAULTS = {
   fontPathNumber: '/fonts/Mayfair.json',
 
   /* ── name size ── */
-  nameSizeShort: 0.07,
-  nameSizeMid: 0.058,
-  nameSizeLong: 0.048,
-  nameSizeXLong: 0.039,
+  nameSize1: 0.106,
+  nameSize2: 0.103,
+  nameSize3: 0.1,
+  nameSize4: 0.084,
+  nameSize5: 0.083,
+  nameSize6: 0.076,
+  nameSize7: 0.064,
+  nameSize8: 0.052,
+  nameSize9: 0.056,
+  nameSize10: 0.048,
+  nameSize11: 0.047,
+  nameSize12: 0.039,
+  nameSize13: 0.039,
   bbNameSizeShort: 0.058,
   bbNameSizeMid: 0.046,
   bbNameSizeLong: 0.038,
@@ -76,15 +84,24 @@ const DEFAULTS = {
   fitToWidth: true,
 
   /* ── Position offsets ── */
-  nameXShort: -0.001, nameYShort: 0.069, nameZShort: 0,
-  nameXMid: -0.013, nameYMid: 0.07, nameZMid: 0,
-  nameXLong: -0.059, nameYLong: 0.076, nameZLong: 0,
-  nameXXLong: -0.046, nameYXLong: 0.08, nameZXLong: 0,
+  nameX1: 0.001, nameY1: -0.007, nameZ1: 0,
+  nameX2: 0.002, nameY2: 0.012, nameZ2: 0,
+  nameX3: 0.002, nameY3: 0.007, nameZ3: 0,
+  nameX4: 0.002, nameY4: 0.021, nameZ4: 0,
+  nameX5: 0, nameY5: 0.03, nameZ5: 0,
+  nameX6: 0, nameY6: 0.03, nameZ6: 0,
+  nameX7: 0, nameY7: 0.035, nameZ7: 0,
+  nameX8: 0, nameY8: 0.039, nameZ8: 0,
+  nameX9: 0, nameY9: 0.044, nameZ9: 0,
+  nameX10: 0, nameY10: 0.044, nameZ10: 0,
+  nameX11: 0, nameY11: 0.049, nameZ11: 0,
+  nameX12: 0, nameY12: 0.049, nameZ12: 0,
+  nameX13: 0.002, nameY13: 0.044, nameZ13: 0,
 
-  numX1: 0.012, numY1: 0.031, numZ1: 0,
-  numX2: -0.044, numY2: 0.048, numZ2: 0,
-  numX3: -0.064, numY3: 0.056, numZ3: 0,
-  numX4: -0.067, numY4: 0.065, numZ4: 0,
+  numX1: 0.012, numY1: -0.039, numZ1: 0,
+  numX2: 0.002, numY2: -0.025, numZ2: 0,
+  numX3: -0.002, numY3: -0.021, numZ3: 0,
+  numX4: -0.002, numY4: -0.016, numZ4: 0,
   bbNumX1: 0, bbNumY1: 0, bbNumZ1: 0,
   bbNumX2: -0.049, bbNumY2: 0.006, bbNumZ2: 0,
   bbNumX3: -0.07, bbNumY3: 0.024, bbNumZ3: 0,
@@ -114,10 +131,27 @@ function curveParamsForName(len: number, t: TweakState) {
 
 function offsetParamsForName(len: number, sport: string, t: TweakState) {
   if (sport === 'Basketball') return { ox: 0, oy: 0, oz: 0, scale: 1 };
-  if (len <= 5) return { ox: t.nameXShort, oy: t.nameYShort, oz: t.nameZShort, scale: 1 };
-  if (len <= 8) return { ox: t.nameXMid, oy: t.nameYMid, oz: t.nameZMid, scale: 1 };
-  if (len <= 11) return { ox: t.nameXLong, oy: t.nameYLong, oz: t.nameZLong, scale: 1 };
-  return { ox: t.nameXXLong, oy: t.nameYXLong, oz: t.nameZXLong, scale: 1 };
+  return {
+    ox: nameNum(t, 'X', len),
+    oy: nameNum(t, 'Y', len),
+    oz: nameNum(t, 'Z', len),
+    scale: 1,
+  };
+}
+
+function textWidth(
+  fontData: any,
+  chars: string[],
+  size: number,
+  extraGap: number,
+) {
+  if (!chars.length) return 0;
+  let w = 0;
+  for (let i = 0; i < chars.length; i++) {
+    w += glyphAdvance(fontData, chars[i], size);
+    if (i < chars.length - 1) w += extraGap;
+  }
+  return w;
 }
 
 function offsetParamsForNumber(len: number, sport: string, t: TweakState) {
@@ -161,6 +195,20 @@ function useTweaks(): TweakState {
     };
   }, []);
   return s;
+}
+
+const NAME_LEN_MAX = 13;
+
+function clampNameLen(len: number) {
+  return Math.min(NAME_LEN_MAX, Math.max(1, len));
+}
+
+function nameNum(
+  t: TweakState,
+  kind: 'Size' | 'X' | 'Y' | 'Z',
+  len: number,
+): number {
+  return t[`name${kind}${clampNameLen(len)}` as keyof TweakState] as number;
 }
 
 interface NeonTextProps {
@@ -223,11 +271,13 @@ const fragmentShader = `
 `;
 
 function sizeForName(len: number, sport: string, t: TweakState) {
-  const bb = sport === 'Basketball';
-  if (len <= 5) return bb ? t.bbNameSizeShort : t.nameSizeShort;
-  if (len <= 8) return bb ? t.bbNameSizeMid : t.nameSizeMid;
-  if (len <= 11) return bb ? t.bbNameSizeLong : t.nameSizeLong;
-  return bb ? t.bbNameSizeXLong : t.nameSizeXLong;
+  if (sport === 'Basketball') {
+    if (len <= 5) return t.bbNameSizeShort;
+    if (len <= 8) return t.bbNameSizeMid;
+    if (len <= 11) return t.bbNameSizeLong;
+    return t.bbNameSizeXLong;
+  }
+  return nameNum(t, 'Size', len);
 }
 
 function sizeForNumber(len: number, sport: string, t: TweakState) {
@@ -275,10 +325,7 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${kv('fontPathNumber')},
 
   /* ── name size ── */
-  ${kv('nameSizeShort')},
-  ${kv('nameSizeMid')},
-  ${kv('nameSizeLong')},
-  ${kv('nameSizeXLong')},
+  ${Array.from({ length: 13 }, (_, i) => kv(`nameSize${i + 1}` as keyof TweakState)).join(',\n  ')},
   ${kv('bbNameSizeShort')},
   ${kv('bbNameSizeMid')},
   ${kv('bbNameSizeLong')},
@@ -320,10 +367,13 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${kv('fitToWidth')},
 
   /* ── Position offsets ── */
-  ${row(['nameXShort', 'nameYShort', 'nameZShort'])},
-  ${row(['nameXMid', 'nameYMid', 'nameZMid'])},
-  ${row(['nameXLong', 'nameYLong', 'nameZLong'])},
-  ${row(['nameXXLong', 'nameYXLong', 'nameZXLong'])},
+  ${Array.from({ length: 13 }, (_, i) =>
+    row([
+      `nameX${i + 1}` as keyof TweakState,
+      `nameY${i + 1}` as keyof TweakState,
+      `nameZ${i + 1}` as keyof TweakState,
+    ]),
+  ).join(',\n  ')},
 
   ${row(['numX1', 'numY1', 'numZ1'])},
   ${row(['numX2', 'numY2', 'numZ2'])},
@@ -359,7 +409,7 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   return `const DEFAULTS = {\n${body}${extra}\n};`;
 }
 
-function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
+function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean; len: number; }) {
   const t = useTweaks();
   const [open, setOpen] = useState(true);
 
@@ -502,10 +552,18 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 into DEFAULTS when done.
               </p>
               <Section title="Name size (by length)">
-                {slider('other ≤5', 'nameSizeShort', 0.04, 0.3, 0.001, values, setOpen, openVal)}
-                {slider('other 6–8', 'nameSizeMid', 0.04, 0.3, 0.001, values, setOpen, openVal)}
-                {slider('other 9–11', 'nameSizeLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
-                {slider('other 12+', 'nameSizeXLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
+                {Array.from({ length: 13 }, (_, i) =>
+                  slider(
+                    `${i + 1} char${i ? 's' : ''}${len === i + 1 ? '  ←' : ''}`,
+                    `nameSize${i + 1}` as keyof TweakState,
+                    0.02,
+                    0.3,
+                    0.001,
+                    values,
+                    setOpen,
+                    openVal,
+                  ),
+                )}
                 {slider('bb ≤5', 'bbNameSizeShort', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('bb 6–8', 'bbNameSizeMid', 0.04, 0.3, 0.001, values, setOpen, openVal)}
                 {slider('bb 9–11', 'bbNameSizeLong', 0.04, 0.3, 0.001, values, setOpen, openVal)}
@@ -582,31 +640,6 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 </div>
               </Section>
               <Section title="Position offsets">
-                <details style={{ marginLeft: 8, marginBottom: 6 }}>
-                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Short (1-5 chars)</summary>
-                  {slider('name X', 'nameXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Y', 'nameYShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Z', 'nameZShort', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                </details>
-                <details style={{ marginLeft: 8, marginBottom: 6 }}>
-                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Mid (6-8 chars)</summary>
-                  {slider('name X', 'nameXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Y', 'nameYMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Z', 'nameZMid', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                </details>
-                <details style={{ marginLeft: 8, marginBottom: 6 }}>
-                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name Long (9-11 chars)</summary>
-                  {slider('name X', 'nameXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Y', 'nameYLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Z', 'nameZLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                </details>
-                <details style={{ marginLeft: 8, marginBottom: 6 }}>
-                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Name XLong (12+ chars)</summary>
-                  {slider('name X', 'nameXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Y', 'nameYXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
-                  {slider('name Z', 'nameZXLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
-                </details>
-
                 <div style={{ marginTop: 12 }}>
                   <details style={{ marginLeft: 8, marginBottom: 6 }}>
                     <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Number (1 digit)</summary>
@@ -658,6 +691,23 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                   </details>
                 </div>
               </Section>
+              <Section title="Name position (by character count)">
+                    {Array.from({ length: 13 }, (_, i) => (
+                      <details
+                        key={i}
+                        open={len === i + 1}
+                        style={{ marginLeft: 8, marginBottom: 6 }}
+                      >
+                        <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>
+                          {i + 1} char{i ? 's' : ''}
+                          {len === i + 1 ? '  ← current' : ''}
+                        </summary>
+                        {slider('name X', `nameX${i + 1}` as keyof TweakState, -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                        {slider('name Y', `nameY${i + 1}` as keyof TweakState, -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                        {slider('name Z', `nameZ${i + 1}` as keyof TweakState, -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                      </details>
+                    ))}
+                  </Section>
               <Section title="Glow (TEXT)">
                 {slider('intensity', 'intensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('soft intensity', 'softIntensity', 0, 20, 0.1, values, setOpen, openVal)}
@@ -932,13 +982,16 @@ export default function NeonText({
     });
   };
 
-  const renderFlat = () => (
-    <Center>
-      <Text3D {...common} size={size} letterSpacing={extraGap}>
-        {raw}
-      </Text3D>
-    </Center>
-  );
+  const renderFlat = () => {
+    const w = textWidth(fontData, chars, size, extraGap);
+    return (
+      <group position={[-w / 2, 0, 0]}>
+        <Text3D {...common} size={size} letterSpacing={extraGap}>
+          {raw}
+        </Text3D>
+      </group>
+    );
+  };
 
   const content = (
     <group
@@ -949,9 +1002,15 @@ export default function NeonText({
     </group>
   );
 
+  const debug = DEBUG.panel ? (
+    <DebugPanel sport={sport} isNumber={isNumber} len={len} />
+  ) : null;
+
+  if (!raw) return <>{debug}</>;
+
   return (
     <>
-      {DEBUG.panel && <DebugPanel sport={sport} isNumber={isNumber} />}
+      {debug}
 
       {DEBUG.orbit && !isNumber && (
         <OrbitControls

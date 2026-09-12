@@ -290,7 +290,7 @@ const Experience = ({
   </button>
 </div>
 
-<button
+{/* <button
   type="button"
   className="absolute bottom-6 right-4 z-50 px-3 py-2 rounded-md bg-white/90 text-black text-xs font-semibold shadow"
   onClick={async () => {
@@ -305,7 +305,7 @@ const Experience = ({
   }}
 >
   Test Snapshot
-</button>
+</button> */}
 
     <Canvas
     shadows={false}
