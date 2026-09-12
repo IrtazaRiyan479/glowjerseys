@@ -7,7 +7,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import * as THREE from 'three';
 import NeonText from './NeonText';
 
-const MODEL_DEBUG = { panel: false };
+const MODEL_DEBUG = { panel: true };
 
 const MODEL_DEFAULTS = {
   groupX: 0, groupY: -0.05, groupZ: 0, groupScale: 1.15,

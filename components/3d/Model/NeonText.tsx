@@ -450,7 +450,7 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
         <div
           style={{
             position: 'fixed',
-            top: 8,
+            top: 48,
             left: 8,
             zIndex: 99999,
             width: 280,

@@ -37,7 +37,7 @@ interface ConfiguratorUIProps {
 /** Exact colors from glowjerseys.com/products/custom-jersey */
 const jerseyColors = [
   { name: 'Yellow', hex: '#FFE800' },
-  { name: 'Orange', hex: '#FF8A00' },
+  { name: 'Orange', hex: '#FF3300' },
   { name: 'Ice Blue', hex: '#2CC5F5' },
   { name: 'Green', hex: '#17D63A' },
   { name: 'Red', hex: '#FF1A15' },

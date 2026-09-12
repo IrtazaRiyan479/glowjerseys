@@ -23,7 +23,7 @@ const Page = () => {
   const [sportsTypeValue, setSportsTypeValue] = useState('Soccer');
   const [name, setName] = useState('BROWN');
   const [number, setNumber] = useState('7');
-  const [outlineColor, setOutlineColor] = useState('#ff3300');
+  const [outlineColor, setOutlineColor] = useState('#FF3300');
   const [nameColor, setNameColor] = useState('#ffffff');
   const [numberColor, setNumberColor] = useState('#ffffff');
   const [backboardColor, setBackboardColor] = useState('transparent');

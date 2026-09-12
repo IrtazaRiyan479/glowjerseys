@@ -13,15 +13,29 @@ import SnapshotController from './SnapshotController';
 const EXP_DEBUG = { panel: false };
 
 const EXP_DEFAULTS = {
-  camX: 0, camY: 0.05, camZ: 1.95, camFov: 32,
-  ambientDark: 0.15, ambientLit: 0.55,
-  dir1Dark: 0.35, dir1Lit: 1.2,
-  dir2Dark: 0.2, dir2Lit: 0.5,
+  camX: 0,
+  camY: 0.05,
+  camZ: 1.95,
+  camFov: 32,
+  ambientDark: 0.15,
+  ambientLit: 0,
+  dir1Dark: 0.35,
+  dir1Lit: 0.44,
+  dir2Dark: 0.2,
+  dir2Lit: 0,
   envIntensity: 0.25,
-  wrapX: 0, wrapY: 0.08, wrapZ: 0.08, wrapScale: 0.8,
-  bloomThreshold: 1.05, bloomIntensity: 0.32, bloomLevels: 4, bloomRadius: 0.35,
-  shadowY: -0.48, shadowOpacity: 0.22, shadowBlur: 1.8,
-  exposure: 1.0,
+  wrapX: 0,
+  wrapY: 0.08,
+  wrapZ: 0.08,
+  wrapScale: 0.8,
+  bloomThreshold: 2,
+  bloomIntensity: 0.43,
+  bloomLevels: 2,
+  bloomRadius: 0,
+  shadowY: -0.69,
+  shadowOpacity: 0.22,
+  shadowBlur: 1.8,
+  exposure: 1
 };
 
 type ExpTweakState = typeof EXP_DEFAULTS;
@@ -82,7 +96,7 @@ function ExperienceDebugPanel() {
 
     const renderPanel = (values: ExpTweakState, openVal: boolean) => {
       root.render(
-        <div style={{ position: 'fixed', top: 8, left: 296, zIndex: 99999, width: 260, maxHeight: '96vh', overflow: 'auto', background: 'rgba(12,12,14,0.92)', color: '#fff', border: '1px solid #333', borderRadius: 10, padding: 10, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', boxShadow: '0 8px 32px rgba(0,0,0,0.45)' }}>
+        <div style={{ position: 'fixed', top: 8, right: 296, zIndex: 99999, width: 260, maxHeight: '96vh', overflow: 'auto', background: 'rgba(12,12,14,0.92)', color: '#fff', border: '1px solid #333', borderRadius: 10, padding: 10, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', boxShadow: '0 8px 32px rgba(0,0,0,0.45)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700 }}>EXPERIENCE TWEAKS</span>
             <button type="button" onClick={() => setOpen((v) => !v)} style={{ background: '#222', color: '#fff', border: '1px solid #444', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}>{openVal ? 'hide' : 'show'}</button>
@@ -153,7 +167,6 @@ function AnimatedCopyButton({ label, onCopy }: { label: string; onCopy: () => st
           const src = onCopy();
           console.log('[TWEAKS DEFAULTS]\n', src);
           await navigator.clipboard?.writeText(src);
-          // 400ms delay so the loading animation is actually visible to the user
           await new Promise((r) => setTimeout(r, 400));
           alert('Tweaks successfully copied to clipboard!');
         } catch (err) {
