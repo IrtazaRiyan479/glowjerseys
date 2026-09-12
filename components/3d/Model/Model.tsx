@@ -21,6 +21,8 @@ const MODEL_DEFAULTS = {
   neonIntensitySoft: 1.15,
   neonIntensityHard: 2.4,
   neonOffEmissive: 0.35,
+  fresnelPow: 2.4,
+  rimBoost: 0.28,
 
   glassOpacity: 0.08, glassRough: 0.35,
   acrylicOpacity: 0.12, acrylicRough: 0.25,
@@ -144,6 +146,8 @@ function ModelDebugPanel() {
                 {slider('glass rough', 'glassRough', 0, 1, 0.01, values)}
                 {slider('acrylic opacity', 'acrylicOpacity', 0, 0.5, 0.005, values)}
                 {slider('acrylic rough', 'acrylicRough', 0, 1, 0.01, values)}
+                {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values)}
+                {slider('rim boost', 'rimBoost', 0, 4, 0.05, values)}
               </details>
               <details open style={{ marginBottom: 8 }}>
                 <summary style={{ cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#9ad' }}>Light positions</summary>
@@ -301,19 +305,37 @@ const Model = ({
   'Soccer';
 
   
-  const vertexShader = `
+    const vertexShader = `
+  varying vec3 vWorldNormal;
+  varying vec3 vViewDir;
+
   void main() {
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+    vWorldNormal = normalize(mat3(modelMatrix) * normal);
+    vViewDir = normalize(cameraPosition - worldPos.xyz);
+    gl_Position = projectionMatrix * viewMatrix * worldPos;
   }
 `;
 
 const fragmentShader = `
   uniform vec3 uColor1;
   uniform float uIntensity;
+  uniform float uFresnelPow;
+  uniform float uRim;
+
+  varying vec3 vWorldNormal;
+  varying vec3 vViewDir;
+
   void main() {
     float peak = max(max(uColor1.r, uColor1.g), uColor1.b);
     vec3 hue = uColor1 / max(peak, 0.001);
-    gl_FragColor = vec4(hue * uIntensity, 1.0);
+
+    vec3 n = normalize(vWorldNormal);
+    vec3 v = normalize(vViewDir);
+    float fresnel = pow(1.0 - clamp(abs(dot(n, v)), 0.0, 1.0), uFresnelPow);
+
+    vec3 col = hue * uIntensity * (1.0 + fresnel * uRim);
+    gl_FragColor = vec4(col, 1.0);
   }
 `;
 
@@ -396,6 +418,8 @@ else if (nameLower.includes('neon')) {
           uColor1: { value: new THREE.Color(outlineColor) },
           uColor2: { value: new THREE.Color(outlineColor) },
           uIntensity: { value: neonIntensity },
+          uFresnelPow: { value: t.fresnelPow },
+          uRim: { value: t.rimBoost },
           uMouseWorld: { value: new THREE.Vector3(999, 999, 999) },
         },
         transparent: false,
@@ -408,6 +432,8 @@ else if (nameLower.includes('neon')) {
       neonMaterialRef.current.uniforms.uColor1.value.set(outlineColor);
       neonMaterialRef.current.uniforms.uColor2.value.set(outlineColor);
       neonMaterialRef.current.uniforms.uIntensity.value = neonIntensity;
+      neonMaterialRef.current.uniforms.uFresnelPow.value = t.fresnelPow;
+      neonMaterialRef.current.uniforms.uRim.value = t.rimBoost;
     }
     
     child.material = neonMaterialRef.current;
@@ -514,13 +540,15 @@ else if (nameLower.includes('neon')) {
     });
   }, [clonedScene, outlineColor, backboardColor, neonOn, isDark, activeColorMap, activeNormalMap, textureVariant, t, neonIntensity, vertexShader, fragmentShader]);
 
-  useEffect(() => {
+    useEffect(() => {
     const mat = neonMaterialRef.current;
     if (!mat?.uniforms) return;
     mat.uniforms.uIntensity.value = neonIntensity;
     mat.uniforms.uColor1.value.set(outlineColor);
     mat.uniforms.uColor2.value.set(outlineColor);
-  }, [neonIntensity, outlineColor]);
+    if (mat.uniforms.uFresnelPow) mat.uniforms.uFresnelPow.value = t.fresnelPow;
+    if (mat.uniforms.uRim) mat.uniforms.uRim.value = t.rimBoost;
+  }, [neonIntensity, outlineColor, t.fresnelPow, t.rimBoost]);
 
 const isTex2 = textureVariant === 2;
 const mul = isTex2 ? t.w2Multiply : t.w1Multiply;

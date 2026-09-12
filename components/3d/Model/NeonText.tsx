@@ -656,8 +656,8 @@ function DebugPanel({ sport, isNumber }: { sport: string; isNumber: boolean }) {
                 {slider('intensity', 'intensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('soft intensity', 'softIntensity', 0, 20, 0.1, values, setOpen, openVal)}
                 {slider('off intensity', 'offIntensity', 0, 2, 0.01, values, setOpen, openVal)}
-                {/* {slider('core white', 'coreWhite', 0, 1, 0.01, values, setOpen, openVal)}
-                {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values, setOpen, openVal)} */}
+                {slider('core white', 'coreWhite', 0, 1, 0.01, values, setOpen, openVal)}
+                {slider('fresnel pow', 'fresnelPow', 0.4, 6, 0.05, values, setOpen, openVal)}
                 {slider('rim boost', 'rimBoost', 0, 4, 0.05, values, setOpen, openVal)}
                 {slider('physical emissive', 'physicalEmissive', 0, 2, 0.01, values, setOpen, openVal)}
               </Section>
