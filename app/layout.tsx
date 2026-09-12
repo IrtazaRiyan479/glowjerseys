@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import './glow-shopify.css';
 import Navbar from '@/components/Navigations/Navbar/Navbar';
 import CartDrawer from '@/components/Cart/CartDrawer';
 

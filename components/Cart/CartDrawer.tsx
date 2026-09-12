@@ -3,40 +3,45 @@
 import { useCartStore } from '@/store/cartStore';
 import { useEffect, useState } from 'react';
 
+const ORIGIN = 'https://glowjerseys.com';
+
 const RECS = [
   {
-    title: 'Love #10',
+    title: 'Booker #15',
     price: '119.99',
-    href: 'https://glowjerseys.com/products/love-10',
-    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_hvqaphhvqaphhvqa.png?width=140',
+    href: `${ORIGIN}/products/booker-1`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
   },
   {
-    title: 'Surtain #2',
+    title: 'James #23',
     price: '119.99',
-    href: 'https://glowjerseys.com/products/surtain-2',
-    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_b1shwvb1shwvb1sh.png?width=140',
+    href: `${ORIGIN}/products/james-23`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
   },
   {
-    title: 'Reed #11',
-    price: '119.99',
-    href: 'https://glowjerseys.com/products/reed-11',
-    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_t86c4zt86c4zt86c.png?width=140',
+    title: 'Mccaffrey #23',
+    price: '107.99',
+    compareAt: '119.99',
+    href: `${ORIGIN}/products/mccaffrey-23`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_lu33yhlu33yhlu33.png?width=140',
   },
   {
-    title: 'Brown #11',
+    title: 'Murray #27',
     price: '119.99',
-    href: 'https://glowjerseys.com/products/brown-11',
-    img: 'https://glowjerseys.com/cdn/shop/files/Screenshot2025-07-09at2.43.25PM.png?width=140',
+    href: `${ORIGIN}/products/murray-27`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_pawly1pawly1pawl.png?width=140',
   },
 ];
 
 const COLOR_MAP: Record<string, string> = {
   '#FFE800': 'Yellow',
   '#FF8A00': 'Orange',
+  '#FF3300': 'Orange',
   '#2CC5F5': 'Ice Blue',
   '#17D63A': 'Green',
   '#FF1A15': 'Red',
   '#0A46FF': 'Blue',
+  '#0B45FF': 'Blue',
   '#8A16FF': 'Purple',
   '#FF2E9A': 'Pink',
   '#FBECCB': 'Neutral White',
@@ -50,28 +55,102 @@ function getColorName(hexOrName: string | undefined): string {
   if (!hexOrName) return '—';
   const key = hexOrName.trim();
   if (COLOR_MAP[key]) return COLOR_MAP[key];
-  const found = Object.entries(COLOR_MAP).find(
-    ([k]) => k.toLowerCase() === key.toLowerCase()
-  );
+  const found = Object.entries(COLOR_MAP).find(([k]) => k.toLowerCase() === key.toLowerCase());
   return found ? found[1] : key;
 }
 
-function CloseButton({ onClick }: { onClick: () => void }) {
+function Price({ amount, className = '' }: { amount: number | string; className?: string }) {
+  const n = typeof amount === 'number' ? amount : parseFloat(amount);
+  const [dollars, cents] = n.toFixed(2).split('.');
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label="Close"
-      className="group relative flex h-9 w-9 items-center justify-center text-black"
-    >
-      <span className="absolute inset-0 rounded-full bg-black/0 transition group-hover:bg-black/[0.08]" />
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="relative z-[1]">
-        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    </button>
+    <span className={`price ${className}`}>
+      <bdi>
+        ${dollars}
+        <sup>.{cents}</sup>
+      </bdi>
+    </span>
   );
 }
 
+function IconClose() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-close" fill="none" viewBox="0 0 12 12">
+      <path d="M1 1L11 11" stroke="currentColor" strokeLinecap="round" fill="none" />
+      <path d="M11 1L1 11" stroke="currentColor" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+function IconPen() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-pen" fill="none" viewBox="0 0 512 512">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M493.25 56.26l-37.51-37.51C443.25 6.25 426.87 0 410.49 0s-32.76 6.25-45.26 18.74L12.85 371.12.15 485.34C-1.45 499.72 9.88 512 23.95 512c.89 0 1.78-.05 2.69-.15l114.14-12.61 352.48-352.48c24.99-24.99 24.99-65.51-.01-90.5zM126.09 468.68l-93.03 10.31 10.36-93.17 263.89-263.89 82.77 82.77-263.99 263.98zm344.54-344.54l-57.93 57.93-82.77-82.77 57.93-57.93c6.04-6.04 14.08-9.37 22.63-9.37 8.55 0 16.58 3.33 22.63 9.37l37.51 37.51c12.47 12.48 12.47 32.78 0 45.26z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconTruck() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-truck" fill="none" viewBox="0 0 24 24" width="14" height="14">
+      <path d="M1 3h13v13H1V3zm13 3h5l4 4v6h-3" stroke="currentColor" strokeWidth="1.5" fill="none" />
+      <circle cx="5.5" cy="18.5" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+      <circle cx="18.5" cy="18.5" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    </svg>
+  );
+}
+
+function Recs() {
+  return (
+    <div className="cart-recommendations">
+      <div className="title h5">You may also like</div>
+      <ul className="mini-cart__navigation">
+        {RECS.map((r) => (
+          <li key={r.title}>
+            <div className="product-container">
+              <a href={r.href} className="product-image">
+                <img src={r.img} alt={r.title} />
+              </a>
+              <div className="product-description">
+                <div className="caption-with-letter-spacing">Glow Jerseys</div>
+                <div className="product-content">
+                  <a href={r.href} className="link">
+                    {r.title}
+                  </a>
+                </div>
+                <div className="price">
+                  {r.compareAt ? (
+                    <>
+                      <span className="price-item--regular">
+                        <Price amount={r.compareAt} />
+                      </span>
+                      <span className="from-label">From</span>
+                      <span className="price-item--sale">
+                        <Price amount={r.price} />
+                      </span>
+                    </>
+                  ) : (
+                    <Price amount={r.price} />
+                  )}
+                </div>
+                <div className="product-button">
+                  <a href={r.href} className="button">
+                    Choose options
+                    <span aria-hidden>→</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
@@ -81,8 +160,9 @@ export default function CartDrawer() {
   const removeItem = useCartStore((s) => s.removeItem);
   const subtotal = useCartStore((s) => s.subtotal);
 
-    const [shown, setShown] = useState(isOpen);
+  const [shown, setShown] = useState(isOpen);
   const [entered, setEntered] = useState(false);
+  const [note, setNote] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -90,10 +170,12 @@ export default function CartDrawer() {
       const id = requestAnimationFrame(() => {
         requestAnimationFrame(() => setEntered(true));
       });
+      document.body.style.overflow = 'hidden';
       return () => cancelAnimationFrame(id);
     }
     setEntered(false);
-    const t = window.setTimeout(() => setShown(false), 320);
+    document.body.style.overflow = '';
+    const t = window.setTimeout(() => setShown(false), 500);
     return () => window.clearTimeout(t);
   }, [isOpen]);
 
@@ -101,228 +183,195 @@ export default function CartDrawer() {
 
   const total = subtotal();
   const isEmpty = carts.length === 0;
+  const [dollars, cents] = total.toFixed(2).split('.');
 
   return (
-    <div className="fixed inset-0 z-[80]">
+    <div className={`gj-theme${entered ? ' mini-cart--open' : ''}`}>
       <button
         type="button"
-        className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
-          entered ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`cart-drawer-overlay${entered ? ' is-open' : ''}`}
         aria-label="Close cart"
         onClick={closeCart}
       />
 
-      <aside
-        className={`absolute right-0 top-0 flex h-full w-full bg-white shadow-2xl
-          transition-transform duration-300 ease-out
-          ${isEmpty ? 'md:max-w-[31rem]' : 'md:max-w-[56rem]'}
-          ${entered ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div className="flex h-full w-full flex-col md:flex-row">
-          {!isEmpty && (
-          <div className="hidden md:flex md:w-[45%] md:flex-col border-r border-[#e5e5e5] overflow-y-auto">
-            <div className="px-8 pt-8 pb-4">
-              <div className="text-[13px] font-medium uppercase tracking-[0.28em] text-black">
-                You may also like
-              </div>
-            </div>
-            <ul className="m-0 list-none space-y-0 px-8 pb-8">
-              {RECS.map((r) => (
-                <li key={r.title} className="flex gap-4 border-b border-[#eee] py-4 first:pt-0">
-                  <a href={r.href} className="h-[70px] w-[70px] shrink-0 overflow-hidden rounded-[2px] bg-neutral-100">
-                    <img src={r.img} alt={r.title} className="h-full w-full object-cover" />
-                  </a>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[10px] uppercase tracking-[0.15em] text-neutral-500">
-                      Glow Jerseys
-                    </div>
-                    <a href={r.href} className="block text-[15px] font-medium uppercase tracking-[0.04em] text-black hover:underline">
-                      {r.title}
-                    </a>
-                    <div className="mt-0.5 text-[15px] text-black">
-                      ${r.price.split('.')[0]}
-                      <sup className="text-[10px]">.{r.price.split('.')[1]}</sup>
-                    </div>
-                    <a
-                      href={r.href}
-                      className="mt-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-black"
-                    >
-                      Choose options
-                      <span aria-hidden>→</span>
-                    </a>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-          )}
-          {/* RIGHT — Cart panel */}
-          <div className="flex h-full min-w-0 flex-1 flex-col">
-            <div className="relative flex h-[64px] shrink-0 items-center justify-center border-b border-[#e5e5e5] px-4">
-              <h2 className="m-0 text-[14px] font-medium uppercase tracking-[0.35em] text-black">
-                Cart
-              </h2>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <CloseButton onClick={closeCart} />
-              </div>
+      <aside className={`cart-drawer${entered ? ' is-open' : ''}${isEmpty ? ' is-empty' : ''}`} id="mini-cart">
+        <form className={`mini-cart${isEmpty ? ' is-empty' : ''}`} onSubmit={(e) => e.preventDefault()}>
+          <div className="mini-cart__inner">
+            <div className="mini-cart__header">
+              <button type="button" className="header__icon header__icon--summary header__icon--cart" aria-label="Close" onClick={closeCart}>
+                <IconClose />
+              </button>
+              <div className="title h4">Cart</div>
+              <span className="mini-cart__border" />
             </div>
 
-            {isEmpty ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-6 px-8 text-center">
-                <p className="m-0 text-[20px] text-black">Your cart is currently empty</p>
-                <a
-                  href="https://glowjerseys.com/collections/all"
-                  className="inline-flex items-center justify-center border border-black px-8 py-3 text-[12px] uppercase tracking-[0.15em] text-black hover:bg-black hover:text-white transition"
-                  onClick={closeCart}
-                >
-                  Return to shop
-                </a>
-              </div>
-            ) : (
-              <>
-                {/* Mobile: recs above lines */}
-                <div className="md:hidden border-b border-[#e5e5e5] px-5 pt-4 pb-2">
-                  <div className="mb-3 text-[12px] font-medium uppercase tracking-[0.25em]">
-                    You may also like
-                  </div>
-                  <ul className="m-0 list-none space-y-3 p-0">
-                    {RECS.slice(0, 2).map((r) => (
-                      <li key={r.title} className="flex gap-3">
-                        <img src={r.img} alt="" className="h-14 w-14 object-cover rounded-sm" />
-                        <div>
-                          <div className="text-[13px] font-medium uppercase">{r.title}</div>
-                          <div className="text-[13px]">${r.price}</div>
+            <div className="mini-cart__empty center">
+              <p className="mini-cart__empty-text h3">Your cart is currently empty</p>
+              <a href={`${ORIGIN}/collections/all`} className="button button--tertiary" onClick={closeCart}>
+                Return to shop
+              </a>
+            </div>
+
+            <div className="mini-cart__main" id="main-cart-items">
+              <Recs />
+              <ul className="mini-cart__navigation">
+                                {carts.map((line) => {
+                  const o = line.selectedOptions;
+                  const title = line.productTitle;
+                  return (
+                    <li key={line.id}>
+                      <button type="button" className="delete-product" aria-label="Remove" onClick={() => removeItem(line.id)}>
+                        <IconClose />
+                      </button>
+                      <div className="product-container">
+                        <div className="product-image">
+                          {o.previewImageUrl ? <img src={o.previewImageUrl} alt={title} /> : null}
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="flex-1 overflow-y-auto px-5 py-2 md:px-8">
-                  <ul className="m-0 list-none p-0">
-                    {carts.map((line) => {
-                      const o = line.selectedOptions;
-                      const title =
-                        o.name && o.number
-                          ? `${o.name.toUpperCase()} #${o.number}`
-                          : line.productTitle;
-                      return (
-                        <li
-                          key={line.id}
-                          className="relative flex gap-4 border-b border-[#e5e5e5] py-5"
-                        >
-                          <button
-                            type="button"
-                            onClick={() => removeItem(line.id)}
-                            className="absolute right-0 top-5 group relative flex h-8 w-8 items-center justify-center"
-                            aria-label="Remove"
-                          >
-                            <span className="absolute inset-0 rounded-full bg-black/0 transition group-hover:bg-black/[0.08]" />
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="relative z-[1]">
-                              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                            </svg>
-                          </button>
-
-                          <div className="h-[70px] w-[70px] shrink-0 overflow-hidden rounded-[2px] bg-neutral-100">
-                            {o.previewImageUrl ? (
-                              <img src={o.previewImageUrl} alt={title} className="h-full w-full object-cover" />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
-                                —
-                              </div>
-                            )}
+                        <div className="product-description">
+                          <div className="product-content">
+                            <span className="link">{title}</span>
                           </div>
-
-                          <div className="min-w-0 flex-1 pr-8">
-  <div className="text-[15px] font-medium uppercase tracking-[0.04em] text-black">
-    {title}
-  </div>
-
-  <div className="mt-1.5 space-y-0.5 text-[13px] text-neutral-500 leading-snug">
-    <div>SIZE: {o.size} inch</div>
-    <div>Backboard: {getColorName(o.backboardColor)}</div>
-    <div>Sport: {o.sport}</div>
-    <div>
-      Custom Name &amp; Number: {o.name ? `${o.name} #${o.number}` : '—'}
-    </div>
-    <div>Jersey Color: {getColorName(o.jerseyColor)}</div>
-    <div>Name Color: {getColorName(o.nameColor)}</div>
-    <div>Number Color: {getColorName(o.numberColor)}</div>
-  </div>
-
-                            <div className="mt-3 flex items-end justify-between">
-                              <div className="inline-flex items-center border border-[#ccc] rounded-sm">
-                                <button
-                                  type="button"
-                                  className="flex h-8 w-8 items-center justify-center text-[16px] text-black"
-                                  onClick={() => updateQuantity(line.id, line.quantity - 1)}
-                                >
-                                  −
-                                </button>
-                                <span className="flex h-8 min-w-[1.75rem] items-center justify-center text-[13px]">
-                                  {line.quantity}
-                                </span>
-                                <button
-                                  type="button"
-                                  className="flex h-8 w-8 items-center justify-center text-[16px] text-black"
-                                  onClick={() => updateQuantity(line.id, line.quantity + 1)}
-                                >
-                                  +
-                                </button>
-                              </div>
-                              <div className="text-[16px] text-black">
-                                ${(line.unitPrice * line.quantity).toFixed(2).replace(/\.(\d+)$/, (m, d) => (
-                                  `.${d}`
-                                ))}
-                              </div>
+                          <dl>
+                            <div className="product-option">
+                              <dt>SIZE:</dt>
+                              <dd>{o.size} inch</dd>
                             </div>
+                            <div className="product-option">
+                              <dt>Backboard:</dt>
+                              <dd>{getColorName(o.backboardColor)}</dd>
+                            </div>
+                            <div className="product-option">
+                              <dt>Sport:</dt>
+                              <dd>{o.sport}</dd>
+                            </div>
+                            <div className="product-option">
+                              <dt>Custom Name &amp; Number:</dt>
+                              <dd>{o.name ? `${o.name} #${o.number}` : '—'}</dd>
+                            </div>
+                            <div className="product-option">
+                              <dt>Jersey Color:</dt>
+                              <dd>{getColorName(o.jerseyColor)}</dd>
+                            </div>
+                            <div className="product-option">
+                              <dt>Name Color:</dt>
+                              <dd>{getColorName(o.nameColor)}</dd>
+                            </div>
+                            <div className="product-option">
+                              <dt>Number Color:</dt>
+                              <dd>{getColorName(o.numberColor)}</dd>
+                            </div>
+                          </dl>
+                          <div className="product-quantity">
+                            <div className="quantity">
+                              <button
+                                type="button"
+                                className="quantity__button"
+                                aria-label="Decrease"
+                                onClick={() => updateQuantity(line.id, line.quantity - 1)}
+                              >
+                                −
+                              </button>
+                              <input
+                                className="quantity__input"
+                                type="number"
+                                readOnly
+                                value={line.quantity}
+                                aria-label="Quantity"
+                              />
+                              <button
+                                type="button"
+                                className="quantity__button"
+                                aria-label="Increase"
+                                onClick={() => updateQuantity(line.id, line.quantity + 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                            <Price amount={line.unitPrice * line.quantity} />
                           </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
 
-                {/* Footer */}
-                <div className="shrink-0 border-t border-[#e5e5e5] px-5 py-5 md:px-8">
-                  <div className="mb-3 flex border-y border-[#e5e5e5]">
+            <div className="mini-cart__footer">
+              <div className="mini-cart__actions">
+                <details className="mini-cart__action disclosure-has-popup">
+                  <summary>
+                    <span>
+                      <IconPen />
+                      Note
+                    </span>
+                  </summary>
+                  <div>
                     <button
                       type="button"
-                      className="flex flex-1 items-center justify-center gap-2 py-3 text-[11px] uppercase tracking-[0.28em] text-black"
+                      className="close"
+                      aria-label="Close"
+                      onClick={(e) => (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open')}
                     >
-                      <span aria-hidden>✎</span> Note
+                      <IconClose />
                     </button>
-                    <div className="w-px bg-[#e5e5e5]" />
+                    <label htmlFor="Cart-note">Order special instructions</label>
+                    <div className="mini-cart__note">
+                      <div className="field">
+                        <textarea
+                          className="text-area text-area--resize-vertical field__input"
+                          name="note"
+                          id="Cart-note"
+                          value={note}
+                          onChange={(e) => setNote(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </details>
+                <details className="mini-cart__action disclosure-has-popup">
+                  <summary>
+                    <span>
+                      <IconTruck />
+                      Shipping
+                    </span>
+                  </summary>
+                  <div>
                     <button
                       type="button"
-                      className="flex flex-1 items-center justify-center gap-2 py-3 text-[11px] uppercase tracking-[0.28em] text-black"
+                      className="close"
+                      aria-label="Close"
+                      onClick={(e) => (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open')}
                     >
-                      <span aria-hidden>🚚</span> Shipping
+                      <IconClose />
                     </button>
+                    <p className="caption-large">
+                      Free standard shipping 14–21 days. Express 7–10 days.
+                    </p>
                   </div>
+                </details>
+              </div>
 
-                  <p className="m-0 mb-3 text-[12px] text-neutral-600">
-                    Taxes and shipping calculated at checkout
-                  </p>
+              <div className="taxes-discounts">
+                <small className="tax-note caption-large rte">
+                  Taxes and{' '}
+                  <a href={`${ORIGIN}/policies/shipping-policy`}>shipping</a> calculated at checkout
+                </small>
+              </div>
 
-                  <div className="mb-4 flex items-center gap-2 rounded-[10px] border border-[#e2e2e2] bg-[#f4f4f4] px-3 py-2.5 text-[13px] font-semibold text-[#3a3a3a]">
-                    📦 Ships in 14–21 business days (7–10 with Express)
-                  </div>
+             <div className="gj-ship-banner">📦 Ships in 14–21 business days (7–10 with Express)</div>
 
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-center gap-2 rounded-md bg-[#0b45ff] px-4 py-3.5 text-[13px] font-bold uppercase tracking-[0.12em] text-white hover:bg-[#0939d6] transition"
-                  >
-                    Check out
-                    <span className="opacity-80">—</span>
-                    <span>${total.toFixed(2)} USD</span>
-                  </button>
-                </div>
-              </>
-            )}
+              <div className="button-container">
+                <button className="button" name="checkout" type="button">
+                  Check out
+                  <span id="mini-cart-subtotal">
+                    ${dollars}.{cents} USD
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </form>
       </aside>
     </div>
   );
