@@ -18,7 +18,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: true,
-  panel: false,
+  panel: true,
   pivot: false,
 };
 
@@ -89,12 +89,12 @@ const DEFAULTS = {
   bbNumX4: 0, bbNumY4: 0, bbNumZ4: 0,
 
   /* ── glow ─── */
-  intensity: 9.2,
-  softIntensity: 5.2,
+  intensity: 2.4,
+  softIntensity: 1.15,
   offIntensity: 0,
   coreWhite: 0,
   fresnelPow: 2.4,
-  rimBoost: 1.15,
+  rimBoost: 0.28,
   physicalEmissive: 0.32,
 
   /* ── orbit ─── */
@@ -208,16 +208,14 @@ const fragmentShader = `
   varying vec3 vViewDir;
 
   void main() {
+    float peak = max(max(uColor.r, uColor.g), uColor.b);
+    vec3 hue = uColor / max(peak, 0.001);
+
     vec3 n = normalize(vWorldNormal);
     vec3 v = normalize(vViewDir);
-    float ndv = abs(dot(n, v));
-    float fresnel = pow(1.0 - clamp(ndv, 0.0, 1.0), uFresnelPow);
+    float fresnel = pow(1.0 - clamp(abs(dot(n, v)), 0.0, 1.0), uFresnelPow);
 
-    float peak = max(max(uColor.r, uColor.g), uColor.b);
-    vec3 sameHueHot = uColor / max(peak, 0.001);
-    vec3 hot = mix(uColor, sameHueHot, uCore);
-
-    vec3 col = hot * uIntensity + uColor * fresnel * uRim * uIntensity;
+    vec3 col = hue * uIntensity * (1.0 + fresnel * uRim);
     gl_FragColor = vec4(col, 1.0);
   }
 `;
