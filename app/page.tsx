@@ -7,7 +7,7 @@ import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
 import type { JerseySelectedOptions } from '@/data';
 
-const sizeOptionData = [{ value: 16, unit: 'in' }, { value: 20, unit: 'in' }, { value: 24, unit: 'in' }];
+const sizeOptionData = [{ value: 20, unit: 'inch' }, { value: 30, unit: 'inch' }];
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
 
 const SPORT_MODELS: Record<string, string> = {
@@ -23,7 +23,7 @@ const Page = () => {
   const [sportsTypeValue, setSportsTypeValue] = useState('Soccer');
   const [name, setName] = useState('BROWN');
   const [number, setNumber] = useState('7');
-  const [outlineColor, setOutlineColor] = useState('#FF3300');
+    const [outlineColor, setOutlineColor] = useState('#FF8A00');
   const [nameColor, setNameColor] = useState('#ffffff');
   const [numberColor, setNumberColor] = useState('#ffffff');
   const [backboardColor, setBackboardColor] = useState('transparent');

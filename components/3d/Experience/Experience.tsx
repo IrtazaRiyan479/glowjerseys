@@ -233,14 +233,15 @@ const Experience = ({
   setNeonOn,
   onSnapshotReady,
 }: ExperienceProps) => {
-  const [textureVariant, setTextureVariant] = useState<1 | 2>(1);
+  // const [textureVariant, setTextureVariant] = useState<1 | 2>(1);
+    const textureVariant = 2 as const;
   const t = useExpTweaks();
 
 
   return (
     <div className="relative h-full w-full min-h-0 min-w-0 overflow-hidden bg-[#1a1a1a]">
     {EXP_DEBUG.panel && <ExperienceDebugPanel />}
-<div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2">
+{/* <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2">
   <button
     type="button"
     onClick={() => setTextureVariant(1)}
@@ -270,7 +271,7 @@ const Experience = ({
       className="w-full h-full object-cover"
     />
   </button>
-</div>
+</div> */}
 
 <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
   <span className="text-white text-xs font-medium drop-shadow">Neon</span>

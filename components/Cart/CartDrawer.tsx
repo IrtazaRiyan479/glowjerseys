@@ -45,6 +45,7 @@ const COLOR_MAP: Record<string, string> = {
   '#8A16FF': 'Purple',
   '#FF2E9A': 'Pink',
   '#FBECCB': 'Neutral White',
+  '#E8C07A': 'Neutral White',
   '#FFFFFF': 'White',
   '#111111': 'Black',
   transparent: 'Transparent',

@@ -37,14 +37,14 @@ interface ConfiguratorUIProps {
 /** Exact colors from glowjerseys.com/products/custom-jersey */
 const jerseyColors = [
   { name: 'Yellow', hex: '#FFE800' },
-  { name: 'Orange', hex: '#FF3300' },
+    { name: 'Orange', hex: '#FF8A00' },
   { name: 'Ice Blue', hex: '#2CC5F5' },
   { name: 'Green', hex: '#17D63A' },
   { name: 'Red', hex: '#FF1A15' },
   { name: 'Blue', hex: '#0A46FF' },
   { name: 'Purple', hex: '#8A16FF' },
   { name: 'Pink', hex: '#FF2E9A' },
-  { name: 'Neutral White', hex: '#FBECCB' },
+  { name: 'Neutral White', hex: '#E8C07A' },
   { name: 'White', hex: '#FFFFFF' },
 ];
 
@@ -61,7 +61,7 @@ const backboardOptions = [
   { name: 'Blue', hex: '#0A46FF' },
   { name: 'Purple', hex: '#8A16FF' },
   { name: 'Pink', hex: '#FF2E9A' },
-  { name: 'Neutral White', hex: '#FBECCB' },
+  { name: 'Neutral White', hex: '#E8C07A' },
   { name: 'White', hex: '#FFFFFF' },
 ];
 

@@ -94,7 +94,7 @@ function serializeModelDefaults(t: ModelTweakState): string {
 }
 
 const SOFT_OUTLINE = [
-  '#FFE800', '#FBECCB', '#ffffff', '#ffff00', '#fff700',
+  '#FFE800', '#FBECCB', '#E8C07A', '#ffffff', '#ffff00', '#fff700',
   '#ffee00', '#f5e6a3', '#f0e68c', '#fffacd', '#fff8dc',
 ];
 
@@ -301,7 +301,7 @@ interface ModelProps {
 
 const Model = ({
   glbUrl,
-  outlineColor = '#ff3300',
+  outlineColor = '#FF8A00',
   backboardColor = 'transparent',
   name = '',
   number = '',
@@ -309,7 +309,7 @@ const Model = ({
   numberColor = '#ffffff',
   neonOn = true,
   isDark = true,
-  textureVariant = 1, 
+  textureVariant = 2,
 }: ModelProps) => {
   const t = useModelTweaks();
  const { scene } = useGLTF(glbUrl);

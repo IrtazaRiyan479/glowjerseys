@@ -225,6 +225,7 @@ interface NeonTextProps {
 const SOFT_COLORS = new Set([
   '#ffe800',
   '#fbeccb',
+  '#e8c07a',
   '#ffffff',
   '#ffff00',
   '#fff700',

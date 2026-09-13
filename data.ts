@@ -7,7 +7,7 @@ export const jerseyColors = [
   { name: 'Blue', hex: '#0A46FF' },
   { name: 'Purple', hex: '#8A16FF' },
   { name: 'Pink', hex: '#FF2E9A' },
-  { name: 'Neutral White', hex: '#FBECCB' },
+    { name: 'Neutral White', hex: '#E8C07A' },
   { name: 'White', hex: '#FFFFFF' },
 ] as const;
 
@@ -22,9 +22,8 @@ export const SPORT_MODELS: Record<string, string> = {
 };
 
 export const SIZE_OPTIONS = [
-  { value: 16, unit: 'in' },
-  { value: 20, unit: 'in' },
-  { value: 24, unit: 'in' },
+  { value: 20, unit: 'inch' },
+  { value: 30, unit: 'inch' },
 ];
 
 export const PRODUCT = {
