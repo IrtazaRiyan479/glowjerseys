@@ -17,7 +17,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: false,
-  panel: false,
+  panel: true,
   pivot: false,
 };
 
@@ -30,33 +30,33 @@ const DEFAULTS = {
   fontPathNumber: '/fonts/Mayfair.json',
 
   /* ── name size ── */
-  nameSize1: 0.106,
-  nameSize2: 0.103,
-  nameSize3: 0.1,
-  nameSize4: 0.084,
-  nameSize5: 0.083,
-  nameSize6: 0.076,
-  nameSize7: 0.064,
-  nameSize8: 0.054,
-  nameSize9: 0.054,
-  nameSize10: 0.048,
-  nameSize11: 0.047,
-  nameSize12: 0.039,
-  nameSize13: 0.039,
+  nameSize1: 0.091,
+  nameSize2: 0.088,
+  nameSize3: 0.078,
+  nameSize4: 0.068,
+  nameSize5: 0.068,
+  nameSize6: 0.061,
+  nameSize7: 0.049,
+  nameSize8: 0.039,
+  nameSize9: 0.039,
+  nameSize10: 0.033,
+  nameSize11: 0.038,
+  nameSize12: 0.034,
+  nameSize13: 0.033,
   bbNameSizeShort: 0.058,
   bbNameSizeMid: 0.046,
   bbNameSizeLong: 0.038,
   bbNameSizeXLong: 0.034,
 
   /* ── number size ─── */
-  numberSize1: 0.179,
-  numberSize2: 0.149,
-  numberSize3: 0.12,
-  numberSize4: 0.091,
-  bbNumberSize1: 0.185,
-  bbNumberSize2: 0.156,
-  bbNumberSize3: 0.12,
-  bbNumberSize4: 0.09,
+  numberSize1: 0.212,
+  numberSize2: 0.173,
+  numberSize3: 0.125,
+  numberSize4: 0.096,
+  bbNumberSize1: 0.199,
+  bbNumberSize2: 0.16,
+  bbNumberSize3: 0.138,
+  bbNumberSize4: 0.113,
 
   /* ── constant gap  */
   nameLetterSpacing: 0,
@@ -98,14 +98,14 @@ const DEFAULTS = {
   nameX12: 0, nameY12: 0.032, nameZ12: 0.01,
   nameX13: 0, nameY13: 0.032, nameZ13: 0.01,
 
-  numX1: 0.012, numY1: -0.039, numZ1: 0,
-  numX2: 0.002, numY2: -0.025, numZ2: 0,
-  numX3: -0.002, numY3: -0.021, numZ3: 0,
-  numX4: -0.002, numY4: -0.016, numZ4: 0,
-  bbNumX1: 0, bbNumY1: 0, bbNumZ1: 0,
-  bbNumX2: -0.049, bbNumY2: 0.006, bbNumZ2: 0,
-  bbNumX3: -0.07, bbNumY3: 0.024, bbNumZ3: 0,
-  bbNumX4: -0.067, bbNumY4: 0.029, bbNumZ4: 0,
+  numX1: 0, numY1: -0.085, numZ1: 0,
+  numX2: -0.004, numY2: -0.067, numZ2: 0,
+  numX3: -0.003, numY3: -0.034, numZ3: 0.01,
+  numX4: -0.003, numY4: -0.027, numZ4: 0,
+  bbNumX1: 0, bbNumY1: -0.084, bbNumZ1: 0.01,
+  bbNumX2: -0.002, bbNumY2: -0.072, bbNumZ2: 0.01,
+  bbNumX3: -0.002, bbNumY3: -0.072, bbNumZ3: 0.01,
+  bbNumX4: -0.003, bbNumY4: -0.05, bbNumZ4: 0.01,
 
   /* ── glow ─── */
   intensity: 2.2,
@@ -513,7 +513,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
         <div
           style={{
             position: 'fixed',
-            top: 48,
+            top: 8,
             left: 8,
             zIndex: 99999,
             width: 280,
