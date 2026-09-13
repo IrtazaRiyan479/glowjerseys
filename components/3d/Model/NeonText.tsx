@@ -1353,7 +1353,7 @@ export default function NeonText({
           maxDistance={t.orbitMax}
           enablePan={false}
           enableRotate={false}
-          enableZoom={false}
+          // enableZoom={false}
         />
       )}
 
