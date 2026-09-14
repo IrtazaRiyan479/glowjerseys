@@ -44,15 +44,15 @@ const DEFAULTS = {
   nameSize12: 0.044,
   nameSize13: 0.042,
   bbNameSizeShort: 0.058,
-  bbNameSizeMid: 0.046,
-  bbNameSizeLong: 0.038,
-  bbNameSizeXLong: 0.034,
+  bbNameSizeMid: 0.042,
+  bbNameSizeLong: 0.034,
+  bbNameSizeXLong: 0.03,
 
   /* ── number size ─── */
   numberSize1: 0.212,
   numberSize2: 0.173,
   numberSize3: 0.125,
-  numberSize4: 0.096,
+  numberSize4: 0.091,
   bbNumberSize1: 0.199,
   bbNumberSize2: 0.16,
   bbNumberSize3: 0.138,
@@ -76,12 +76,19 @@ const DEFAULTS = {
 
   /* ── basketball name arc */
   curveRadiusShort: 0, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.003, curveYShort: -0.001, curveZShort: -0.005,
-  curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: 0.017, curveZMid: 0,
-  curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: 0.025, curveZLong: 0,
-  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.006, curveYXLong: 0.035, curveZXLong: 0.001,
+  curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: -0.001, curveZMid: 0,
+  curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: -0.001, curveZLong: 0,
+  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.006, curveYXLong: -0.001, curveZXLong: 0.001,
   maxNameWidthBB: 0.7,
   maxNameWidthOther: 0.82,
   fitToWidth: true,
+
+  /* ── hockey name arc */
+  hkCurveRadiusShort: 0, hkCurveSagShort: 1, hkCurveTiltShort: 1, hkCurveXShort: 0, hkCurveYShort: 0.033, hkCurveZShort: 0,
+  hkCurveRadiusMid: 0, hkCurveSagMid: 1, hkCurveTiltMid: 1, hkCurveXMid: 0, hkCurveYMid: 0.033, hkCurveZMid: 0,
+  hkCurveRadiusLong: 0, hkCurveSagLong: 1, hkCurveTiltLong: 1, hkCurveXLong: 0, hkCurveYLong: 0.033, hkCurveZLong: 0,
+  hkCurveRadiusXLong: 0, hkCurveSagXLong: 1, hkCurveTiltXLong: 1, hkCurveXXLong: 0, hkCurveYXLong: 0.033, hkCurveZXLong: 0.001,
+  maxNameWidthHK: 0.82,
 
   /* ── Position offsets ── */
   nameX1: 0, nameY1: 0, nameZ1: 0.011,
@@ -98,14 +105,14 @@ const DEFAULTS = {
   nameX12: 0, nameY12: 0.032, nameZ12: 0.01,
   nameX13: 0, nameY13: 0.033, nameZ13: 0.01,
 
-  numX1: 0, numY1: -0.085, numZ1: 0,
-  numX2: -0.004, numY2: -0.067, numZ2: 0,
-  numX3: -0.003, numY3: -0.034, numZ3: 0.01,
-  numX4: -0.003, numY4: -0.027, numZ4: 0,
-  bbNumX1: 0, bbNumY1: -0.084, bbNumZ1: 0.01,
-  bbNumX2: -0.002, bbNumY2: -0.072, bbNumZ2: 0.01,
-  bbNumX3: -0.002, bbNumY3: -0.072, bbNumZ3: 0.01,
-  bbNumX4: -0.003, bbNumY4: -0.05, bbNumZ4: 0.01,
+  numX1: 0, numY1: 0, numZ1: 0,
+  numX2: -0.004, numY2: 0.025, numZ2: 0,
+  numX3: -0.003, numY3: 0.061, numZ3: 0.01,
+  numX4: -0.003, numY4: 0.088, numZ4: 0,
+  bbNumX1: 0, bbNumY1: -0.027, bbNumZ1: 0.01,
+  bbNumX2: -0.002, bbNumY2: -0.019, bbNumZ2: 0.01,
+  bbNumX3: -0.002, bbNumY3: -0.008, bbNumZ3: 0.01,
+  bbNumX4: -0.003, bbNumY4: 0.006, bbNumZ4: 0.01,
 
   /* ── glow ─── */
   intensity: 2.2,
@@ -122,11 +129,26 @@ const DEFAULTS = {
   orbitDamping: true,
 };
 
-function curveParamsForName(len: number, t: TweakState) {
-  if (len <= 5) return { radius: t.curveRadiusShort, sag: t.curveSagShort, tilt: t.curveTiltShort, cx: t.curveXShort, cy: t.curveYShort, cz: t.curveZShort };
-  if (len <= 8) return { radius: t.curveRadiusMid, sag: t.curveSagMid, tilt: t.curveTiltMid, cx: t.curveXMid, cy: t.curveYMid, cz: t.curveZMid };
-  if (len <= 11) return { radius: t.curveRadiusLong, sag: t.curveSagLong, tilt: t.curveTiltLong, cx: t.curveXLong, cy: t.curveYLong, cz: t.curveZLong };
-  return { radius: t.curveRadiusXLong, sag: t.curveSagXLong, tilt: t.curveTiltXLong, cx: t.curveXXLong, cy: t.curveYXLong, cz: t.curveZXLong };
+function curveParamsForName(len: number, t: TweakState, sport: string) {
+  const hk = sport === 'Hockey';
+  if (len <= 5) {
+    return hk
+      ? { radius: t.hkCurveRadiusShort, sag: t.hkCurveSagShort, tilt: t.hkCurveTiltShort, cx: t.hkCurveXShort, cy: t.hkCurveYShort, cz: t.hkCurveZShort }
+      : { radius: t.curveRadiusShort, sag: t.curveSagShort, tilt: t.curveTiltShort, cx: t.curveXShort, cy: t.curveYShort, cz: t.curveZShort };
+  }
+  if (len <= 8) {
+    return hk
+      ? { radius: t.hkCurveRadiusMid, sag: t.hkCurveSagMid, tilt: t.hkCurveTiltMid, cx: t.hkCurveXMid, cy: t.hkCurveYMid, cz: t.hkCurveZMid }
+      : { radius: t.curveRadiusMid, sag: t.curveSagMid, tilt: t.curveTiltMid, cx: t.curveXMid, cy: t.curveYMid, cz: t.curveZMid };
+  }
+  if (len <= 11) {
+    return hk
+      ? { radius: t.hkCurveRadiusLong, sag: t.hkCurveSagLong, tilt: t.hkCurveTiltLong, cx: t.hkCurveXLong, cy: t.hkCurveYLong, cz: t.hkCurveZLong }
+      : { radius: t.curveRadiusLong, sag: t.curveSagLong, tilt: t.curveTiltLong, cx: t.curveXLong, cy: t.curveYLong, cz: t.curveZLong };
+  }
+  return hk
+    ? { radius: t.hkCurveRadiusXLong, sag: t.hkCurveSagXLong, tilt: t.hkCurveTiltXLong, cx: t.hkCurveXXLong, cy: t.hkCurveYXLong, cz: t.hkCurveZXLong }
+    : { radius: t.curveRadiusXLong, sag: t.curveSagXLong, tilt: t.curveTiltXLong, cx: t.curveXXLong, cy: t.curveYXLong, cz: t.curveZXLong };
 }
 
 function offsetParamsForName(len: number, sport: string, t: TweakState) {
@@ -374,6 +396,13 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${kv('maxNameWidthBB')},
   ${kv('maxNameWidthOther')},
   ${kv('fitToWidth')},
+
+  /* ── hockey name arc */
+  ${row(['hkCurveRadiusShort', 'hkCurveSagShort', 'hkCurveTiltShort', 'hkCurveXShort', 'hkCurveYShort', 'hkCurveZShort'])},
+  ${row(['hkCurveRadiusMid', 'hkCurveSagMid', 'hkCurveTiltMid', 'hkCurveXMid', 'hkCurveYMid', 'hkCurveZMid'])},
+  ${row(['hkCurveRadiusLong', 'hkCurveSagLong', 'hkCurveTiltLong', 'hkCurveXLong', 'hkCurveYLong', 'hkCurveZLong'])},
+  ${row(['hkCurveRadiusXLong', 'hkCurveSagXLong', 'hkCurveTiltXLong', 'hkCurveXXLong', 'hkCurveYXLong', 'hkCurveZXLong'])},
+  ${kv('maxNameWidthHK')},
 
   /* ── Position offsets ── */
   ${Array.from({ length: 13 }, (_, i) =>
@@ -648,6 +677,37 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                   {slider('max width other', 'maxNameWidthOther', 0.3, 1.4, 0.01, values, setOpen, openVal)}
                 </div>
               </Section>
+              <Section title="Hockey curve">
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Short (1-5 chars)</summary>
+                  {slider('radius', 'hkCurveRadiusShort', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('curve X', 'hkCurveXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'hkCurveYShort', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'hkCurveZShort', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Mid (6-8 chars)</summary>
+                  {slider('radius', 'hkCurveRadiusMid', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('curve X', 'hkCurveXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'hkCurveYMid', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'hkCurveZMid', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Long (9-11 chars)</summary>
+                  {slider('radius', 'hkCurveRadiusLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('curve X', 'hkCurveXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'hkCurveYLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'hkCurveZLong', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                <details style={{ marginLeft: 8, marginBottom: 6 }}>
+                  <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>XLong (12+ chars)</summary>
+                  {slider('radius', 'hkCurveRadiusXLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('curve X', 'hkCurveXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
+                  {slider('curve Y', 'hkCurveYXLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
+                  {slider('curve Z', 'hkCurveZXLong', -0.1, 0.1, 0.001, values, setOpen, openVal)}
+                </details>
+                {slider('max width HK', 'maxNameWidthHK', 0.3, 1.4, 0.01, values, setOpen, openVal)}
+              </Section>
               <Section title="Position offsets">
                 <div style={{ marginTop: 12 }}>
                   <details style={{ marginLeft: 8, marginBottom: 6 }}>
@@ -849,7 +909,8 @@ export default function NeonText({
   const len = chars.length;
 
   const isBasketball = sport === 'Basketball';
-  const useCurve = isBasketball && !isNumber && len > 0;
+  const isHockey = sport === 'Hockey';
+  const useCurve = (isBasketball || isHockey) && !isNumber && len > 0;
 
   const baseSize = isNumber
     ? sizeForNumber(len, sport, t)
@@ -863,7 +924,7 @@ export default function NeonText({
 
   const size = useMemo(() => {
     if (!len) return baseSize;
-    const maxW = isBasketball ? t.maxNameWidthBB : t.maxNameWidthOther;
+    const maxW = isBasketball ? t.maxNameWidthBB : isHockey ? t.maxNameWidthHK : t.maxNameWidthOther;
     if (isNumber || !t.fitToWidth) return baseSize;
     const widths = chars.map((c) => glyphAdvance(fontData, c, baseSize));
     const total =
@@ -968,7 +1029,7 @@ export default function NeonText({
     }
     const mid = cursor / 2;
 
-    const { radius: rawRadius, sag, tilt, cx, cy, cz } = curveParamsForName(len, t);
+    const { radius: rawRadius, sag, tilt, cx, cy, cz } = curveParamsForName(len, t, sport);
     const radius = Math.max(0.15, rawRadius);
 
     return chars.map((ch, i) => {
