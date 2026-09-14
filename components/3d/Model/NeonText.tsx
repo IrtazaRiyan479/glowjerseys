@@ -38,11 +38,11 @@ const DEFAULTS = {
   nameSize6: 0.069,
   nameSize7: 0.061,
   nameSize8: 0.054,
-  nameSize9: 0.049,
-  nameSize10: 0.047,
-  nameSize11: 0.045,
-  nameSize12: 0.044,
-  nameSize13: 0.042,
+  nameSize9: 0.048,
+  nameSize10: 0.043,
+  nameSize11: 0.039,
+  nameSize12: 0.035,
+  nameSize13: 0.033,
   bbNameSizeShort: 0.058,
   bbNameSizeMid: 0.042,
   bbNameSizeLong: 0.034,
@@ -59,7 +59,7 @@ const DEFAULTS = {
   bbNumberSize4: 0.113,
 
   /* ── constant gap  */
-  nameLetterSpacing: 0,
+  nameLetterSpacing: 0.006,
   numberLetterSpacing: 0,
 
   /* ── extrusion / tube profile ─── */
@@ -161,19 +161,46 @@ function offsetParamsForName(len: number, sport: string, t: TweakState) {
   };
 }
 
+function bevelPad(bevelSize: number, bevelOffset: number) {
+  return 2 * Math.max(0, bevelSize + bevelOffset);
+}
+
+function glyphVisualWidth(fontData: any, ch: string, size: number): number {
+  const g =
+    fontData?.glyphs?.[ch] ||
+    fontData?.glyphs?.[ch.toUpperCase()] ||
+    fontData?.glyphs?.['?'];
+  const res = fontData?.resolution || 1000;
+  const xMin = g?.x_min ?? 0;
+  const xMax = g?.x_max ?? (g?.ha ?? 700);
+  return (Math.max(xMax - xMin, 1) / res) * size;
+}
+
+function glyphXMid(fontData: any, ch: string, size: number): number {
+  const g =
+    fontData?.glyphs?.[ch] ||
+    fontData?.glyphs?.[ch.toUpperCase()] ||
+    fontData?.glyphs?.['?'];
+  const res = fontData?.resolution || 1000;
+  const xMin = g?.x_min ?? 0;
+  const xMax = g?.x_max ?? (g?.ha ?? 700);
+  return ((xMin + xMax) / 2 / res) * size;
+}
+
 function textWidth(
   fontData: any,
   chars: string[],
   size: number,
   extraGap: number,
+  pad = 0,
 ) {
   if (!chars.length) return 0;
   let w = 0;
   for (let i = 0; i < chars.length; i++) {
-    w += glyphAdvance(fontData, chars[i], size);
+    w += glyphVisualWidth(fontData, chars[i], size);
     if (i < chars.length - 1) w += extraGap;
   }
-  return w;
+  return w + pad;
 }
 
 function offsetParamsForNumber(len: number, sport: string, t: TweakState) {
@@ -922,16 +949,33 @@ export default function NeonText({
   const bevelSize = isNumber ? t.numberBevelSize : t.nameBevelSize;
   const lineWidth = isNumber ? t.numberLineWidth : t.nameLineWidth;
 
-  const size = useMemo(() => {
-    if (!len) return baseSize;
-    const maxW = isBasketball ? t.maxNameWidthBB : isHockey ? t.maxNameWidthHK : t.maxNameWidthOther;
-    if (isNumber || !t.fitToWidth) return baseSize;
-    const widths = chars.map((c) => glyphAdvance(fontData, c, baseSize));
-    const total =
-      widths.reduce((a, b) => a + b, 0) + extraGap * Math.max(0, len - 1);
-    if (total <= maxW || total <= 0) return baseSize;
-    return baseSize * (maxW / total);
-  }, [baseSize, chars, extraGap, fontData, isBasketball, isNumber, len, t.fitToWidth, t.maxNameWidthBB, t.maxNameWidthOther]);
+    const size = useMemo(() => {
+    if (!len || isNumber || !t.fitToWidth) return baseSize;
+    const maxW = isBasketball
+      ? t.maxNameWidthBB
+      : isHockey
+        ? t.maxNameWidthHK
+        : t.maxNameWidthOther;
+    const pad = bevelPad(bevelSize, lineWidth);
+    const unit = textWidth(fontData, chars, 1, extraGap, pad);
+    if (!(unit > 0)) return baseSize;
+    return Math.min(baseSize, maxW / unit);
+  }, [
+    baseSize,
+    bevelSize,
+    chars,
+    extraGap,
+    fontData,
+    isBasketball,
+    isHockey,
+    isNumber,
+    len,
+    lineWidth,
+    t.fitToWidth,
+    t.maxNameWidthBB,
+    t.maxNameWidthHK,
+    t.maxNameWidthOther,
+  ]);
 
   const isSoft = SOFT_COLORS.has(color.toLowerCase());
   const activeIntensity = neonOn
@@ -1008,26 +1052,27 @@ export default function NeonText({
     material: mat,
   } as const;
 
-    const renderCurved = () => {
-    const res = fontData?.resolution || 1000;
-    const widths = chars.map((c) => glyphAdvance(fontData, c, size));
-    const xMids = chars.map((c) => {
-      const g =
-        fontData?.glyphs?.[c] ||
-        fontData?.glyphs?.[c.toUpperCase()] ||
-        fontData?.glyphs?.['?'];
-      const xMin = g?.x_min ?? 0;
-      const xMax = g?.x_max ?? (g?.ha ?? 700);
-      return (((xMin + xMax) / 2) / res) * size;
-    });
+    const renderLetters = () => {
+    const vis = chars.map((c) => glyphVisualWidth(fontData, c, size));
+    const xMids = chars.map((c) => glyphXMid(fontData, c, size));
 
     const centers: number[] = [];
     let cursor = 0;
     for (let i = 0; i < len; i++) {
-      centers.push(cursor + widths[i] / 2);
-      cursor += widths[i] + (i < len - 1 ? extraGap : 0);
+      centers.push(cursor + vis[i] / 2);
+      cursor += vis[i] + (i < len - 1 ? extraGap : 0);
     }
     const mid = cursor / 2;
+
+    if (!useCurve) {
+      return chars.map((ch, i) => (
+        <group key={`${ch}-${i}`} position={[centers[i] - mid - xMids[i], 0, 0]}>
+          <Text3D {...common} size={size}>
+            {ch}
+          </Text3D>
+        </group>
+      ));
+    }
 
     const { radius: rawRadius, sag, tilt, cx, cy, cz } = curveParamsForName(len, t, sport);
     const radius = Math.max(0.15, rawRadius);
@@ -1035,12 +1080,10 @@ export default function NeonText({
     return chars.map((ch, i) => {
       const arc = centers[i] - mid;
       const angle = arc / radius;
-
       const x = Math.sin(angle) * radius + cx;
       const y = (Math.cos(angle) - 1) * radius * sag + cy;
       const z = cz;
       const rotZ = -angle * tilt;
-
       return (
         <group key={`${ch}-${i}`} position={[x, y, z]} rotation={[0, 0, rotZ]}>
           <group position={[-xMids[i], 0, 0]}>
@@ -1053,23 +1096,12 @@ export default function NeonText({
     });
   };
 
-  const renderFlat = () => {
-    const w = textWidth(fontData, chars, size, extraGap);
-    return (
-      <group position={[-w / 2, 0, 0]}>
-        <Text3D {...common} size={size} letterSpacing={extraGap}>
-          {raw}
-        </Text3D>
-      </group>
-    );
-  };
-
   const content = (
     <group
       position={[position[0] + ox, position[1] + oy, position[2] + oz]}
       scale={sc}
     >
-      {useCurve ? renderCurved() : renderFlat()}
+    {renderLetters()}
     </group>
   );
 
