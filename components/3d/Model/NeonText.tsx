@@ -16,8 +16,8 @@ import {
  - DEBUG SWITCHES
  - =========================================================================== */
 const DEBUG = {
-  orbit: true,
-  panel: true,
+  orbit: false,
+  panel: false,
   pivot: false,
 };
 
@@ -43,10 +43,10 @@ const DEFAULTS = {
   nameSize11: 0.039,
   nameSize12: 0.035,
   nameSize13: 0.036,
-  bbNameSizeShort: 0.063,
-  bbNameSizeMid: 0.05,
-  bbNameSizeLong: 0.04,
-  bbNameSizeXLong: 0.035,
+  bbNameSizeShort: 0.061,
+  bbNameSizeMid: 0.047,
+  bbNameSizeLong: 0.038,
+  bbNameSizeXLong: 0.032,
 
   /* ── number size ─── */
   numberSize1: 0.212,
@@ -79,7 +79,7 @@ const DEFAULTS = {
   curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: 0.02, curveZMid: 0,
   curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: 0.029, curveZLong: 0,
   curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.006, curveYXLong: 0.038, curveZXLong: 0.001,
-  curveSpanShort: 1.34, curveSpanMid: 1.57, curveSpanLong: 1.65, curveSpanXLong: 1.65,
+  curveSpanShort: 1.07, curveSpanMid: 1.57, curveSpanLong: 1.65, curveSpanXLong: 1.65,
   maxNameWidthBB: 0.7,
   maxNameWidthOther: 0.82,
   fitToWidth: true,
