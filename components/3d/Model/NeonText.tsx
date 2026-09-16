@@ -17,7 +17,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: false,
-  panel: true,
+  panel: false,
   pivot: false,
 };
 
@@ -311,12 +311,13 @@ const fragmentShader = `
     float peak = max(max(uColor.r, uColor.g), uColor.b);
     vec3 hue = uColor / max(peak, 0.001);
 
-    vec3 n = normalize(vWorldNormal);
+    float nlen = length(vWorldNormal);
+    vec3 n = nlen > 1e-5 ? vWorldNormal / nlen : vec3(0.0, 0.0, 1.0);
     vec3 v = normalize(vViewDir);
     float ndv = abs(dot(n, v));
     float w = fwidth(ndv);
     float ndvAA = mix(ndv, smoothstep(-w, w, ndv), 0.35);
-    float fresnel = pow(1.0 - clamp(ndvAA, 0.0, 1.0), uFresnelPow);
+    float fresnel = pow(1.0 - clamp(ndvAA, 0.0, 1.0), max(uFresnelPow, 1e-4));
 
     vec3 col = hue * uIntensity * (1.0 + fresnel * uRim);
 
@@ -999,6 +1000,9 @@ export default function NeonText({
       toneMapped: false,
       depthWrite: true,
       depthTest: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
       side: THREE.FrontSide,
       dithering: true,
     });
@@ -1055,18 +1059,22 @@ export default function NeonText({
     const renderLetters = () => {
     const vis = chars.map((c) => glyphVisualWidth(fontData, c, size));
     const xMids = chars.map((c) => glyphXMid(fontData, c, size));
+    const pad = bevelPad(bevelSize, lineWidth);
 
     const centers: number[] = [];
     let cursor = 0;
     for (let i = 0; i < len; i++) {
       centers.push(cursor + vis[i] / 2);
-      cursor += vis[i] + (i < len - 1 ? extraGap : 0);
+      cursor += vis[i] + pad + (i < len - 1 ? extraGap : 0);
     }
     const mid = cursor / 2;
 
     if (!useCurve) {
       return chars.map((ch, i) => (
-        <group key={`${ch}-${i}`} position={[centers[i] - mid - xMids[i], 0, 0]}>
+        <group
+          key={`${ch}-${i}`}
+          position={[centers[i] - mid - xMids[i], 0, i * 0.0015]}
+        >
           <Text3D {...common} size={size}>
             {ch}
           </Text3D>
