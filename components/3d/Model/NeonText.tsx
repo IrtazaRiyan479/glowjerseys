@@ -17,7 +17,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: false,
-  panel: true,
+  panel: false,
   pivot: false,
 };
 
