@@ -17,7 +17,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: false,
-  panel: false,
+  panel: true,
   pivot: false,
 };
 
@@ -37,12 +37,12 @@ const DEFAULTS = {
   nameSize5: 0.071,
   nameSize6: 0.069,
   nameSize7: 0.061,
-  nameSize8: 0.054,
-  nameSize9: 0.048,
-  nameSize10: 0.043,
-  nameSize11: 0.039,
-  nameSize12: 0.035,
-  nameSize13: 0.036,
+  nameSize8: 0.053,
+  nameSize9: 0.046,
+  nameSize10: 0.041,
+  nameSize11: 0.037,
+  nameSize12: 0.033,
+  nameSize13: 0.031,
   bbNameSizeShort: 0.061,
   bbNameSizeMid: 0.047,
   bbNameSizeLong: 0.038,
@@ -103,11 +103,11 @@ const DEFAULTS = {
   nameX6: 0.001, nameY6: 0.016, nameZ6: 0.01,
   nameX7: 0, nameY7: 0.021, nameZ7: 0.01,
   nameX8: 0, nameY8: 0.025, nameZ8: 0.01,
-  nameX9: 0, nameY9: 0.029, nameZ9: 0.01,
-  nameX10: 0, nameY10: 0.03, nameZ10: 0.01,
-  nameX11: 0, nameY11: 0.031, nameZ11: 0.01,
+  nameX9: -0.005, nameY9: 0.029, nameZ9: 0.01,
+  nameX10: -0.005, nameY10: 0.03, nameZ10: 0.01,
+  nameX11: -0.005, nameY11: 0.031, nameZ11: 0.01,
   nameX12: 0, nameY12: 0.032, nameZ12: 0.01,
-  nameX13: -0.006, nameY13: 0.033, nameZ13: 0.01,
+  nameX13: -0.009, nameY13: 0.033, nameZ13: 0.01,
 
   numX1: 0, numY1: -0.028, numZ1: 0,
   numX2: -0.004, numY2: 0.006, numZ2: 0,
@@ -185,7 +185,20 @@ function curveOpticalGap(
 }
 
 const KERN_PAIRS: Record<string, number> = {
-  OW: -0.16, 
+  OW: -0.16, WO: -0.14, OV: -0.14, VO: -0.12,
+  OY: -0.14, YO: -0.12, OA: -0.1, AO: -0.1,
+  AW: -0.14, WA: -0.14, AV: -0.14, VA: -0.14,
+  AY: -0.12, YA: -0.12, VW: -0.1, WV: -0.1,
+  WN: -0.08, WM: -0.06, WH: -0.06, WU: -0.08,
+  VN: -0.06, YN: -0.06,
+  LW: -0.14, LV: -0.12, LY: -0.12, LT: -0.12,
+  TW: -0.12, TV: -0.12, TY: -0.12, TA: -0.14,
+  TO: -0.12, TC: -0.1, TG: -0.1, AT: -0.08,
+  FA: -0.12, PA: -0.1, RA: -0.08, LA: -0.06,
+  AC: -0.08, AG: -0.08, CA: -0.08, GA: -0.08,
+  OO: -0.03, OC: -0.03, CO: -0.03, OG: -0.03, GO: -0.03,
+  BR: 0.08, BB: 0.05, RR: 0.05, BH: 0.04, BN: 0.03,
+  IB: 0.05, II: 0.08, HI: 0.04, IH: 0.04,
 };
 
 const DIAG_LEFT = new Set(['A', 'K', 'V', 'W', 'X', 'Y']);
@@ -903,7 +916,6 @@ function AnimatedCopyButton({ label, onCopy }: { label: string; onCopy: () => st
           const src = onCopy();
           console.log('[TWEAKS DEFAULTS]\n', src);
           await navigator.clipboard?.writeText(src);
-          // 400ms delay so the loading animation is actually visible to the user
           await new Promise((r) => setTimeout(r, 400));
           alert('Tweaks successfully copied to clipboard!');
         } catch (err) {
