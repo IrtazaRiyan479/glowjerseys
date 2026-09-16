@@ -16,8 +16,8 @@ import {
  - DEBUG SWITCHES
  - =========================================================================== */
 const DEBUG = {
-  orbit: false,
-  panel: false,
+  orbit: true,
+  panel: true,
   pivot: false,
 };
 
@@ -42,11 +42,11 @@ const DEFAULTS = {
   nameSize10: 0.043,
   nameSize11: 0.039,
   nameSize12: 0.035,
-  nameSize13: 0.033,
-  bbNameSizeShort: 0.058,
-  bbNameSizeMid: 0.042,
-  bbNameSizeLong: 0.034,
-  bbNameSizeXLong: 0.03,
+  nameSize13: 0.036,
+  bbNameSizeShort: 0.063,
+  bbNameSizeMid: 0.05,
+  bbNameSizeLong: 0.04,
+  bbNameSizeXLong: 0.035,
 
   /* ── number size ─── */
   numberSize1: 0.212,
@@ -59,8 +59,8 @@ const DEFAULTS = {
   bbNumberSize4: 0.108,
 
   /* ── constant gap  */
-  nameLetterSpacing: 0.01,
-  numberLetterSpacing: 0.006,
+  nameLetterSpacing: 0.005,
+  numberLetterSpacing: 0.003,
 
   /* ── extrusion / tube profile ─── */
   nameExtrusion: 0.009,
@@ -75,19 +75,23 @@ const DEFAULTS = {
   numberLineWidth: -0.0018,
 
   /* ── basketball name arc */
-  curveRadiusShort: 0, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.003, curveYShort: -0.001, curveZShort: -0.005,
-  curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: -0.001, curveZMid: 0,
-  curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: -0.001, curveZLong: 0,
-  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.006, curveYXLong: -0.001, curveZXLong: 0.001,
+  curveRadiusShort: 0, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.004, curveYShort: 0.007, curveZShort: -0.005,
+  curveRadiusMid: 0, curveSagMid: 1, curveTiltMid: 1, curveXMid: -0.003, curveYMid: 0.02, curveZMid: 0,
+  curveRadiusLong: 0, curveSagLong: 1, curveTiltLong: 1, curveXLong: -0.005, curveYLong: 0.029, curveZLong: 0,
+  curveRadiusXLong: 0, curveSagXLong: 1, curveTiltXLong: 1, curveXXLong: -0.006, curveYXLong: 0.038, curveZXLong: 0.001,
+  curveSpanShort: 1.34, curveSpanMid: 1.57, curveSpanLong: 1.65, curveSpanXLong: 1.65,
   maxNameWidthBB: 0.7,
   maxNameWidthOther: 0.82,
   fitToWidth: true,
+  curveGapScale: 1.2,
+  kernStrength: 0.7,
 
   /* ── hockey name arc */
   hkCurveRadiusShort: 0, hkCurveSagShort: 1, hkCurveTiltShort: 1, hkCurveXShort: 0, hkCurveYShort: 0.033, hkCurveZShort: 0,
   hkCurveRadiusMid: 0, hkCurveSagMid: 1, hkCurveTiltMid: 1, hkCurveXMid: 0, hkCurveYMid: 0.033, hkCurveZMid: 0,
   hkCurveRadiusLong: 0, hkCurveSagLong: 1, hkCurveTiltLong: 1, hkCurveXLong: 0, hkCurveYLong: 0.033, hkCurveZLong: 0,
   hkCurveRadiusXLong: 0, hkCurveSagXLong: 1, hkCurveTiltXLong: 1, hkCurveXXLong: 0, hkCurveYXLong: 0.033, hkCurveZXLong: 0.001,
+  hkCurveSpanShort: 0.75, hkCurveSpanMid: 1.05, hkCurveSpanLong: 1.28, hkCurveSpanXLong: 1.52,
   maxNameWidthHK: 0.82,
 
   /* ── Position offsets ── */
@@ -103,12 +107,12 @@ const DEFAULTS = {
   nameX10: 0, nameY10: 0.03, nameZ10: 0.01,
   nameX11: 0, nameY11: 0.031, nameZ11: 0.01,
   nameX12: 0, nameY12: 0.032, nameZ12: 0.01,
-  nameX13: 0, nameY13: 0.033, nameZ13: 0.01,
+  nameX13: -0.006, nameY13: 0.033, nameZ13: 0.01,
 
-  numX1: 0, numY1: 0, numZ1: 0,
-  numX2: -0.004, numY2: 0.025, numZ2: 0,
-  numX3: -0.003, numY3: 0.061, numZ3: 0.01,
-  numX4: -0.003, numY4: 0.088, numZ4: 0,
+  numX1: 0, numY1: -0.028, numZ1: 0,
+  numX2: -0.004, numY2: 0.006, numZ2: 0,
+  numX3: -0.003, numY3: 0.05, numZ3: 0.01,
+  numX4: -0.003, numY4: 0.078, numZ4: 0,
   bbNumX1: 0, bbNumY1: -0.027, bbNumZ1: 0.01,
   bbNumX2: -0.002, bbNumY2: -0.019, bbNumZ2: 0.01,
   bbNumX3: -0.002, bbNumY3: -0.008, bbNumZ3: 0.01,
@@ -133,22 +137,27 @@ function curveParamsForName(len: number, t: TweakState, sport: string) {
   const hk = sport === 'Hockey';
   if (len <= 5) {
     return hk
-      ? { radius: t.hkCurveRadiusShort, sag: t.hkCurveSagShort, tilt: t.hkCurveTiltShort, cx: t.hkCurveXShort, cy: t.hkCurveYShort, cz: t.hkCurveZShort }
-      : { radius: t.curveRadiusShort, sag: t.curveSagShort, tilt: t.curveTiltShort, cx: t.curveXShort, cy: t.curveYShort, cz: t.curveZShort };
+      ? { radius: t.hkCurveRadiusShort, sag: t.hkCurveSagShort, tilt: t.hkCurveTiltShort, cx: t.hkCurveXShort, cy: t.hkCurveYShort, cz: t.hkCurveZShort, span: t.hkCurveSpanShort }
+      : { radius: t.curveRadiusShort, sag: t.curveSagShort, tilt: t.curveTiltShort, cx: t.curveXShort, cy: t.curveYShort, cz: t.curveZShort, span: t.curveSpanShort };
   }
   if (len <= 8) {
     return hk
-      ? { radius: t.hkCurveRadiusMid, sag: t.hkCurveSagMid, tilt: t.hkCurveTiltMid, cx: t.hkCurveXMid, cy: t.hkCurveYMid, cz: t.hkCurveZMid }
-      : { radius: t.curveRadiusMid, sag: t.curveSagMid, tilt: t.curveTiltMid, cx: t.curveXMid, cy: t.curveYMid, cz: t.curveZMid };
+      ? { radius: t.hkCurveRadiusMid, sag: t.hkCurveSagMid, tilt: t.hkCurveTiltMid, cx: t.hkCurveXMid, cy: t.hkCurveYMid, cz: t.hkCurveZMid, span: t.hkCurveSpanMid }
+      : { radius: t.curveRadiusMid, sag: t.curveSagMid, tilt: t.curveTiltMid, cx: t.curveXMid, cy: t.curveYMid, cz: t.curveZMid, span: t.curveSpanMid };
   }
   if (len <= 11) {
     return hk
-      ? { radius: t.hkCurveRadiusLong, sag: t.hkCurveSagLong, tilt: t.hkCurveTiltLong, cx: t.hkCurveXLong, cy: t.hkCurveYLong, cz: t.hkCurveZLong }
-      : { radius: t.curveRadiusLong, sag: t.curveSagLong, tilt: t.curveTiltLong, cx: t.curveXLong, cy: t.curveYLong, cz: t.curveZLong };
+      ? { radius: t.hkCurveRadiusLong, sag: t.hkCurveSagLong, tilt: t.hkCurveTiltLong, cx: t.hkCurveXLong, cy: t.hkCurveYLong, cz: t.hkCurveZLong, span: t.hkCurveSpanLong }
+      : { radius: t.curveRadiusLong, sag: t.curveSagLong, tilt: t.curveTiltLong, cx: t.curveXLong, cy: t.curveYLong, cz: t.curveZLong, span: t.curveSpanLong };
   }
   return hk
-    ? { radius: t.hkCurveRadiusXLong, sag: t.hkCurveSagXLong, tilt: t.hkCurveTiltXLong, cx: t.hkCurveXXLong, cy: t.hkCurveYXLong, cz: t.hkCurveZXLong }
-    : { radius: t.curveRadiusXLong, sag: t.curveSagXLong, tilt: t.curveTiltXLong, cx: t.curveXXLong, cy: t.curveYXLong, cz: t.curveZXLong };
+    ? { radius: t.hkCurveRadiusXLong, sag: t.hkCurveSagXLong, tilt: t.hkCurveTiltXLong, cx: t.hkCurveXXLong, cy: t.hkCurveYXLong, cz: t.hkCurveZXLong, span: t.hkCurveSpanXLong }
+    : { radius: t.curveRadiusXLong, sag: t.curveSagXLong, tilt: t.curveTiltXLong, cx: t.curveXXLong, cy: t.curveYXLong, cz: t.curveZXLong, span: t.curveSpanXLong };
+}
+
+function resolveCurveRadius(raw: number, halfUnrolled: number, span: number) {
+  const auto = halfUnrolled / Math.max(span, 0.25);
+  return Math.max(0.04, raw > 0.001 ? raw : auto);
 }
 
 function offsetParamsForName(len: number, sport: string, t: TweakState) {
@@ -163,6 +172,31 @@ function offsetParamsForName(len: number, sport: string, t: TweakState) {
 
 function bevelPad(bevelSize: number, bevelOffset: number) {
   return 2 * Math.max(0, bevelSize + bevelOffset);
+}
+
+function curveOpticalGap(
+  pairGap: number,
+  radius: number,
+  size: number,
+  scale: number,
+) {
+  const r = Math.max(radius, 1e-4);
+  return pairGap * scale * (r / (r + size * 0.9));
+}
+
+const KERN_PAIRS: Record<string, number> = {
+  OW: -0.16, 
+};
+
+const DIAG_LEFT = new Set(['A', 'K', 'V', 'W', 'X', 'Y']);
+
+function glyphKernEm(a: string, b: string): number {
+  return KERN_PAIRS[a.toUpperCase() + b.toUpperCase()] ?? 0;
+}
+
+function curveSplayKern(nextCh: string, dAng: number, size: number): number {
+  if (!DIAG_LEFT.has(nextCh.toUpperCase())) return 0;
+  return -0.32 * size * Math.abs(Math.sin(dAng));
 }
 
 function glyphVisualWidth(fontData: any, ch: string, size: number): number {
@@ -198,9 +232,9 @@ function textWidth(
   let w = 0;
   for (let i = 0; i < chars.length; i++) {
     w += glyphVisualWidth(fontData, chars[i], size);
-    if (i < chars.length - 1) w += extraGap;
+    if (i < chars.length - 1) w += extraGap + pad;
   }
-  return w + pad;
+  return w;
 }
 
 function offsetParamsForNumber(len: number, sport: string, t: TweakState) {
@@ -421,15 +455,19 @@ function serializeTweaksAsDefaults(t: TweakState): string {
   ${row(['curveRadiusMid', 'curveSagMid', 'curveTiltMid', 'curveXMid', 'curveYMid', 'curveZMid'])},
   ${row(['curveRadiusLong', 'curveSagLong', 'curveTiltLong', 'curveXLong', 'curveYLong', 'curveZLong'])},
   ${row(['curveRadiusXLong', 'curveSagXLong', 'curveTiltXLong', 'curveXXLong', 'curveYXLong', 'curveZXLong'])},
+  ${row(['curveSpanShort', 'curveSpanMid', 'curveSpanLong', 'curveSpanXLong'])},
   ${kv('maxNameWidthBB')},
   ${kv('maxNameWidthOther')},
   ${kv('fitToWidth')},
+  ${kv('curveGapScale')},
+  ${kv('kernStrength')},
 
   /* ── hockey name arc */
   ${row(['hkCurveRadiusShort', 'hkCurveSagShort', 'hkCurveTiltShort', 'hkCurveXShort', 'hkCurveYShort', 'hkCurveZShort'])},
   ${row(['hkCurveRadiusMid', 'hkCurveSagMid', 'hkCurveTiltMid', 'hkCurveXMid', 'hkCurveYMid', 'hkCurveZMid'])},
   ${row(['hkCurveRadiusLong', 'hkCurveSagLong', 'hkCurveTiltLong', 'hkCurveXLong', 'hkCurveYLong', 'hkCurveZLong'])},
   ${row(['hkCurveRadiusXLong', 'hkCurveSagXLong', 'hkCurveTiltXLong', 'hkCurveXXLong', 'hkCurveYXLong', 'hkCurveZXLong'])},
+  ${row(['hkCurveSpanShort', 'hkCurveSpanMid', 'hkCurveSpanLong', 'hkCurveSpanXLong'])},
   ${kv('maxNameWidthHK')},
 
   /* ── Position offsets ── */
@@ -648,6 +686,8 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
               <Section title="Constant letter gap">
                 {slider('name spacing', 'nameLetterSpacing', 0, 0.08, 0.001, values, setOpen, openVal)}
                 {slider('number spacing', 'numberLetterSpacing', 0, 0.1, 0.001, values, setOpen, openVal)}
+                {slider('curve gap scale', 'curveGapScale', 0.15, 1.2, 0.01, values, setOpen, openVal)}
+                {slider('kern strength', 'kernStrength', 0, 2, 0.05, values, setOpen, openVal)}
               </Section>
               <Section title="Extrusion / bevel (tube)">
                 {slider('name extrusion', 'nameExtrusion', 0.004, 0.12, 0.001, values, setOpen, openVal)}
@@ -665,6 +705,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Short (1-5 chars)</summary>
                   {slider('radius', 'curveRadiusShort', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'curveSpanShort', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagShort', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltShort', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -674,6 +715,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Mid (6-8 chars)</summary>
                   {slider('radius', 'curveRadiusMid', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'curveSpanMid', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagMid', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltMid', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -683,6 +725,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Long (9-11 chars)</summary>
                   {slider('radius', 'curveRadiusLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'curveSpanLong', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagLong', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltLong', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -692,6 +735,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>XLong (12+ chars)</summary>
                   {slider('radius', 'curveRadiusXLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'curveSpanXLong', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {/* {slider('sag', 'curveSagXLong', 0, 1.4, 0.01, values, setOpen, openVal)}
                   {slider('tilt', 'curveTiltXLong', 0, 1.4, 0.01, values, setOpen, openVal)} */}
                   {slider('curve X', 'curveXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
@@ -709,6 +753,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Short (1-5 chars)</summary>
                   {slider('radius', 'hkCurveRadiusShort', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'hkCurveSpanShort', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {slider('curve X', 'hkCurveXShort', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('curve Y', 'hkCurveYShort', -0.2, 0.2, 0.001, values, setOpen, openVal)}
                   {slider('curve Z', 'hkCurveZShort', -0.1, 0.1, 0.001, values, setOpen, openVal)}
@@ -716,6 +761,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Mid (6-8 chars)</summary>
                   {slider('radius', 'hkCurveRadiusMid', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'hkCurveSpanMid', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {slider('curve X', 'hkCurveXMid', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('curve Y', 'hkCurveYMid', -0.2, 0.2, 0.001, values, setOpen, openVal)}
                   {slider('curve Z', 'hkCurveZMid', -0.1, 0.1, 0.001, values, setOpen, openVal)}
@@ -723,6 +769,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>Long (9-11 chars)</summary>
                   {slider('radius', 'hkCurveRadiusLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'hkCurveSpanLong', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {slider('curve X', 'hkCurveXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('curve Y', 'hkCurveYLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
                   {slider('curve Z', 'hkCurveZLong', -0.1, 0.1, 0.001, values, setOpen, openVal)}
@@ -730,6 +777,7 @@ function DebugPanel({ sport, isNumber, len }: { sport: string; isNumber: boolean
                 <details style={{ marginLeft: 8, marginBottom: 6 }}>
                   <summary style={{ cursor: 'pointer', fontSize: 10, color: '#aaa', marginBottom: 4 }}>XLong (12+ chars)</summary>
                   {slider('radius', 'hkCurveRadiusXLong', 0.0, 5.4, 0.01, values, setOpen, openVal)}
+                  {slider('wrap (auto)', 'hkCurveSpanXLong', 0.4, 1.65, 0.01, values, setOpen, openVal)}
                   {slider('curve X', 'hkCurveXXLong', -0.4, 0.4, 0.001, values, setOpen, openVal)}
                   {slider('curve Y', 'hkCurveYXLong', -0.2, 0.2, 0.001, values, setOpen, openVal)}
                   {slider('curve Z', 'hkCurveZXLong', -0.1, 0.1, 0.001, values, setOpen, openVal)}
@@ -1060,12 +1108,49 @@ export default function NeonText({
     const vis = chars.map((c) => glyphVisualWidth(fontData, c, size));
     const xMids = chars.map((c) => glyphXMid(fontData, c, size));
     const pad = bevelPad(bevelSize, lineWidth);
+    const pairGap = extraGap + pad;
 
+    let radius = 0.15;
+    let sag = 1;
+    let tilt = 1;
+    let cx = 0;
+    let cy = 0;
+    let cz = 0;
+    if (useCurve) {
+      const p = curveParamsForName(len, t, sport);
+      sag = p.sag;
+      tilt = p.tilt;
+      cx = p.cx;
+      cy = p.cy;
+      cz = p.cz;
+      let rough = 0;
+      const estGap = extraGap * t.curveGapScale;
+      for (let i = 0; i < len; i++) {
+        rough += vis[i];
+        if (i < len - 1) rough += estGap;
+      }
+      radius = resolveCurveRadius(p.radius, rough / 2, p.span);
+    }
+
+        const gap = useCurve
+      ? curveOpticalGap(extraGap, radius, size, t.curveGapScale)
+      : pairGap;
+
+    const kMul = isNumber ? 0 : t.kernStrength;
     const centers: number[] = [];
     let cursor = 0;
     for (let i = 0; i < len; i++) {
       centers.push(cursor + vis[i] / 2);
-      cursor += vis[i] + pad + (i < len - 1 ? extraGap : 0);
+      let step = vis[i];
+      if (i < len - 1) {
+        step += gap;
+        step += glyphKernEm(chars[i], chars[i + 1]) * size * kMul;
+        if (useCurve) {
+          const dAng = (vis[i] + vis[i + 1]) * 0.5 / Math.max(radius, 1e-4);
+          step += curveSplayKern(chars[i + 1], dAng, size) * kMul;
+        }
+      }
+      cursor += step;
     }
     const mid = cursor / 2;
 
@@ -1082,15 +1167,12 @@ export default function NeonText({
       ));
     }
 
-    const { radius: rawRadius, sag, tilt, cx, cy, cz } = curveParamsForName(len, t, sport);
-    const radius = Math.max(0.15, rawRadius);
-
     return chars.map((ch, i) => {
       const arc = centers[i] - mid;
       const angle = arc / radius;
       const x = Math.sin(angle) * radius + cx;
       const y = (Math.cos(angle) - 1) * radius * sag + cy;
-      const z = cz;
+      const z = cz + i * 0.0015;
       const rotZ = -angle * tilt;
       return (
         <group key={`${ch}-${i}`} position={[x, y, z]} rotation={[0, 0, rotZ]}>
