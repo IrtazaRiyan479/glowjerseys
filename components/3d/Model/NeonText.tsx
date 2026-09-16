@@ -17,7 +17,7 @@ import {
  - =========================================================================== */
 const DEBUG = {
   orbit: false,
-  panel: false,
+  panel: true,
   pivot: false,
 };
 
@@ -56,11 +56,11 @@ const DEFAULTS = {
   bbNumberSize1: 0.199,
   bbNumberSize2: 0.16,
   bbNumberSize3: 0.138,
-  bbNumberSize4: 0.113,
+  bbNumberSize4: 0.108,
 
   /* ── constant gap  */
-  nameLetterSpacing: 0.006,
-  numberLetterSpacing: 0,
+  nameLetterSpacing: 0.01,
+  numberLetterSpacing: 0.006,
 
   /* ── extrusion / tube profile ─── */
   nameExtrusion: 0.009,
