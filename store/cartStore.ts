@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { JerseySelectedOptions } from '@/data';
 import { PRODUCT } from '@/data';
+import { computeJerseyPrice } from '@/lib/pricing';
 
 export type CartLine = {
   id: string;
@@ -44,7 +45,7 @@ export const useCartStore = create<CartStore>()(
             {
               id,
               productTitle: PRODUCT.name,
-              unitPrice: PRODUCT.price,
+              unitPrice: computeJerseyPrice(selectedOptions.size),
               quantity: Math.max(1, quantity),
               selectedOptions,
             },

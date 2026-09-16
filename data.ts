@@ -21,15 +21,15 @@ export const SPORT_MODELS: Record<string, string> = {
   Hockey: '/3d/models/Hockey.glb',
 };
 
+// Real variant IDs/prices from the mk-enterprises-x35r23fp.myshopify.com demo store.
 export const SIZE_OPTIONS = [
-  { value: 20, unit: 'inch' },
-  { value: 30, unit: 'inch' },
-];
+  { value: 20, unit: 'inch', variantId: 'gid://shopify/ProductVariant/48359110443244', price: 164.99 },
+  { value: 30, unit: 'inch', variantId: 'gid://shopify/ProductVariant/48359110476012', price: 299.99 },
+] as const;
 
 export const PRODUCT = {
   slug: 'custom-glow-jersey',
   name: 'Custom Glow Jersey',
-  price: 164.99,
   currency: 'USD',
 };
 

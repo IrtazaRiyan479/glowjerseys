@@ -1,6 +1,7 @@
 'use client';
 
 import { useCartStore } from '@/store/cartStore';
+import { getAppApiPath } from '@/lib/appProxyPath';
 import { useEffect, useState } from 'react';
 
 const ORIGIN = 'https://glowjerseys.com';
@@ -164,6 +165,8 @@ export default function CartDrawer() {
   const [shown, setShown] = useState(isOpen);
   const [entered, setEntered] = useState(false);
   const [note, setNote] = useState('');
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -185,6 +188,54 @@ export default function CartDrawer() {
   const total = subtotal();
   const isEmpty = carts.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
+
+  const handleCheckout = async () => {
+    if (checkingOut || isEmpty) return;
+    setCheckingOut(true);
+    setCheckoutError(null);
+    try {
+      // Only resolves to the shop's real cart when this page is loaded
+      // through the Shopify App Proxy (same-origin as the storefront).
+      // Fetched client-side, not server-side, since a relative fetch here
+      // uses the browser's actual current origin — the server never sees it.
+      let storefrontCartLines: { variant_id: number; quantity: number }[] = [];
+      try {
+        const cartRes = await fetch('/cart.js', { cache: 'no-store' });
+        if (cartRes.ok) {
+          const cart = await cartRes.json();
+          storefrontCartLines = (cart.items ?? []).map(
+            (item: { variant_id: number; quantity: number }) => ({
+              variant_id: item.variant_id,
+              quantity: item.quantity,
+            })
+          );
+        }
+      } catch {
+        // Expected until this app is served through the App Proxy.
+      }
+
+      const res = await fetch(getAppApiPath('/api/create-draft-order'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lines: carts.map((line) => ({
+            selectedOptions: line.selectedOptions,
+            quantity: line.quantity,
+          })),
+          storefrontCartLines,
+          note,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.invoiceUrl) {
+        throw new Error(data.error || 'Checkout failed.');
+      }
+      window.location.href = data.invoiceUrl;
+    } catch (err) {
+      setCheckoutError(err instanceof Error ? err.message : 'Checkout failed.');
+      setCheckingOut(false);
+    }
+  };
 
   return (
     <div className={`gj-theme${entered ? ' mini-cart--open' : ''}`}>
@@ -363,12 +414,23 @@ export default function CartDrawer() {
              <div className="gj-ship-banner">📦 Ships in 14–21 business days (7–10 with Express)</div>
 
               <div className="button-container">
-                <button className="button" name="checkout" type="button">
-                  Check out
+                <button
+                  className="button"
+                  name="checkout"
+                  type="button"
+                  onClick={handleCheckout}
+                  disabled={checkingOut || isEmpty}
+                >
+                  {checkingOut ? 'Processing…' : 'Check out'}
                   <span id="mini-cart-subtotal">
                     ${dollars}.{cents} USD
                   </span>
                 </button>
+                {checkoutError && (
+                  <p role="alert" style={{ color: '#c0392b', fontSize: '12px', marginTop: '8px' }}>
+                    {checkoutError}
+                  </p>
+                )}
               </div>
             </div>
           </div>

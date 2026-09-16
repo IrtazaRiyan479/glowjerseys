@@ -5,9 +5,8 @@ import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
 import React, { useCallback, useRef, useState } from 'react';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
-import type { JerseySelectedOptions } from '@/data';
+import { SIZE_OPTIONS, type JerseySelectedOptions } from '@/data';
 
-const sizeOptionData = [{ value: 20, unit: 'inch' }, { value: 30, unit: 'inch' }];
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
 
 const SPORT_MODELS: Record<string, string> = {
@@ -100,7 +99,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
     <div className="z-10 flex min-h-0 min-w-0 w-full flex-col overflow-y-auto overflow-x-hidden bg-white text-black">
       <div className="p-4 pb-8 md:p-5 lg:pt-8">
         <ConfiguratorUI
-          sizeOptionData={sizeOptionData}
+          sizeOptionData={SIZE_OPTIONS}
           sizeOptionValue={sizeOptionValue}
           setSizeOptionValue={setSizeOptionValue}
           sportsTypeData={sportsTypeData}

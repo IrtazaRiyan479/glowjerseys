@@ -1,7 +1,10 @@
 'use client';
 
+import { SIZE_OPTIONS } from '@/data';
+import { computeJerseyPrice } from '@/lib/pricing';
+
 interface ConfiguratorUIProps {
-  sizeOptionData: any[];
+  sizeOptionData: readonly any[];
   sizeOptionValue: number | undefined;
   setSizeOptionValue: (v: number) => void;
   sportsTypeData: any[];
@@ -95,6 +98,9 @@ const ConfiguratorUI = ({
   const nameLen = name?.length ?? 0;
   const numberLen = number?.length ?? 0;
 
+  const price = computeJerseyPrice(sizeOptionValue ?? 20);
+  const [priceDollars, priceCents] = price.toFixed(2).split('.');
+
   const segmentActive =
     'border-[#0b45ff] bg-[rgba(11,69,255,0.12)] text-[#0b45ff] shadow-[inset_0_0_0_1px_#0b45ff]';
   const segmentIdle =
@@ -127,8 +133,8 @@ const ConfiguratorUI = ({
         className="mt-2 font-semibold tracking-tight"
         style={{ fontSize: '1.65rem', letterSpacing: '-0.02em' }}
       >
-        $164
-        <span style={{ fontSize: '0.95rem', verticalAlign: 'super' }}>.99</span>
+        ${priceDollars}
+        <span style={{ fontSize: '0.95rem', verticalAlign: 'super' }}>.{priceCents}</span>
       </p>
 
       <p className="mt-1 text-sm text-gray-500">Shipping calculated at checkout.</p>
@@ -147,13 +153,7 @@ const ConfiguratorUI = ({
           SIZE
         </p>
         <div className="flex gap-2">
-          {(sizeOptionData?.length
-            ? sizeOptionData
-            : [
-                { value: 20, unit: 'inch' },
-                { value: 30, unit: 'inch' },
-              ]
-          ).map((option: any) => {
+          {(sizeOptionData?.length ? sizeOptionData : SIZE_OPTIONS).map((option: any) => {
             const isActive = sizeOptionValue === option.value;
             return (
               <button
