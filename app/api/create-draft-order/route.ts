@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { computeJerseyPrice } from '@/lib/pricing';
+import { computeJerseyPrice, getSizeOption } from '@/lib/pricing';
 import { PRODUCT, toShopifyProperties, type JerseySelectedOptions } from '@/data';
 import { draftOrderCreate, type DraftOrderLineItemInput } from '@/lib/shopify/adminClient';
 import { verifyAppProxySignature } from '@/lib/shopify/verifyProxySignature';
@@ -82,16 +82,22 @@ export async function POST(request: NextRequest) {
 
   let customLineItems: DraftOrderLineItemInput[];
   try {
-    // Authoritative price, recomputed server-side from the selected size —
-    // the client-submitted config is never trusted for pricing.
-    customLineItems = lines.map((line) => ({
-      title: `${PRODUCT.name} — ${line.selectedOptions.size}" ${line.selectedOptions.sport}`,
-      quantity: line.quantity,
-      originalUnitPrice: computeJerseyPrice(line.selectedOptions.size).toFixed(2),
-      requiresShipping: true,
-      taxable: true,
-      customAttributes: toShopifyProperties(line.selectedOptions),
-    }));
+    // Attached to the real product variant for the selected size (inventory
+    // and per-product sales reporting), with the price still overridden to
+    // our authoritative, server-side-recomputed amount — the client-submitted
+    // config is never trusted for pricing.
+    customLineItems = lines.map((line) => {
+      const { variantId } = getSizeOption(line.selectedOptions.size);
+      return {
+        variantId,
+        quantity: line.quantity,
+        priceOverride: {
+          amount: computeJerseyPrice(line.selectedOptions.size).toFixed(2),
+          currencyCode: PRODUCT.currency,
+        },
+        customAttributes: toShopifyProperties(line.selectedOptions),
+      };
+    });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Failed to price cart lines.' },

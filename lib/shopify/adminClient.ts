@@ -43,11 +43,14 @@ async function adminGraphQL<T>(query: string, variables?: Record<string, unknown
 export type DraftOrderLineItemInput =
   | { variantId: string; quantity: number }
   | {
-      title: string;
+      // Attached to a real product variant so it counts toward inventory and
+      // per-product sales reporting. `priceOverride` (not `originalUnitPrice`,
+      // which Shopify silently ignores once variantId is set) is what makes
+      // the charged price the one we computed server-side rather than the
+      // variant's catalog price.
+      variantId: string;
       quantity: number;
-      originalUnitPrice: string;
-      requiresShipping?: boolean;
-      taxable?: boolean;
+      priceOverride: { amount: string; currencyCode: string };
       customAttributes?: { key: string; value: string }[];
     };
 
