@@ -1,8 +1,11 @@
 'use client';
 
 import { useCartStore } from '@/store/cartStore';
-import { getAppApiPath } from '@/lib/appProxyPath';
+import { updateStorefrontCartNote } from '@/lib/shopify/storefrontCart';
+import { SIZE_OPTIONS, numericVariantId } from '@/data';
 import { useEffect, useState } from 'react';
+
+const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.variantId)));
 
 const ORIGIN = 'https://glowjerseys.com';
 
@@ -179,9 +182,6 @@ function Recs() {
 export default function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
   const closeCart = useCartStore((s) => s.closeCart);
-  const carts = useCartStore((s) => s.carts);
-  const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const removeItem = useCartStore((s) => s.removeItem);
   const subtotal = useCartStore((s) => s.subtotal);
   const storefrontItems = useCartStore((s) => s.storefrontItems);
   const refreshStorefrontCart = useCartStore((s) => s.refreshStorefrontCart);
@@ -224,7 +224,7 @@ export default function CartDrawer() {
   if (!shown) return null;
 
   const total = subtotal();
-  const isEmpty = carts.length === 0 && storefrontItems.length === 0;
+  const isEmpty = storefrontItems.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
 
   const handleStorefrontQuantityChange = async (key: string, quantity: number) => {
@@ -244,26 +244,16 @@ export default function CartDrawer() {
     setCheckingOut(true);
     setCheckoutError(null);
     try {
-      const res = await fetch(getAppApiPath('/api/create-draft-order'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lines: carts.map((line) => ({
-            selectedOptions: line.selectedOptions,
-            quantity: line.quantity,
-          })),
-          storefrontCartLines: storefrontItems.map((item) => ({
-            variant_id: item.variant_id,
-            quantity: item.quantity,
-          })),
-          note,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.invoiceUrl) {
-        throw new Error(data.error || 'Checkout failed.');
+      if (note) {
+        await updateStorefrontCartNote(note);
       }
-      window.location.href = data.invoiceUrl;
+      // Everything (jerseys and regular products) is already genuinely in
+      // Shopify's real cart by this point, so checkout is just Shopify's
+      // own native checkout — no custom order-building needed here. A full
+      // navigation is required (not useRouter/next/link): /checkout is a
+      // Shopify-native route outside this Next.js app entirely.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = '/checkout';
     } catch (err) {
       setCheckoutError(err instanceof Error ? err.message : 'Checkout failed.');
       setCheckingOut(false);
@@ -305,123 +295,80 @@ export default function CartDrawer() {
                 </p>
               )}
               <ul className="mini-cart__navigation">
-                {storefrontItems.map((item) => (
-                  <li key={item.key}>
-                    <button
-                      type="button"
-                      className="delete-product"
-                      aria-label="Remove"
-                      disabled={storefrontUpdatingKey === item.key}
-                      onClick={() => handleStorefrontQuantityChange(item.key, 0)}
-                    >
-                      <IconClose />
-                    </button>
-                    <div className="product-container">
-                      <div className="product-image">
-                        {item.image ? <img src={item.image} alt={item.product_title} /> : null}
-                      </div>
-                      <div className="product-description">
-                        <div className="product-content">
-                          <a href={item.url} className="link">
-                            {item.product_title}
-                          </a>
-                        </div>
-                        {item.variant_title && (
-                          <dl>
-                            <div className="product-option">
-                              <dt>Variant:</dt>
-                              <dd>{item.variant_title}</dd>
-                            </div>
-                          </dl>
-                        )}
-                        <div className="product-quantity">
-                          <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
-                            <button
-                              type="button"
-                              className="quantity__button"
-                              aria-label="Decrease"
-                              disabled={storefrontUpdatingKey === item.key}
-                              onClick={() => handleStorefrontQuantityChange(item.key, item.quantity - 1)}
-                            >
-                              −
-                            </button>
-                            <input
-                              className="quantity__input"
-                              type="number"
-                              readOnly
-                              value={item.quantity}
-                              aria-label="Quantity"
-                            />
-                            <button
-                              type="button"
-                              className="quantity__button"
-                              aria-label="Increase"
-                              disabled={storefrontUpdatingKey === item.key}
-                              onClick={() => handleStorefrontQuantityChange(item.key, item.quantity + 1)}
-                            >
-                              +
-                            </button>
-                            {storefrontUpdatingKey === item.key && <Spinner />}
-                          </div>
-                          <Price amount={item.line_price / 100} />
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-                {carts.map((line) => {
-                  const o = line.selectedOptions;
-                  const title = line.productTitle;
+                {storefrontItems.map((item) => {
+                  const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
+                  const p = item.properties ?? {};
+                  const image = isJersey ? p['Preview Image'] || null : item.image;
                   return (
-                    <li key={line.id}>
-                      <button type="button" className="delete-product" aria-label="Remove" onClick={() => removeItem(line.id)}>
+                    <li key={item.key}>
+                      <button
+                        type="button"
+                        className="delete-product"
+                        aria-label="Remove"
+                        disabled={storefrontUpdatingKey === item.key}
+                        onClick={() => handleStorefrontQuantityChange(item.key, 0)}
+                      >
                         <IconClose />
                       </button>
                       <div className="product-container">
                         <div className="product-image">
-                          {o.previewImageUrl ? <img src={o.previewImageUrl} alt={title} /> : null}
+                          {image ? <img src={image} alt={item.product_title} /> : null}
                         </div>
                         <div className="product-description">
                           <div className="product-content">
-                            <span className="link">{title}</span>
+                            <a href={item.url} className="link">
+                              {item.product_title}
+                            </a>
                           </div>
-                          <dl>
-                            <div className="product-option">
-                              <dt>SIZE:</dt>
-                              <dd>{o.size} inch</dd>
-                            </div>
-                            <div className="product-option">
-                              <dt>Backboard:</dt>
-                              <dd>{getColorName(o.backboardColor)}</dd>
-                            </div>
-                            <div className="product-option">
-                              <dt>Sport:</dt>
-                              <dd>{o.sport}</dd>
-                            </div>
-                            <div className="product-option">
-                              <dt>Custom Name &amp; Number:</dt>
-                              <dd>{o.name ? `${o.name} #${o.number}` : '—'}</dd>
-                            </div>
-                            <div className="product-option">
-                              <dt>Jersey Color:</dt>
-                              <dd>{getColorName(o.jerseyColor)}</dd>
-                            </div>
-                            <div className="product-option">
-                              <dt>Name Color:</dt>
-                              <dd>{getColorName(o.nameColor)}</dd>
-                            </div>
-                            <div className="product-option">
-                              <dt>Number Color:</dt>
-                              <dd>{getColorName(o.numberColor)}</dd>
-                            </div>
-                          </dl>
+                          {isJersey ? (
+                            <dl>
+                              <div className="product-option">
+                                <dt>SIZE:</dt>
+                                <dd>{p['Size']}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Backboard:</dt>
+                                <dd>{getColorName(p['Backboard'])}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Sport:</dt>
+                                <dd>{p['Sport']}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Custom Name &amp; Number:</dt>
+                                <dd>{p['Name'] ? `${p['Name']} #${p['Number']}` : '—'}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Jersey Color:</dt>
+                                <dd>{getColorName(p['Jersey Color'])}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Name Color:</dt>
+                                <dd>{getColorName(p['Name Color'])}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Number Color:</dt>
+                                <dd>{getColorName(p['Number Color'])}</dd>
+                              </div>
+                            </dl>
+                          ) : (
+                            item.variant_title && (
+                              <dl>
+                                <div className="product-option">
+                                  <dt>Variant:</dt>
+                                  <dd>{item.variant_title}</dd>
+                                </div>
+                              </dl>
+                            )
+                          )}
                           <div className="product-quantity">
-                            <div className="quantity">
+                            <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
                               <button
                                 type="button"
                                 className="quantity__button"
                                 aria-label="Decrease"
-                                onClick={() => updateQuantity(line.id, line.quantity - 1)}
+                                disabled={storefrontUpdatingKey === item.key}
+                                onClick={() => handleStorefrontQuantityChange(item.key, item.quantity - 1)}
                               >
                                 −
                               </button>
@@ -429,19 +376,21 @@ export default function CartDrawer() {
                                 className="quantity__input"
                                 type="number"
                                 readOnly
-                                value={line.quantity}
+                                value={item.quantity}
                                 aria-label="Quantity"
                               />
                               <button
                                 type="button"
                                 className="quantity__button"
                                 aria-label="Increase"
-                                onClick={() => updateQuantity(line.id, line.quantity + 1)}
+                                disabled={storefrontUpdatingKey === item.key}
+                                onClick={() => handleStorefrontQuantityChange(item.key, item.quantity + 1)}
                               >
                                 +
                               </button>
+                              {storefrontUpdatingKey === item.key && <Spinner />}
                             </div>
-                            <Price amount={line.unitPrice * line.quantity} />
+                            <Price amount={item.line_price / 100} />
                           </div>
                         </div>
                       </div>

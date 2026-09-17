@@ -10,7 +10,8 @@ import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
 import React, { useRef, useState } from 'react';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
-import { SIZE_OPTIONS, type JerseySelectedOptions } from '@/data';
+import { SIZE_OPTIONS, toCartLineProperties, numericVariantId, type JerseySelectedOptions } from '@/data';
+import { getSizeOption } from '@/lib/pricing';
 
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
 
@@ -38,9 +39,10 @@ const Page = () => {
   const [quantity, setQuantity] = useState(1);
 
 
-const addItem = useCartStore((s) => s.addItem);
+const addStorefrontItem = useCartStore((s) => s.addStorefrontItem);
 const snapshotRef = useRef<(() => Promise<string | null>) | null>(null);
 const [addingToCart, setAddingToCart] = useState(false);
+const [addToCartError, setAddToCartError] = useState<string | null>(null);
 
 // Only wired up to Experience (disabled above) — see its import comment.
 // const onSnapshotReady = useCallback((fn: () => Promise<string | null>) => {
@@ -50,6 +52,7 @@ const [addingToCart, setAddingToCart] = useState(false);
 const handleAddToCart = async () => {
   if (addingToCart) return;
   setAddingToCart(true);
+  setAddToCartError(null);
   try {
     let previewImageUrl: string | undefined;
 
@@ -74,7 +77,14 @@ const handleAddToCart = async () => {
       previewImageUrl,
     };
 
-    addItem(selectedOptions, quantity);
+    // Added directly to the real Shopify cart (as the size's real product
+    // variant + these as line item properties), not a local-only cart, so
+    // it's genuinely shared with the rest of the store from the moment it's
+    // added, not just at checkout.
+    const { variantId } = getSizeOption(selectedOptions.size);
+    await addStorefrontItem(numericVariantId(variantId), quantity, toCartLineProperties(selectedOptions));
+  } catch (err) {
+    setAddToCartError(err instanceof Error ? err.message : 'Failed to add to cart.');
   } finally {
     setAddingToCart(false);
   }
@@ -137,6 +147,7 @@ const handleAddToCart = async () => {
           setQuantity={setQuantity}
           onAddToCart={handleAddToCart}
           addingToCart={addingToCart}
+          addToCartError={addToCartError}
         />
       </div>
     </div>

@@ -60,3 +60,21 @@ export function toShopifyProperties(opts: JerseySelectedOptions) {
       : []),
   ];
 }
+
+// Plain-object form of the same properties, for Shopify's storefront
+// /cart/add.js Ajax API (which takes `properties` as {key: value}, unlike
+// the Admin API's {key, value}[] shape used above).
+export function toCartLineProperties(opts: JerseySelectedOptions): Record<string, string> {
+  return Object.fromEntries(toShopifyProperties(opts).map(({ key, value }) => [key, value]));
+}
+
+// SIZE_OPTIONS.variantId is a GID (gid://shopify/ProductVariant/123) for the
+// Admin API's use; the storefront /cart.js and /cart/add.js Ajax endpoints
+// take the plain numeric id instead.
+export function numericVariantId(gid: string): number {
+  const match = gid.match(/(\d+)$/);
+  if (!match) {
+    throw new Error(`Could not parse a numeric variant id from "${gid}".`);
+  }
+  return Number(match[1]);
+}

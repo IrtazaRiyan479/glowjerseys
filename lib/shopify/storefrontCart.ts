@@ -13,6 +13,7 @@ export type StorefrontCartItem = {
   line_price: number; // cents
   image: string | null;
   url: string;
+  properties: Record<string, string> | null;
 };
 
 export async function fetchStorefrontCart(): Promise<StorefrontCartItem[]> {
@@ -23,6 +24,36 @@ export async function fetchStorefrontCart(): Promise<StorefrontCartItem[]> {
     return (cart.items ?? []) as StorefrontCartItem[];
   } catch {
     return [];
+  }
+}
+
+export async function addToStorefrontCart(
+  variantId: number,
+  quantity: number,
+  properties: Record<string, string>
+): Promise<StorefrontCartItem[]> {
+  const res = await fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: [{ id: variantId, quantity, properties }] }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Failed to add to cart: ${body || res.status}`);
+  }
+  // /cart/add.js's own response only describes the added line, not the full
+  // cart — re-fetch so callers get back the authoritative current state.
+  return fetchStorefrontCart();
+}
+
+export async function updateStorefrontCartNote(note: string): Promise<void> {
+  const res = await fetch('/cart/update.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ note }),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to save order note.');
   }
 }
 

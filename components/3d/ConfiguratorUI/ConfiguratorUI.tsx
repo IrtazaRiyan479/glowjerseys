@@ -35,6 +35,7 @@ interface ConfiguratorUIProps {
   setQuantity: (v: number) => void;
   onAddToCart?: () => void;
   addingToCart?: boolean;
+  addToCartError?: string | null;
 }
 
 /** Exact colors from glowjerseys.com/products/custom-jersey */
@@ -94,6 +95,7 @@ const ConfiguratorUI = ({
   setQuantity,
   onAddToCart,
   addingToCart,
+  addToCartError,
 }: ConfiguratorUIProps) => {
   const nameLen = name?.length ?? 0;
   const numberLen = number?.length ?? 0;
@@ -506,6 +508,11 @@ const ConfiguratorUI = ({
   {addingToCart ? '' : 'ADD TO CART'}
 </button>
 </div>
+{addToCartError && (
+  <p className="mt-2 text-xs text-red-600" role="alert">
+    {addToCartError}
+  </p>
+)}
 
 {/* ── ACCORDIONS ───────────────────────────────────── */}
 <div className="mt-6 border-t border-gray-200">
