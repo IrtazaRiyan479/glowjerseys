@@ -2,6 +2,11 @@
 
 import { useCartStore } from '@/store/cartStore';
 import { getAppApiPath } from '@/lib/appProxyPath';
+import {
+  fetchStorefrontCart,
+  updateStorefrontCartItem,
+  type StorefrontCartItem,
+} from '@/lib/shopify/storefrontCart';
 import { useEffect, useState } from 'react';
 
 const ORIGIN = 'https://glowjerseys.com';
@@ -168,6 +173,14 @@ export default function CartDrawer() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
+  // The real Shopify cart (only resolves when this page is loaded through
+  // the App Proxy, same-origin as the storefront). Kept in sync here so it
+  // behaves like a real cart, quantity/remove actually update Shopify's
+  // cart, not just this drawer's display.
+  const [storefrontItems, setStorefrontItems] = useState<StorefrontCartItem[]>([]);
+  const [storefrontUpdatingKey, setStorefrontUpdatingKey] = useState<string | null>(null);
+  const [storefrontError, setStorefrontError] = useState<string | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       setShown(true);
@@ -175,6 +188,7 @@ export default function CartDrawer() {
         requestAnimationFrame(() => setEntered(true));
       });
       document.body.style.overflow = 'hidden';
+      fetchStorefrontCart().then(setStorefrontItems);
       return () => cancelAnimationFrame(id);
     }
     setEntered(false);
@@ -185,35 +199,29 @@ export default function CartDrawer() {
 
   if (!shown) return null;
 
-  const total = subtotal();
-  const isEmpty = carts.length === 0;
+  const storefrontSubtotal = storefrontItems.reduce((n, item) => n + item.line_price, 0) / 100;
+  const total = subtotal() + storefrontSubtotal;
+  const isEmpty = carts.length === 0 && storefrontItems.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
+
+  const handleStorefrontQuantityChange = async (key: string, quantity: number) => {
+    setStorefrontUpdatingKey(key);
+    setStorefrontError(null);
+    try {
+      const items = await updateStorefrontCartItem(key, quantity);
+      setStorefrontItems(items);
+    } catch (err) {
+      setStorefrontError(err instanceof Error ? err.message : 'Failed to update cart.');
+    } finally {
+      setStorefrontUpdatingKey(null);
+    }
+  };
 
   const handleCheckout = async () => {
     if (checkingOut || isEmpty) return;
     setCheckingOut(true);
     setCheckoutError(null);
     try {
-      // Only resolves to the shop's real cart when this page is loaded
-      // through the Shopify App Proxy (same-origin as the storefront).
-      // Fetched client-side, not server-side, since a relative fetch here
-      // uses the browser's actual current origin — the server never sees it.
-      let storefrontCartLines: { variant_id: number; quantity: number }[] = [];
-      try {
-        const cartRes = await fetch('/cart.js', { cache: 'no-store' });
-        if (cartRes.ok) {
-          const cart = await cartRes.json();
-          storefrontCartLines = (cart.items ?? []).map(
-            (item: { variant_id: number; quantity: number }) => ({
-              variant_id: item.variant_id,
-              quantity: item.quantity,
-            })
-          );
-        }
-      } catch {
-        // Expected until this app is served through the App Proxy.
-      }
-
       const res = await fetch(getAppApiPath('/api/create-draft-order'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -222,7 +230,10 @@ export default function CartDrawer() {
             selectedOptions: line.selectedOptions,
             quantity: line.quantity,
           })),
-          storefrontCartLines,
+          storefrontCartLines: storefrontItems.map((item) => ({
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+          })),
           note,
         }),
       });
@@ -266,8 +277,76 @@ export default function CartDrawer() {
 
             <div className="mini-cart__main" id="main-cart-items">
               <Recs />
+              {storefrontError && (
+                <p role="alert" style={{ color: '#c0392b', fontSize: '12px', margin: '0 0 8px' }}>
+                  {storefrontError}
+                </p>
+              )}
               <ul className="mini-cart__navigation">
-                                {carts.map((line) => {
+                {storefrontItems.map((item) => (
+                  <li key={item.key}>
+                    <button
+                      type="button"
+                      className="delete-product"
+                      aria-label="Remove"
+                      disabled={storefrontUpdatingKey === item.key}
+                      onClick={() => handleStorefrontQuantityChange(item.key, 0)}
+                    >
+                      <IconClose />
+                    </button>
+                    <div className="product-container">
+                      <div className="product-image">
+                        {item.image ? <img src={item.image} alt={item.product_title} /> : null}
+                      </div>
+                      <div className="product-description">
+                        <div className="product-content">
+                          <a href={item.url} className="link">
+                            {item.product_title}
+                          </a>
+                        </div>
+                        {item.variant_title && (
+                          <dl>
+                            <div className="product-option">
+                              <dt>Variant:</dt>
+                              <dd>{item.variant_title}</dd>
+                            </div>
+                          </dl>
+                        )}
+                        <div className="product-quantity">
+                          <div className="quantity">
+                            <button
+                              type="button"
+                              className="quantity__button"
+                              aria-label="Decrease"
+                              disabled={storefrontUpdatingKey === item.key}
+                              onClick={() => handleStorefrontQuantityChange(item.key, item.quantity - 1)}
+                            >
+                              −
+                            </button>
+                            <input
+                              className="quantity__input"
+                              type="number"
+                              readOnly
+                              value={item.quantity}
+                              aria-label="Quantity"
+                            />
+                            <button
+                              type="button"
+                              className="quantity__button"
+                              aria-label="Increase"
+                              disabled={storefrontUpdatingKey === item.key}
+                              onClick={() => handleStorefrontQuantityChange(item.key, item.quantity + 1)}
+                            >
+                              +
+                            </button>
+                          </div>
+                          <Price amount={item.line_price / 100} />
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+                {carts.map((line) => {
                   const o = line.selectedOptions;
                   const title = line.productTitle;
                   return (
