@@ -2,11 +2,6 @@
 
 import { useCartStore } from '@/store/cartStore';
 import { getAppApiPath } from '@/lib/appProxyPath';
-import {
-  fetchStorefrontCart,
-  updateStorefrontCartItem,
-  type StorefrontCartItem,
-} from '@/lib/shopify/storefrontCart';
 import { useEffect, useState } from 'react';
 
 const ORIGIN = 'https://glowjerseys.com';
@@ -76,6 +71,28 @@ function Price({ amount, className = '' }: { amount: number | string; className?
         <sup>.{cents}</sup>
       </bdi>
     </span>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="w-4 h-4 animate-spin text-black/20 fill-black"
+      viewBox="0 0 100 101"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ marginLeft: 8 }}
+    >
+      <path
+        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+        fill="currentColor"
+      />
+      <path
+        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+        fill="currentFill"
+      />
+    </svg>
   );
 }
 
@@ -166,20 +183,26 @@ export default function CartDrawer() {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const subtotal = useCartStore((s) => s.subtotal);
+  const storefrontItems = useCartStore((s) => s.storefrontItems);
+  const refreshStorefrontCart = useCartStore((s) => s.refreshStorefrontCart);
+  const updateStorefrontItem = useCartStore((s) => s.updateStorefrontItem);
 
   const [shown, setShown] = useState(isOpen);
   const [entered, setEntered] = useState(false);
   const [note, setNote] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
-
-  // The real Shopify cart (only resolves when this page is loaded through
-  // the App Proxy, same-origin as the storefront). Kept in sync here so it
-  // behaves like a real cart, quantity/remove actually update Shopify's
-  // cart, not just this drawer's display.
-  const [storefrontItems, setStorefrontItems] = useState<StorefrontCartItem[]>([]);
   const [storefrontUpdatingKey, setStorefrontUpdatingKey] = useState<string | null>(null);
   const [storefrontError, setStorefrontError] = useState<string | null>(null);
+
+  // Fetched once on mount (this component is always mounted in the layout)
+  // so the nav bar badge reflects the real cart even before the drawer's
+  // ever been opened, then refreshed each time the drawer opens in case it
+  // changed elsewhere (e.g. added via the real theme in another tab).
+  useEffect(() => {
+    refreshStorefrontCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -188,19 +211,19 @@ export default function CartDrawer() {
         requestAnimationFrame(() => setEntered(true));
       });
       document.body.style.overflow = 'hidden';
-      fetchStorefrontCart().then(setStorefrontItems);
+      refreshStorefrontCart();
       return () => cancelAnimationFrame(id);
     }
     setEntered(false);
     document.body.style.overflow = '';
     const t = window.setTimeout(() => setShown(false), 500);
     return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   if (!shown) return null;
 
-  const storefrontSubtotal = storefrontItems.reduce((n, item) => n + item.line_price, 0) / 100;
-  const total = subtotal() + storefrontSubtotal;
+  const total = subtotal();
   const isEmpty = carts.length === 0 && storefrontItems.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
 
@@ -208,8 +231,7 @@ export default function CartDrawer() {
     setStorefrontUpdatingKey(key);
     setStorefrontError(null);
     try {
-      const items = await updateStorefrontCartItem(key, quantity);
-      setStorefrontItems(items);
+      await updateStorefrontItem(key, quantity);
     } catch (err) {
       setStorefrontError(err instanceof Error ? err.message : 'Failed to update cart.');
     } finally {
@@ -313,7 +335,7 @@ export default function CartDrawer() {
                           </dl>
                         )}
                         <div className="product-quantity">
-                          <div className="quantity">
+                          <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
                             <button
                               type="button"
                               className="quantity__button"
@@ -339,6 +361,7 @@ export default function CartDrawer() {
                             >
                               +
                             </button>
+                            {storefrontUpdatingKey === item.key && <Spinner />}
                           </div>
                           <Price amount={item.line_price / 100} />
                         </div>

@@ -5,6 +5,11 @@ import { persist } from 'zustand/middleware';
 import type { JerseySelectedOptions } from '@/data';
 import { PRODUCT } from '@/data';
 import { computeJerseyPrice } from '@/lib/pricing';
+import {
+  fetchStorefrontCart,
+  updateStorefrontCartItem,
+  type StorefrontCartItem,
+} from '@/lib/shopify/storefrontCart';
 
 export type CartLine = {
   id: string;
@@ -17,6 +22,10 @@ export type CartLine = {
 type CartStore = {
   carts: CartLine[];
   isOpen: boolean;
+  // The real Shopify cart (only resolves through the App Proxy). Lives here
+  // rather than in a single component so both the nav bar badge and the
+  // cart drawer see the same, current state.
+  storefrontItems: StorefrontCartItem[];
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
@@ -26,6 +35,8 @@ type CartStore = {
   clearCart: () => void;
   totalQuantity: () => number;
   subtotal: () => number;
+  refreshStorefrontCart: () => Promise<void>;
+  updateStorefrontItem: (key: string, quantity: number) => Promise<void>;
 };
 
 export const useCartStore = create<CartStore>()(
@@ -33,6 +44,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       carts: [],
       isOpen: false,
+      storefrontItems: [],
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
       toggleCart: () => set((s) => ({ isOpen: !s.isOpen })),
@@ -68,9 +80,21 @@ export const useCartStore = create<CartStore>()(
 
       clearCart: () => set({ carts: [] }),
 
-      totalQuantity: () => get().carts.reduce((n, l) => n + l.quantity, 0),
+      totalQuantity: () =>
+        get().carts.reduce((n, l) => n + l.quantity, 0) +
+        get().storefrontItems.reduce((n, i) => n + i.quantity, 0),
       subtotal: () =>
-        get().carts.reduce((n, l) => n + l.unitPrice * l.quantity, 0),
+        get().carts.reduce((n, l) => n + l.unitPrice * l.quantity, 0) +
+        get().storefrontItems.reduce((n, i) => n + i.line_price, 0) / 100,
+
+      refreshStorefrontCart: async () => {
+        const items = await fetchStorefrontCart();
+        set({ storefrontItems: items });
+      },
+      updateStorefrontItem: async (key, quantity) => {
+        const items = await updateStorefrontCartItem(key, quantity);
+        set({ storefrontItems: items });
+      },
     }),
     {
       name: 'glow-jersey-cart',

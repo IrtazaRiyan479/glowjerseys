@@ -116,9 +116,8 @@ export default function Navbar() {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInput = useRef<HTMLInputElement>(null);
 
-  const carts = useCartStore((s) => s.carts);
   const openCart = useCartStore((s) => s.openCart);
-  const count = carts.reduce((n, l) => n + l.quantity, 0);
+  const count = useCartStore((s) => s.totalQuantity());
 
   const jerseys = NAV.find((n) => n.children)!;
   const jerseysMobile = [
