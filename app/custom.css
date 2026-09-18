@@ -12,6 +12,13 @@
   font-display: swap;
   src: url("https://glowjerseys.com/cdn/fonts/poppins/poppins_n6.aa29d4918bc243723d56b59572e18228ed0786f6.woff2") format("woff2");
 }
+@font-face {
+  font-family: Poppins;
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("https://glowjerseys.com/cdn/fonts/poppins/poppins_i4.846ad1e22474f856bd6b81ba4585a60799a9f5d2.woff2") format("woff2");
+}
 
 .gj-theme {
   --font-body-family: Poppins, sans-serif;

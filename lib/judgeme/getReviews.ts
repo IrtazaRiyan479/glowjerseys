@@ -10,6 +10,7 @@ export type JudgemeReview = {
   badgeLabel: string;
   createdAt: string;
   images: { small: string; original: string }[];
+  hasVideo: boolean;
 };
 
 // Mirrors the "transparency badge" Judge.me renders under each review body.
@@ -50,6 +51,7 @@ export async function getReviews(): Promise<JudgemeReview[]> {
           images: (r.pictures ?? [])
             .filter((p: any) => !p.hidden && p.urls?.small)
             .map((p: any) => ({ small: p.urls.small, original: p.urls.original || p.urls.small })),
+          hasVideo: r.has_published_videos === true,
         };
       });
     /* eslint-enable @typescript-eslint/no-explicit-any */

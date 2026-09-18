@@ -30,7 +30,51 @@ const TRANSPARENCY_BADGE_STYLE: React.CSSProperties = {
   color: 'rgb(123, 123, 123)',
 };
 
-type SortOption = 'most-recent' | 'highest-rating' | 'lowest-rating';
+type SortOption =
+  | 'most-recent'
+  | 'highest-rating'
+  | 'lowest-rating'
+  | 'only-pictures'
+  | 'pictures-first'
+  | 'videos-first'
+  | 'most-helpful';
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'most-recent', label: 'Most Recent' },
+  { value: 'highest-rating', label: 'Highest Rating' },
+  { value: 'lowest-rating', label: 'Lowest Rating' },
+  { value: 'only-pictures', label: 'Only Pictures' },
+  { value: 'pictures-first', label: 'Pictures First' },
+  { value: 'videos-first', label: 'Videos First' },
+  { value: 'most-helpful', label: 'Most Helpful' },
+];
+
+const byRecent = (a: JudgemeReview, b: JudgemeReview) =>
+  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+function sortReviews(reviews: JudgemeReview[], sort: SortOption): JudgemeReview[] {
+  const list = [...reviews];
+  const hasPics = (r: JudgemeReview) => (r.images.length > 0 ? 1 : 0);
+  const hasVid = (r: JudgemeReview) => (r.hasVideo ? 1 : 0);
+  switch (sort) {
+    case 'highest-rating':
+      return list.sort((a, b) => b.rating - a.rating || byRecent(a, b));
+    case 'lowest-rating':
+      return list.sort((a, b) => a.rating - b.rating || byRecent(a, b));
+    case 'only-pictures':
+      return list.filter((r) => r.images.length > 0).sort(byRecent);
+    case 'pictures-first':
+      return list.sort((a, b) => hasPics(b) - hasPics(a) || byRecent(a, b));
+    case 'videos-first':
+      return list.sort((a, b) => hasVid(b) - hasVid(a) || byRecent(a, b));
+    case 'most-helpful':
+      // The reviews API exposes no helpfulness votes, so this can't be ranked
+      // by votes. With zero votes the live widget falls back to recency too.
+      return list.sort(byRecent);
+    default:
+      return list.sort(byRecent);
+  }
+}
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -165,13 +209,7 @@ export default function ReviewsSection() {
     return (reviews.filter((r) => r.verifiedBuyer).length / reviews.length) * 100;
   }, [reviews]);
 
-  const sortedReviews = useMemo(() => {
-    const copy = [...reviews];
-    if (sort === 'highest-rating') copy.sort((a, b) => b.rating - a.rating);
-    else if (sort === 'lowest-rating') copy.sort((a, b) => a.rating - b.rating);
-    else copy.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    return copy;
-  }, [reviews, sort]);
+  const sortedReviews = useMemo(() => sortReviews(reviews, sort), [reviews, sort]);
 
   if (loading) {
     return (
@@ -301,9 +339,11 @@ export default function ReviewsSection() {
                   setPage(1);
                 }}
               >
-                <option value="most-recent">Most Recent</option>
-                <option value="highest-rating">Highest Rating</option>
-                <option value="lowest-rating">Lowest Rating</option>
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
               </select>
               <span className="jdgm-sort-dropdown-arrow" />
             </label>

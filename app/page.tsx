@@ -149,6 +149,8 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
   <ReviewsSection />
   <InstagramBanner />
   <NewsletterMarquee />
+  {/* Empty spacer before the footer, matching the live theme's own gap here. */}
+  <div className="py-9" />
   </>
 );
 };
