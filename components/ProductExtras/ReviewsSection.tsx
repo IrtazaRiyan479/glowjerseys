@@ -14,12 +14,15 @@ const WRITE_REVIEW_URL = 'https://glowjerseys.com/products/custom-jersey#judgeme
 const CHECKMARK_SRC = 'https://public-images.judge.me/judgeme/logos/verified-checkmark.svg';
 const SHOP_BADGE_SRC = 'https://public-images.judge.me/judgeme/verified-badge-v2/verified-by-shop_light.svg';
 const MEDAL_BASE = 'https://public-images.judge.me/judgeme/medals-v2-2025-rebranding/auth';
+const WIDGET_STYLE: React.CSSProperties = { width: '100%', maxWidth: 1200, margin: '0 auto' };
 
-// Judge.me's JS sets these inline rather than in the stylesheet.
+const BADGE_OFFSET: React.CSSProperties = { marginLeft: 10 };
+
 const TRANSPARENCY_BADGE_STYLE: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   padding: '4px 8px',
+  marginTop: '10px',
   marginRight: '2px',
   borderRadius: '0px',
   border: '1px solid rgb(230, 230, 230)',
@@ -77,13 +80,13 @@ function ReviewCard({ review }: { review: JudgemeReview }) {
           <span className="jdgm-rev__author-wrapper">
             <span className="jdgm-rev__author">{review.author}</span>
             {review.viaShopApp ? (
-              <span className="jdgm-rev__source" data-source="shop-app">
+              <span className="jdgm-rev__source" data-source="shop-app" style={BADGE_OFFSET}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className="jdgm-rev__verification-badge-img" alt="Verified by Shop" src={SHOP_BADGE_SRC} />
               </span>
             ) : review.verifiedBuyer ? (
               // Text comes from CSS (.jdgm-rev__buyer-badge:before), so leave it empty.
-              <span className="jdgm-rev__buyer-badge-wrapper">
+              <span className="jdgm-rev__buyer-badge-wrapper" style={BADGE_OFFSET}>
                 <span className="jdgm-rev__buyer-badge" />
               </span>
             ) : null}
@@ -140,6 +143,7 @@ function ReviewCard({ review }: { review: JudgemeReview }) {
 
 export default function ReviewsSection() {
   const [reviews, setReviews] = useState<JudgemeReview[]>([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortOption>('most-recent');
 
@@ -147,7 +151,8 @@ export default function ReviewsSection() {
     fetch(publicAssetUrl('/api/reviews'))
       .then((res) => res.json())
       .then((data) => setReviews(data.reviews ?? []))
-      .catch(() => setReviews([]));
+      .catch(() => setReviews([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const averageRating = useMemo(() => {
@@ -168,6 +173,18 @@ export default function ReviewsSection() {
     return copy;
   }, [reviews, sort]);
 
+  if (loading) {
+    return (
+      <div className="jdgm-widget jdgm-review-widget" style={WIDGET_STYLE}>
+        <div className="jdgm-rev-widg">
+          <div style={{ padding: '48px 0' }}>
+            <div className="jdgm-spinner" role="status" aria-label="Loading reviews" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (reviews.length === 0) return null;
 
   // Approximate tier cutoffs — Judge.me doesn't publish the exact thresholds.
@@ -187,7 +204,7 @@ export default function ReviewsSection() {
     <div
       className="jdgm-widget jdgm-review-widget jdgm--done-setup-widget"
       data-widget="review"
-      style={{ maxWidth: 1200, margin: '0 auto' }}
+      style={WIDGET_STYLE}
     >
       <div className="jdgm-rev-widg" data-average-rating={average} data-number-of-reviews={reviews.length}>
         <div className="jdgm-rev-widg__header">
