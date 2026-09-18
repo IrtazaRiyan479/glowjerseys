@@ -1,46 +1,81 @@
 'use client';
 
-import { useCartStore, type CartLine } from '@/store/cartStore';
+import { useCartStore } from '@/store/cartStore';
 import { updateStorefrontCartNote } from '@/lib/shopify/storefrontCart';
 import { SIZE_OPTIONS, numericVariantId } from '@/data';
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 
 const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.variantId)));
+
 const ORIGIN = 'https://glowjerseys.com';
+
+/** Fake lines for UI preview when /cart.js is empty. Set false before shipping. */
+const PREVIEW_CART = true;
+
+const DEMO_ITEMS = [
+  {
+    key: 'demo-jefferson',
+    variant_id: 1,
+    product_title: 'Jefferson #18',
+    variant_title: '20 inches',
+    quantity: 1,
+    price: 10799,
+    line_price: 10799,
+    image:
+      'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
+    url: `${ORIGIN}/products/jefferson-18`,
+    properties: null as Record<string, string> | null,
+  },
+  {
+    key: 'demo-custom',
+    variant_id: numericVariantId(SIZE_OPTIONS[0].variantId),
+    product_title: 'Custom Glow Jersey',
+    variant_title: '20 inch',
+    quantity: 1,
+    price: 16499,
+    line_price: 16499,
+    image: null as string | null,
+    url: `${ORIGIN}/products/custom-jersey`,
+    properties: {
+      Size: '20 inch',
+      Backboard: 'Black',
+      Sport: 'Basketball',
+      Name: 'BROWN',
+      Number: '7',
+      'Jersey Color': 'Orange',
+      'Name Color': 'White',
+      'Number Color': 'White',
+      'Preview Image':
+        'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
+    },
+  },
+];
 
 const RECS = [
   {
-    title: 'Jordan #23',
+    title: 'Booker #15',
     price: '119.99',
-    href: `${ORIGIN}/products/jordan-23`,
-    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_n0c5nvn0c5nvn0c5.png?v=1781552626&width=140',
-    ratio: '100%',
-    alt: 'Jordan ',
+    href: `${ORIGIN}/products/booker-1`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
   },
   {
-    title: 'Hall #20',
+    title: 'James #23',
     price: '119.99',
-    href: `${ORIGIN}/products/hall-20`,
-    img: 'https://glowjerseys.com/cdn/shop/files/Screenshot2025-07-09at2.52.55PM.png?v=1752090782&width=140',
-    ratio: '138.90020366598776%',
-    alt: 'Hall ',
+    href: `${ORIGIN}/products/james-23`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
   },
   {
-    title: 'Point #21',
-    price: '119.99',
-    compareAt: '99.99',
-    href: `${ORIGIN}/products/point-21`,
-    img: 'https://glowjerseys.com/cdn/shop/files/Screenshot2026-01-07at3.24.23PM.png?v=1767821070&width=140',
-    ratio: '133.69175627240145%',
-    alt: 'Point ',
+    title: 'Mccaffrey #23',
+    price: '107.99',
+    compareAt: '119.99',
+    href: `${ORIGIN}/products/mccaffrey-23`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_lu33yhlu33yhlu33.png?width=140',
   },
   {
-    title: 'Custom Soccer Glow Jersey',
-    price: '164.99',
-    href: `${ORIGIN}/products/custom-soccer-glow-jersey`,
-    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_f4fxr1f4fxr1f4fx.png?v=1781551905&width=140',
-    ratio: '100%',
-    alt: 'Custom Soccer Glow Jersey',
+    title: 'Murray #27',
+    price: '119.99',
+    href: `${ORIGIN}/products/murray-27`,
+    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_pawly1pawly1pawl.png?width=140',
   },
 ];
 
@@ -71,22 +106,37 @@ function getColorName(hexOrName: string | undefined): string {
   return found ? found[1] : key;
 }
 
-function PriceMoney({ amount }: { amount: number | string }) {
-  const n = typeof amount === 'number' ? amount : parseFloat(String(amount));
+function Price({ amount, className = '' }: { amount: number | string; className?: string }) {
+  const n = typeof amount === 'number' ? amount : parseFloat(amount);
   const [dollars, cents] = n.toFixed(2).split('.');
   return (
-    <bdi>
-      <span className="price__prefix">$</span>
-      {dollars}
-      <sup className="price__suffix">.{cents}</sup>
-    </bdi>
+    <span className={`price ${className}`}>
+      <bdi>
+        ${dollars}
+        <sup>.{cents}</sup>
+      </bdi>
+    </span>
   );
 }
 
-function IconSpinner() {
+function Spinner() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-spinner" fill="none" viewBox="0 0 66 66">
-      <circle className="path" fill="none" strokeWidth="6" cx="33" cy="33" r="30" />
+    <svg
+      aria-hidden="true"
+      className="w-4 h-4 animate-spin text-black/20 fill-black"
+      viewBox="0 0 100 101"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ marginLeft: 8 }}
+    >
+      <path
+        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+        fill="currentColor"
+      />
+      <path
+        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+        fill="currentFill"
+      />
     </svg>
   );
 }
@@ -132,20 +182,10 @@ function IconArrow() {
   );
 }
 
-function IconCart() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-cart medium-hide large-up-hide" fill="none" viewBox="0 0 18 19">
-      <path d="M3.09333 5.87954L16.2853 5.87945V5.87945C16.3948 5.8795 16.4836 5.96831 16.4836 6.07785V11.4909C16.4836 11.974 16.1363 12.389 15.6603 12.4714C11.3279 13.2209 9.49656 13.2033 5.25251 13.9258C4.68216 14.0229 4.14294 13.6285 4.0774 13.0537C3.77443 10.3963 2.99795 3.58502 2.88887 2.62142C2.75288 1.42015 0.905376 1.51528 0.283581 1.51478" stroke="currentColor" />
-      <path d="M13.3143 16.8554C13.3143 17.6005 13.9183 18.2045 14.6634 18.2045C15.4085 18.2045 16.0125 17.6005 16.0125 16.8554C16.0125 16.1104 15.4085 15.5063 14.6634 15.5063C13.9183 15.5063 13.3143 16.1104 13.3143 16.8554Z" fill="currentColor" />
-      <path d="M3.72831 16.8554C3.72831 17.6005 4.33233 18.2045 5.07741 18.2045C5.8225 18.2045 6.42651 17.6005 6.42651 16.8554C6.42651 16.1104 5.8225 15.5063 5.07741 15.5063C4.33233 15.5063 3.72831 16.1104 3.72831 16.8554Z" fill="currentColor" />
-    </svg>
-  );
-}
-
 function IconMinus() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-minus" fill="none" viewBox="0 0 10 2">
-      <path fillRule="evenodd" clipRule="evenodd" d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z" fill="currentColor" />
+      <path fill="currentColor" d="M1 1h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -153,87 +193,50 @@ function IconMinus() {
 function IconPlus() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-plus" fill="none" viewBox="0 0 10 10">
-      <path fillRule="evenodd" clipRule="evenodd" d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z" fill="currentColor" />
+      <path fill="currentColor" d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
-}
-
-function IconDiscount() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-discount" fill="none" viewBox="0 0 24 24">
-      <path fillRule="evenodd" clipRule="evenodd" d="M10.9 2.1l9.899 1.415 1.414 9.9-9.192 9.192a1 1 0 0 1-1.414 0l-9.9-9.9a1 1 0 0 1 0-1.414L10.9 2.1zm2.828 8.486a2 2 0 1 0 2.828-2.829 2 2 0 0 0-2.828 2.829z" fill="currentColor" />
-    </svg>
-  );
-}
-
-function closeDetails(el: HTMLElement) {
-  el.closest('details')?.removeAttribute('open');
 }
 
 function Recs() {
   return (
     <div className="cart-recommendations">
-      <div className="title h4">You may also like</div>
+      <div className="title h5">You may also like</div>
       <ul className="mini-cart__navigation">
         {RECS.map((r) => (
           <li key={r.title}>
-            <div className="product-container product-container--link">
-              <div className="product-image">
-                <a href={r.href} className="media-wrapper media-wrapper--small">
-                  <div className="media media--adapt" style={{ '--image-ratio-percent': r.ratio } as CSSProperties}>
-                    <img src={r.img} alt={r.alt} width={70} height={70} />
-                  </div>
-                </a>
-              </div>
+            <div className="product-container">
+              <a href={r.href} className="product-image">
+                <img src={r.img} alt={r.title} />
+              </a>
               <div className="product-description">
-                <span className="visually-hidden">Vendor:</span>
                 <div className="caption-with-letter-spacing">Glow Jerseys</div>
                 <div className="product-content">
-                  <a href={r.href} className="link product-title">
+                  <a href={r.href} className="link">
                     {r.title}
                   </a>
                 </div>
-                <div className={`price${r.compareAt ? ' price--on-sale' : ''}`}>
-                  <dl>
-                    <div className="price__regular">
-                      <dt>
-                        <span className="visually-hidden visually-hidden--inline">Regular price</span>
-                      </dt>
-                      <dd>
-                        <span className="price-item price-item--regular">
-                          <PriceMoney amount={r.price} />
-                        </span>
-                      </dd>
-                    </div>
-                    <div className="price__sale">
-                      <dt className="price__compare">
-                        <span className="visually-hidden visually-hidden--inline">Regular price</span>
-                      </dt>
-                      <dd className="price__compare">
-                        <s className="price-item price-item--regular">
-                          {r.compareAt ? <PriceMoney amount={r.compareAt} /> : <bdi />}
-                        </s>
-                      </dd>
-                      <dt>
-                        <span className="visually-hidden visually-hidden--inline">Sale price</span>
-                      </dt>
-                      <dd>
-                        <span className="price-item price-item--sale">
-                          <PriceMoney amount={r.price} />
-                        </span>
-                      </dd>
-                    </div>
-                  </dl>
+                <div className="price">
+                  {r.compareAt ? (
+                    <>
+                      <span className="price-item--regular">
+                        <Price amount={r.compareAt} />
+                      </span>
+                      <span className="from-label">From</span>
+                      <span className="price-item--sale">
+                        <Price amount={r.price} />
+                      </span>
+                    </>
+                  ) : (
+                    <Price amount={r.price} />
+                  )}
                 </div>
                 <div className="product-button">
-                  <a href={r.href} className="button button--small button--cta" tabIndex={-1}>
-                    <span className="small-hide">
-                      <span className="label">Choose options</span>
-                      <IconArrow />
-                    </span>
-                    <IconCart />
-                  </a>
-                </div>
+  <a href={r.href} className="button">
+    <span>Choose options</span>
+    <IconArrow />
+  </a>
+</div>
               </div>
             </div>
           </li>
@@ -243,71 +246,31 @@ function Recs() {
   );
 }
 
-function LineOptions({ item }: { item: CartLine }) {
-  const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
-  const p = item.properties ?? {};
-  if (isJersey) {
-    const nameNum = p['Custom Name & Number'] || (p.Name ? `${p.Name} #${p.Number}` : '—');
-    return (
-      <dl>
-        <div className="product-option">
-          <dt>SIZE: </dt>
-          <dd>{p.Size || p.SIZE || item.variant_title}</dd>
-        </div>
-        <div className="product-option">
-          <dt>Backboard: </dt>
-          <dd>{getColorName(p.Backboard)}</dd>
-        </div>
-        <div className="product-option">
-          <dt>Sport: </dt>
-          <dd>{p.Sport}</dd>
-        </div>
-        <div className="product-option">
-          <dt>Custom Name & Number: </dt>
-          <dd>{nameNum}</dd>
-        </div>
-        <div className="product-option">
-          <dt>Jersey Color: </dt>
-          <dd>{getColorName(p['Jersey Color'])}</dd>
-        </div>
-        <div className="product-option">
-          <dt>Name Color: </dt>
-          <dd>{getColorName(p['Name Color'])}</dd>
-        </div>
-        <div className="product-option">
-          <dt>Number Color: </dt>
-          <dd>{getColorName(p['Number Color'])}</dd>
-        </div>
-      </dl>
-    );
-  }
-  if (item.variant_title && item.variant_title !== 'Default Title') {
-    return (
-      <dl>
-        <div className="product-option">
-          <dt>Size:</dt>
-          <dd>{item.variant_title}</dd>
-        </div>
-      </dl>
-    );
-  }
-  return null;
-}
-
 export default function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
   const closeCart = useCartStore((s) => s.closeCart);
   const subtotal = useCartStore((s) => s.subtotal);
-  const items = useCartStore((s) => s.storefrontItems);
+  const storefrontItems = useCartStore((s) => s.storefrontItems);
+  const refreshStorefrontCart = useCartStore((s) => s.refreshStorefrontCart);
   const updateStorefrontItem = useCartStore((s) => s.updateStorefrontItem);
 
   const [shown, setShown] = useState(isOpen);
+  const [demoItems, setDemoItems] = useState(DEMO_ITEMS);
   const [entered, setEntered] = useState(false);
   const [note, setNote] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [storefrontUpdatingKey, setStorefrontUpdatingKey] = useState<string | null>(null);
   const [storefrontError, setStorefrontError] = useState<string | null>(null);
+
+  // Fetched once on mount (this component is always mounted in the layout)
+  // so the nav bar badge reflects the real cart even before the drawer's
+  // ever been opened, then refreshed each time the drawer opens in case it
+  // changed elsewhere (e.g. added via the real theme in another tab).
+  useEffect(() => {
+    refreshStorefrontCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -316,24 +279,42 @@ export default function CartDrawer() {
         requestAnimationFrame(() => setEntered(true));
       });
       document.body.style.overflow = 'hidden';
+      refreshStorefrontCart();
       return () => cancelAnimationFrame(id);
     }
     setEntered(false);
     document.body.style.overflow = '';
     const t = window.setTimeout(() => setShown(false), 500);
     return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   if (!shown) return null;
 
-  const total = subtotal();
+    const usingDemo = PREVIEW_CART;
+  const items = usingDemo ? demoItems : storefrontItems;
+  const total = usingDemo
+    ? demoItems.reduce((n, i) => n + i.line_price, 0) / 100
+    : subtotal();
   const isEmpty = items.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
 
   const handleStorefrontQuantityChange = async (key: string, quantity: number) => {
-    if (storefrontUpdatingKey) return;
-    setStorefrontUpdatingKey(key);
-    setStorefrontError(null);
+        setStorefrontError(null);
+    if (!usingDemo) setStorefrontUpdatingKey(key);
+
+    if (usingDemo) {
+      setDemoItems((prev) =>
+        prev
+          .map((i) =>
+            i.key === key
+              ? { ...i, quantity: Math.max(0, quantity), line_price: i.price * Math.max(0, quantity) }
+              : i
+          )
+          .filter((i) => i.quantity > 0)
+      );
+      return;
+    }
     try {
       await updateStorefrontItem(key, quantity);
     } catch (err) {
@@ -348,8 +329,16 @@ export default function CartDrawer() {
     setCheckingOut(true);
     setCheckoutError(null);
     try {
-      if (note) await updateStorefrontCartNote(note).catch(() => undefined);
-      window.location.href = `${ORIGIN}/checkout`;
+      if (note) {
+        await updateStorefrontCartNote(note);
+      }
+      // Everything (jerseys and regular products) is already genuinely in
+      // Shopify's real cart by this point, so checkout is just Shopify's
+      // own native checkout — no custom order-building needed here. A full
+      // navigation is required (not useRouter/next/link): /checkout is a
+      // Shopify-native route outside this Next.js app entirely.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = '/checkout';
     } catch (err) {
       setCheckoutError(err instanceof Error ? err.message : 'Checkout failed.');
       setCheckingOut(false);
@@ -370,13 +359,13 @@ export default function CartDrawer() {
           <div className="mini-cart__inner">
             <div className="mini-cart__header">
               <button
-                type="button"
-                className="header__icon header__icon--summary header__icon--cart cart-close"
-                aria-label="Close"
-                onClick={closeCart}
-              >
-                <IconClose />
-              </button>
+  type="button"
+  className="header__icon header__icon--summary header__icon--cart cart-close"
+  aria-label="Close"
+  onClick={closeCart}
+>
+  <IconClose />
+</button>
               <div className="title h4">Cart</div>
               <span className="mini-cart__border" />
             </div>
@@ -391,7 +380,7 @@ export default function CartDrawer() {
             <div className="mini-cart__main" id="main-cart-items">
               <Recs />
               {storefrontError && (
-                <p role="alert" className="cart-item__error form__message errors">
+                <p role="alert" style={{ color: '#c0392b', fontSize: '12px', margin: '0 0 8px' }}>
                   {storefrontError}
                 </p>
               )}
@@ -399,57 +388,76 @@ export default function CartDrawer() {
                 {items.map((item) => {
                   const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
                   const p = item.properties ?? {};
-                  const image = isJersey ? p['Preview Image'] || item.image : item.image;
-                  const updating = storefrontUpdatingKey === item.key;
-                  const discounted = Boolean(item.original_line_price && item.original_line_price > item.line_price);
+                  const image = isJersey ? p['Preview Image'] || null : item.image;
                   return (
                     <li key={item.key}>
-                      <div className={`loading-overlay${updating ? '' : ' hidden'}`}>
-                        <div className="loading-overlay__spinner">
-                          <IconSpinner />
-                        </div>
-                      </div>
                       <button
                         type="button"
                         className="delete-product"
-                        aria-label={`Remove ${item.product_title}`}
-                        disabled={updating}
+                        aria-label="Remove"
+                        disabled={storefrontUpdatingKey === item.key}
                         onClick={() => handleStorefrontQuantityChange(item.key, 0)}
                       >
                         <IconClose />
                       </button>
                       <div className="product-container">
                         <div className="product-image">
-                          {image ? (
-                            <a href={item.url} className="media-wrapper media-wrapper--small">
-                              <div className="media media--adapt" style={{ '--image-ratio-percent': '100%' } as CSSProperties}>
-                                <img src={image} alt={item.product_title} width={70} height={70} />
-                              </div>
-                            </a>
-                          ) : null}
+                          {image ? <img src={image} alt={item.product_title} /> : null}
                         </div>
                         <div className="product-description">
                           <div className="product-content">
-                            <a href={item.url} className="link product-title">
+                            <a href={item.url} className="link">
                               {item.product_title}
                             </a>
                           </div>
-                          <LineOptions item={item} />
-                          {item.discount_title ? (
-                            <ul className="discounts list-unstyled" role="list" aria-label="Discount">
-                              <li className="discounts__discount">
-                                <IconDiscount />
-                                {item.discount_title}
-                              </li>
-                            </ul>
-                          ) : null}
+                          {isJersey ? (
+                            <dl>
+                              <div className="product-option">
+                                <dt>SIZE:</dt>
+                                <dd>{p['Size']}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Backboard:</dt>
+                                <dd>{getColorName(p['Backboard'])}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Sport:</dt>
+                                <dd>{p['Sport']}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Custom Name &amp; Number:</dt>
+                                <dd>{p['Name'] ? `${p['Name']} #${p['Number']}` : '—'}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Jersey Color:</dt>
+                                <dd>{getColorName(p['Jersey Color'])}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Name Color:</dt>
+                                <dd>{getColorName(p['Name Color'])}</dd>
+                              </div>
+                              <div className="product-option">
+                                <dt>Number Color:</dt>
+                                <dd>{getColorName(p['Number Color'])}</dd>
+                              </div>
+                            </dl>
+                          ) : (
+  item.variant_title && item.variant_title !== 'Default Title' && (
+    <dl>
+      <div className="product-option">
+        <dt>Size:</dt>
+        <dd>{item.variant_title}</dd>
+      </div>
+    </dl>
+  )
+)}
                           <div className="product-quantity">
-                            <div className="quantity">
+                            <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
                               <button
                                 type="button"
                                 className="quantity__button"
-                                aria-label={`Decrease quantity for ${item.product_title}`}
-                                disabled={updating}
+                                aria-label="Decrease"
+                                disabled={storefrontUpdatingKey === item.key}
                                 onClick={() => handleStorefrontQuantityChange(item.key, item.quantity - 1)}
                               >
                                 <IconMinus />
@@ -459,36 +467,20 @@ export default function CartDrawer() {
                                 type="number"
                                 readOnly
                                 value={item.quantity}
-                                aria-label={`Quantity for ${item.product_title}`}
+                                aria-label="Quantity"
                               />
                               <button
                                 type="button"
                                 className="quantity__button"
-                                aria-label={`Increase quantity for ${item.product_title}`}
-                                disabled={updating}
+                                aria-label="Increase"
+                                disabled={storefrontUpdatingKey === item.key}
                                 onClick={() => handleStorefrontQuantityChange(item.key, item.quantity + 1)}
                               >
                                 <IconPlus />
                               </button>
+                              {!usingDemo && storefrontUpdatingKey === item.key && <Spinner />}
                             </div>
-                            {discounted ? (
-                              <dl className="cart-item__discounted-prices">
-                                <dt className="visually-hidden">Regular price</dt>
-                                <dd className="price--on-sale">
-                                  <s className="price price-item--regular">
-                                    <PriceMoney amount={(item.original_line_price as number) / 100} />
-                                  </s>
-                                </dd>
-                                <dt className="visually-hidden">Sale price</dt>
-                                <dd className="price">
-                                  <PriceMoney amount={item.line_price / 100} />
-                                </dd>
-                              </dl>
-                            ) : (
-                              <dd className="price">
-                                <PriceMoney amount={item.line_price / 100} />
-                              </dd>
-                            )}
+                            <Price amount={item.line_price / 100} />
                           </div>
                         </div>
                       </div>
@@ -508,7 +500,12 @@ export default function CartDrawer() {
                     </span>
                   </summary>
                   <div>
-                    <button type="button" className="close" aria-label="Close" onClick={(e) => closeDetails(e.currentTarget)}>
+                    <button
+                      type="button"
+                      className="close"
+                      aria-label="Close"
+                      onClick={(e) => (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open')}
+                    >
                       <IconClose />
                     </button>
                     <label htmlFor="Cart-note">Order special instructions</label>
@@ -522,11 +519,6 @@ export default function CartDrawer() {
                           onChange={(e) => setNote(e.target.value)}
                         />
                       </div>
-                      <div>
-                        <button className="button button--full-width" type="button" onClick={(e) => closeDetails(e.currentTarget)}>
-                          Apply
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </details>
@@ -538,37 +530,45 @@ export default function CartDrawer() {
                     </span>
                   </summary>
                   <div>
-                    <button type="button" className="close" aria-label="Close" onClick={(e) => closeDetails(e.currentTarget)}>
+                    <button
+                      type="button"
+                      className="close"
+                      aria-label="Close"
+                      onClick={(e) => (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open')}
+                    >
                       <IconClose />
                     </button>
-                    <label htmlFor="ShippingCalculatorCountry">
-                      Estimate shipping rates
-                      <span className="mini-cart__question">
-                        <span className="mini-cart__tooltip">Shipping & taxes will be calculated at checkout</span>
-                      </span>
-                    </label>
-                    <p className="caption-large">Free standard shipping 14–21 days. Express 7–10 days.</p>
+                    <p className="caption-large">
+                      Free standard shipping 14–21 days. Express 7–10 days.
+                    </p>
                   </div>
                 </details>
               </div>
 
               <div className="taxes-discounts">
                 <small className="tax-note caption-large rte">
-                  Taxes and <a href={`${ORIGIN}/policies/shipping-policy`}>shipping</a> calculated at checkout
+                  Taxes and{' '}
+                  <a href={`${ORIGIN}/policies/shipping-policy`}>shipping</a> calculated at checkout
                 </small>
               </div>
 
-              <div className="gj-ship-banner">📦 Ships in 14–21 business days (7–10 with Express)</div>
+             <div className="gj-ship-banner">📦 Ships in 14–21 business days (7–10 with Express)</div>
 
               <div className="button-container">
-                <button className="button" name="checkout" type="button" onClick={handleCheckout} disabled={checkingOut || isEmpty}>
+                <button
+                  className="button"
+                  name="checkout"
+                  type="button"
+                  onClick={handleCheckout}
+                  disabled={checkingOut || isEmpty}
+                >
                   {checkingOut ? 'Processing…' : 'Check out'}
-                  <span className="price" id="mini-cart-subtotal">
+                  <span id="mini-cart-subtotal">
                     ${dollars}.{cents} USD
                   </span>
                 </button>
                 {checkoutError && (
-                  <p role="alert" className="cart-item__error form__message errors">
+                  <p role="alert" style={{ color: '#c0392b', fontSize: '12px', marginTop: '8px' }}>
                     {checkoutError}
                   </p>
                 )}
