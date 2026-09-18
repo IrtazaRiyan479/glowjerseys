@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
       { source: "/3d/:path*", headers: corsHeader },
       { source: "/textures/:path*", headers: corsHeader },
       { source: "/fonts/:path*", headers: corsHeader },
+      { source: "/api/:path*", headers: corsHeader },
     ];
   },
 };

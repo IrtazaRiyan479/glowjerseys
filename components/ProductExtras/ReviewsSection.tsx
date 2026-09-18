@@ -1,14 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getReviews, type JudgemeReview } from '@/actions/judgeme/getReviews';
+import { publicAssetUrl } from '@/lib/publicAssetUrl';
+import type { JudgemeReview } from '@/lib/judgeme/getReviews';
 
 export default function ReviewsSection() {
   const [reviews, setReviews] = useState<JudgemeReview[]>([]);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    getReviews().then(setReviews).catch(() => setReviews([]));
+    fetch(publicAssetUrl('/api/reviews'))
+      .then((res) => res.json())
+      .then((data) => setReviews(data.reviews ?? []))
+      .catch(() => setReviews([]));
   }, []);
 
   if (reviews.length === 0) return null;

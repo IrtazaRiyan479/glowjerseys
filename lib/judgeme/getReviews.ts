@@ -1,5 +1,3 @@
-'use server';
-
 export type JudgemeReview = {
   author: string;
   verified: boolean;
