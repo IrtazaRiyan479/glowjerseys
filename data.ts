@@ -11,25 +11,27 @@ export const jerseyColors = [
   { name: 'White', hex: '#FFFFFF' },
 ] as const;
 
+import { publicAssetUrl } from '@/lib/publicAssetUrl';
+
 export const SPORTS = ['Baseball', 'Basketball', 'Football', 'Soccer', 'Hockey'] as const;
 
 export const SPORT_MODELS: Record<string, string> = {
-  Baseball: '/3d/models/BaseBall.glb',
-  Basketball: '/3d/models/Basketball.glb',
-  Football: '/3d/models/Football.glb',
-  Soccer: '/3d/models/BlueSoccer.glb',
-  Hockey: '/3d/models/Hockey.glb',
+  Baseball: publicAssetUrl('/3d/models/BaseBall.glb'),
+  Basketball: publicAssetUrl('/3d/models/Basketball.glb'),
+  Football: publicAssetUrl('/3d/models/Football.glb'),
+  Soccer: publicAssetUrl('/3d/models/BlueSoccer.glb'),
+  Hockey: publicAssetUrl('/3d/models/Hockey.glb'),
 };
 
+// Real variant IDs/prices from the mk-enterprises-x35r23fp.myshopify.com demo store.
 export const SIZE_OPTIONS = [
-  { value: 20, unit: 'inch' },
-  { value: 30, unit: 'inch' },
-];
+  { value: 20, unit: 'inch', variantId: 'gid://shopify/ProductVariant/48359110443244', price: 164.99 },
+  { value: 30, unit: 'inch', variantId: 'gid://shopify/ProductVariant/48359110476012', price: 299.99 },
+] as const;
 
 export const PRODUCT = {
   slug: 'custom-glow-jersey',
   name: 'Custom Glow Jersey',
-  price: 164.99,
   currency: 'USD',
 };
 
@@ -59,4 +61,22 @@ export function toShopifyProperties(opts: JerseySelectedOptions) {
       ? [{ key: 'Preview Image', value: opts.previewImageUrl }]
       : []),
   ];
+}
+
+// Plain-object form of the same properties, for Shopify's storefront
+// /cart/add.js Ajax API (which takes `properties` as {key: value}, unlike
+// the Admin API's {key, value}[] shape used above).
+export function toCartLineProperties(opts: JerseySelectedOptions): Record<string, string> {
+  return Object.fromEntries(toShopifyProperties(opts).map(({ key, value }) => [key, value]));
+}
+
+// SIZE_OPTIONS.variantId is a GID (gid://shopify/ProductVariant/123) for the
+// Admin API's use; the storefront /cart.js and /cart/add.js Ajax endpoints
+// take the plain numeric id instead.
+export function numericVariantId(gid: string): number {
+  const match = gid.match(/(\d+)$/);
+  if (!match) {
+    throw new Error(`Could not parse a numeric variant id from "${gid}".`);
+  }
+  return Number(match[1]);
 }

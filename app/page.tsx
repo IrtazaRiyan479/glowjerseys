@@ -5,18 +5,16 @@ import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
 import React, { useCallback, useRef, useState } from 'react';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
-import type { JerseySelectedOptions } from '@/data';
+import {
+  SIZE_OPTIONS,
+  SPORT_MODELS,
+  toCartLineProperties,
+  numericVariantId,
+  type JerseySelectedOptions,
+} from '@/data';
+import { getSizeOption } from '@/lib/pricing';
 
-const sizeOptionData = [{ value: 20, unit: 'inch' }, { value: 30, unit: 'inch' }];
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
-
-const SPORT_MODELS: Record<string, string> = {
-  Baseball: '/3d/models/BaseBall.glb',
-  Basketball: '/3d/models/Basketball.glb',
-  Football: '/3d/models/Football.glb',
-  Soccer: '/3d/models/BlueSoccer.glb',
-  Hockey: '/3d/models/Hockey.glb',
-};
 
 const Page = () => {
   const [sizeOptionValue, setSizeOptionValue] = useState(20);
@@ -33,9 +31,10 @@ const Page = () => {
   const [quantity, setQuantity] = useState(1);
 
 
-const addItem = useCartStore((s) => s.addItem);
+const addStorefrontItem = useCartStore((s) => s.addStorefrontItem);
 const snapshotRef = useRef<(() => Promise<string | null>) | null>(null);
 const [addingToCart, setAddingToCart] = useState(false);
+const [addToCartError, setAddToCartError] = useState<string | null>(null);
 
 const onSnapshotReady = useCallback((fn: () => Promise<string | null>) => {
   snapshotRef.current = fn;
@@ -44,6 +43,7 @@ const onSnapshotReady = useCallback((fn: () => Promise<string | null>) => {
 const handleAddToCart = async () => {
   if (addingToCart) return;
   setAddingToCart(true);
+  setAddToCartError(null);
   try {
     let previewImageUrl: string | undefined;
 
@@ -68,13 +68,20 @@ const handleAddToCart = async () => {
       previewImageUrl,
     };
 
-    addItem(selectedOptions, quantity);
+    // Added directly to the real Shopify cart (as the size's real product
+    // variant + these as line item properties), not a local-only cart, so
+    // it's genuinely shared with the rest of the store from the moment it's
+    // added, not just at checkout.
+    const { variantId } = getSizeOption(selectedOptions.size);
+    await addStorefrontItem(numericVariantId(variantId), quantity, toCartLineProperties(selectedOptions));
+  } catch (err) {
+    setAddToCartError(err instanceof Error ? err.message : 'Failed to add to cart.');
   } finally {
     setAddingToCart(false);
   }
 };
 
-const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb';
+const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
 
 
    return (
@@ -100,7 +107,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
     <div className="z-10 flex min-h-0 min-w-0 w-full flex-col overflow-y-auto overflow-x-hidden bg-white text-black">
       <div className="p-4 pb-8 md:p-5 lg:pt-8">
         <ConfiguratorUI
-          sizeOptionData={sizeOptionData}
+          sizeOptionData={SIZE_OPTIONS}
           sizeOptionValue={sizeOptionValue}
           setSizeOptionValue={setSizeOptionValue}
           sportsTypeData={sportsTypeData}
@@ -129,6 +136,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb'
           setQuantity={setQuantity}
           onAddToCart={handleAddToCart}
           addingToCart={addingToCart}
+          addToCartError={addToCartError}
         />
       </div>
     </div>

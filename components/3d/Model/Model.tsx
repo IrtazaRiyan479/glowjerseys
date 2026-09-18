@@ -6,6 +6,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import * as THREE from 'three';
 import NeonText from './NeonText';
+import { SPORT_MODELS } from '@/data';
+import { publicAssetUrl } from '@/lib/publicAssetUrl';
 
 const MODEL_DEBUG = { panel: false };
 
@@ -328,10 +330,10 @@ const Model = ({
 
   
   const [c1, n1, c2, n2] = useLoader(THREE.TextureLoader, [
-    '/textures/wall/BrickWall01.jpg',
-    '/textures/wall/BrickWall01_Normal.jpg',
-    '/textures/wall/BrickWall02.jpg',
-    '/textures/wall/BrickWall02_Normal.jpg',
+    publicAssetUrl('/textures/wall/BrickWall01.jpg'),
+    publicAssetUrl('/textures/wall/BrickWall01_Normal.jpg'),
+    publicAssetUrl('/textures/wall/BrickWall02.jpg'),
+    publicAssetUrl('/textures/wall/BrickWall02_Normal.jpg'),
   ]);
 
   const sport =
@@ -667,10 +669,10 @@ return (
   );
 };
 
-useGLTF.preload('/3d/models/Basketball.glb');
-useGLTF.preload('/3d/models/BaseBall.glb');
-useGLTF.preload('/3d/models/Football.glb');
-useGLTF.preload('/3d/models/BlueSoccer.glb');
-useGLTF.preload('/3d/models/Hockey.glb');
+useGLTF.preload(SPORT_MODELS.Basketball);
+useGLTF.preload(SPORT_MODELS.Baseball);
+useGLTF.preload(SPORT_MODELS.Football);
+useGLTF.preload(SPORT_MODELS.Soccer);
+useGLTF.preload(SPORT_MODELS.Hockey);
 
 export default React.memo(Model);
