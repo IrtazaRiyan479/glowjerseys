@@ -1,26 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-type Review = {
-  author: string;
-  verified: boolean;
-  text: string;
-  source: string;
-};
-
-const SAMPLE_REVIEWS: Review[] = [
-  {
-    author: 'Brandon',
-    verified: true,
-    text: 'Love the jersey lights. Getting a lot of complimets and they are perfect on my back patio. Will be getting some more for sure.',
-    source: 'Review written in Shop App',
-  },
-];
+import { useEffect, useState } from 'react';
+import { getReviews, type JudgemeReview } from '@/actions/judgeme/getReviews';
 
 export default function ReviewsSection() {
+  const [reviews, setReviews] = useState<JudgemeReview[]>([]);
   const [page, setPage] = useState(1);
-  const totalPages = 3;
-  const review = SAMPLE_REVIEWS[0];
+
+  useEffect(() => {
+    getReviews().then(setReviews).catch(() => setReviews([]));
+  }, []);
+
+  if (reviews.length === 0) return null;
+
+  const totalPages = reviews.length;
+  const review = reviews[page - 1];
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-9">
@@ -39,37 +33,39 @@ export default function ReviewsSection() {
         </span>
       </div>
 
-      <div className="flex items-center justify-center gap-3 mt-6 text-sm">
-        {Array.from({ length: totalPages }).map((_, i) => {
-          const n = i + 1;
-          return (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setPage(n)}
-              className={n === page ? 'font-bold text-black' : 'text-gray-400 hover:text-black'}
-            >
-              {n}
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          className="text-gray-400 hover:text-black"
-          aria-label="Next page"
-        >
-          ›
-        </button>
-        <button
-          type="button"
-          onClick={() => setPage(totalPages)}
-          className="text-gray-400 hover:text-black"
-          aria-label="Last page"
-        >
-          »
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-6 text-sm">
+          {Array.from({ length: totalPages }).map((_, i) => {
+            const n = i + 1;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setPage(n)}
+                className={n === page ? 'font-bold text-black' : 'text-gray-400 hover:text-black'}
+              >
+                {n}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            className="text-gray-400 hover:text-black"
+            aria-label="Next page"
+          >
+            ›
+          </button>
+          <button
+            type="button"
+            onClick={() => setPage(totalPages)}
+            className="text-gray-400 hover:text-black"
+            aria-label="Last page"
+          >
+            »
+          </button>
+        </div>
+      )}
     </div>
   );
 }
