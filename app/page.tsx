@@ -2,6 +2,9 @@
 
 import Experience from '@/components/3d/Experience/Experience';
 import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
+import ReviewsSection from '@/components/ProductExtras/ReviewsSection';
+import InstagramBanner from '@/components/ProductExtras/InstagramBanner';
+import NewsletterMarquee from '@/components/ProductExtras/NewsletterMarquee';
 import React, { useCallback, useRef, useState } from 'react';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
@@ -85,7 +88,8 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
 
 
    return (
-  <div className="grid h-full min-h-0 w-full grid-cols-1 grid-rows-[minmax(0,42svh)_minmax(0,1fr)] bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:grid-rows-1">
+  <>
+  <div className="grid min-h-[85svh] w-full grid-cols-1 grid-rows-[minmax(0,42svh)_minmax(0,1fr)] bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:grid-rows-1">
     <div className="relative min-h-0 min-w-0 p-4 pb-2 md:p-6 lg:p-8 lg:pr-4">
       <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#1a1a1a]">
         <Experience
@@ -141,6 +145,11 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
       </div>
     </div>
   </div>
+
+  <ReviewsSection />
+  <InstagramBanner />
+  <NewsletterMarquee />
+  </>
 );
 };
 
