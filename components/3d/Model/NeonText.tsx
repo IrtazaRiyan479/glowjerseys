@@ -52,8 +52,8 @@ const DEFAULTS = {
   /* ── number size ─── */
   numberSize1: 0.212,
   numberSize2: 0.173,
-  numberSize3: 0.125,
-  numberSize4: 0.091,
+  numberSize3: 0.12,
+  numberSize4: 0.084,
   bbNumberSize1: 0.199,
   bbNumberSize2: 0.16,
   bbNumberSize3: 0.138,
@@ -69,11 +69,11 @@ const DEFAULTS = {
   nameBevelThickness: 0.011,
   nameBevelSize: 0.0042,
   numberBevelThickness: 0.013,
-  numberBevelSize: 0.005,
+  numberBevelSize: 0.0038,
   bevelSegments: 8,
   curveSegments: 32,
   nameLineWidth: -0.001,
-  numberLineWidth: -0.0018,
+  numberLineWidth: -0.0016,
 
   /* ── basketball name arc */
   curveRadiusShort: 0, curveSagShort: 1, curveTiltShort: 1, curveXShort: -0.004, curveYShort: 0.007, curveZShort: -0.005,
