@@ -9,6 +9,48 @@ const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.va
 
 const ORIGIN = 'https://glowjerseys.com';
 
+/** Fake lines for UI preview when /cart.js is empty. Set false before shipping. */
+const PREVIEW_CART = true;
+
+const DEMO_ITEMS = [
+  {
+    key: 'demo-jefferson',
+    variant_id: 1,
+    product_title: 'Jefferson #18',
+    variant_title: '20 inches',
+    quantity: 1,
+    price: 10799,
+    line_price: 10799,
+    image:
+      'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
+    url: `${ORIGIN}/products/jefferson-18`,
+    properties: null as Record<string, string> | null,
+  },
+  {
+    key: 'demo-custom',
+    variant_id: numericVariantId(SIZE_OPTIONS[0].variantId),
+    product_title: 'Custom Glow Jersey',
+    variant_title: '20 inch',
+    quantity: 1,
+    price: 16499,
+    line_price: 16499,
+    image: null as string | null,
+    url: `${ORIGIN}/products/custom-jersey`,
+    properties: {
+      Size: '20 inch',
+      Backboard: 'Black',
+      Sport: 'Basketball',
+      Name: 'BROWN',
+      Number: '7',
+      'Jersey Color': 'Orange',
+      'Name Color': 'White',
+      'Number Color': 'White',
+      'Preview Image':
+        'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
+    },
+  },
+];
+
 const RECS = [
   {
     title: 'Booker #15',
@@ -123,10 +165,35 @@ function IconPen() {
 
 function IconTruck() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-truck" fill="none" viewBox="0 0 24 24" width="14" height="14">
-      <path d="M1 3h13v13H1V3zm13 3h5l4 4v6h-3" stroke="currentColor" strokeWidth="1.5" fill="none" />
-      <circle cx="5.5" cy="18.5" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
-      <circle cx="18.5" cy="18.5" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-truck" fill="none" viewBox="0 0 640 512">
+      <path
+        fill="currentColor"
+        d="M280 192c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H40c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8h240zm352 192h-24V275.9c0-16.8-6.8-33.3-18.8-45.2l-83.9-83.9c-11.8-12-28.3-18.8-45.2-18.8H416V78.6c0-25.7-22.2-46.6-49.4-46.6H113.4C86.2 32 64 52.9 64 78.6V96H8c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8h240c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H96V78.6c0-8.1 7.8-14.6 17.4-14.6h253.2c9.6 0 17.4 6.5 17.4 14.6V384H207.6C193 364.7 170 352 144 352c-18.1 0-34.6 6.2-48 16.4V288H64v144c0 44.2 35.8 80 80 80s80-35.8 80-80c0-5.5-.6-10.8-1.6-16h195.2c-1.1 5.2-1.6 10.5-1.6 16 0 44.2 35.8 80 80 80s80-35.8 80-80c0-5.5-.6-10.8-1.6-16H632c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8zm-488 96c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm272-320h44.1c8.4 0 16.7 3.4 22.6 9.4l83.9 83.9c.8.8 1.1 1.9 1.8 2.8H416V160zm80 320c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm80-96h-16.4C545 364.7 522 352 496 352s-49 12.7-63.6 32H416v-96h160v96zM256 248v-16c0-4.4-3.6-8-8-8H8c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8h240c4.4 0 8-3.6 8-8z"
+      />
+    </svg>
+  );
+}
+
+function IconArrow() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-arrow" fill="none" viewBox="0 0 14 10">
+      <path fillRule="evenodd" clipRule="evenodd" d="M8.537.808a.5.5 0 01.817-.162l4 4a.5.5 0 010 .708l-4 4a.5.5 0 11-.708-.708L11.793 5.5H1a.5.5 0 010-1h10.793L8.646 1.354a.5.5 0 01-.109-.546z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function IconMinus() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-minus" fill="none" viewBox="0 0 10 2">
+      <path fill="currentColor" d="M1 1h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconPlus() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-plus" fill="none" viewBox="0 0 10 10">
+      <path fill="currentColor" d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -165,11 +232,11 @@ function Recs() {
                   )}
                 </div>
                 <div className="product-button">
-                  <a href={r.href} className="button">
-                    Choose options
-                    <span aria-hidden>→</span>
-                  </a>
-                </div>
+  <a href={r.href} className="button">
+    <span>Choose options</span>
+    <IconArrow />
+  </a>
+</div>
               </div>
             </div>
           </li>
@@ -188,6 +255,7 @@ export default function CartDrawer() {
   const updateStorefrontItem = useCartStore((s) => s.updateStorefrontItem);
 
   const [shown, setShown] = useState(isOpen);
+  const [demoItems, setDemoItems] = useState(DEMO_ITEMS);
   const [entered, setEntered] = useState(false);
   const [note, setNote] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
@@ -223,13 +291,30 @@ export default function CartDrawer() {
 
   if (!shown) return null;
 
-  const total = subtotal();
-  const isEmpty = storefrontItems.length === 0;
+    const usingDemo = PREVIEW_CART;
+  const items = usingDemo ? demoItems : storefrontItems;
+  const total = usingDemo
+    ? demoItems.reduce((n, i) => n + i.line_price, 0) / 100
+    : subtotal();
+  const isEmpty = items.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
 
   const handleStorefrontQuantityChange = async (key: string, quantity: number) => {
-    setStorefrontUpdatingKey(key);
-    setStorefrontError(null);
+        setStorefrontError(null);
+    if (!usingDemo) setStorefrontUpdatingKey(key);
+
+    if (usingDemo) {
+      setDemoItems((prev) =>
+        prev
+          .map((i) =>
+            i.key === key
+              ? { ...i, quantity: Math.max(0, quantity), line_price: i.price * Math.max(0, quantity) }
+              : i
+          )
+          .filter((i) => i.quantity > 0)
+      );
+      return;
+    }
     try {
       await updateStorefrontItem(key, quantity);
     } catch (err) {
@@ -273,9 +358,14 @@ export default function CartDrawer() {
         <form className={`mini-cart${isEmpty ? ' is-empty' : ''}`} onSubmit={(e) => e.preventDefault()}>
           <div className="mini-cart__inner">
             <div className="mini-cart__header">
-              <button type="button" className="header__icon header__icon--summary header__icon--cart" aria-label="Close" onClick={closeCart}>
-                <IconClose />
-              </button>
+              <button
+  type="button"
+  className="header__icon header__icon--summary header__icon--cart cart-close"
+  aria-label="Close"
+  onClick={closeCart}
+>
+  <IconClose />
+</button>
               <div className="title h4">Cart</div>
               <span className="mini-cart__border" />
             </div>
@@ -295,7 +385,7 @@ export default function CartDrawer() {
                 </p>
               )}
               <ul className="mini-cart__navigation">
-                {storefrontItems.map((item) => {
+                {items.map((item) => {
                   const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
                   const p = item.properties ?? {};
                   const image = isJersey ? p['Preview Image'] || null : item.image;
@@ -352,15 +442,15 @@ export default function CartDrawer() {
                               </div>
                             </dl>
                           ) : (
-                            item.variant_title && (
-                              <dl>
-                                <div className="product-option">
-                                  <dt>Variant:</dt>
-                                  <dd>{item.variant_title}</dd>
-                                </div>
-                              </dl>
-                            )
-                          )}
+  item.variant_title && item.variant_title !== 'Default Title' && (
+    <dl>
+      <div className="product-option">
+        <dt>Size:</dt>
+        <dd>{item.variant_title}</dd>
+      </div>
+    </dl>
+  )
+)}
                           <div className="product-quantity">
                             <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
                               <button
@@ -370,7 +460,7 @@ export default function CartDrawer() {
                                 disabled={storefrontUpdatingKey === item.key}
                                 onClick={() => handleStorefrontQuantityChange(item.key, item.quantity - 1)}
                               >
-                                −
+                                <IconMinus />
                               </button>
                               <input
                                 className="quantity__input"
@@ -386,9 +476,9 @@ export default function CartDrawer() {
                                 disabled={storefrontUpdatingKey === item.key}
                                 onClick={() => handleStorefrontQuantityChange(item.key, item.quantity + 1)}
                               >
-                                +
+                                <IconPlus />
                               </button>
-                              {storefrontUpdatingKey === item.key && <Spinner />}
+                              {!usingDemo && storefrontUpdatingKey === item.key && <Spinner />}
                             </div>
                             <Price amount={item.line_price / 100} />
                           </div>
