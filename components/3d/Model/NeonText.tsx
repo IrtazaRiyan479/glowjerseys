@@ -10,6 +10,7 @@ import {
   PivotControls,
   useFont,
 } from '@react-three/drei';
+import { publicAssetUrl } from '@/lib/publicAssetUrl';
 
 
 /* ===========================================================================
@@ -22,12 +23,12 @@ const DEBUG = {
 };
 
 /* ===========================================================================
- - DEFAULTS 
+ - DEFAULTS
  - =========================================================================== */
 const DEFAULTS = {
   /* ── font ─── */
-  fontPathName: '/fonts/Avante.json',
-  fontPathNumber: '/fonts/Mayfair.json',
+  fontPathName: publicAssetUrl('/fonts/Avante.json'),
+  fontPathNumber: publicAssetUrl('/fonts/Mayfair.json'),
 
   /* ── name size ── */
   nameSize1: 0.091,

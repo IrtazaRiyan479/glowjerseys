@@ -1,28 +1,20 @@
 'use client';
 
-// Experience (Three.js scene) disabled for now — its assets (glb models,
-// textures, fonts) are plain public/ files referenced by root-relative path,
-// which 404 when loaded through the Shopify App Proxy (assetPrefix doesn't
-// cover public/, only /_next/static/*). Not fixing that here since it's out
-// of scope for getting checkout working; re-enable once that's addressed.
-// import Experience from '@/components/3d/Experience/Experience';
+import Experience from '@/components/3d/Experience/Experience';
 import ConfiguratorUI from '@/components/3d/ConfiguratorUI/ConfiguratorUI';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
 import { useCartStore } from '@/store/cartStore';
-import { SIZE_OPTIONS, toCartLineProperties, numericVariantId, type JerseySelectedOptions } from '@/data';
+import {
+  SIZE_OPTIONS,
+  SPORT_MODELS,
+  toCartLineProperties,
+  numericVariantId,
+  type JerseySelectedOptions,
+} from '@/data';
 import { getSizeOption } from '@/lib/pricing';
 
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
-
-// Only used by Experience (disabled above) — see its import comment.
-// const SPORT_MODELS: Record<string, string> = {
-//   Baseball: '/3d/models/BaseBall.glb',
-//   Basketball: '/3d/models/Basketball.glb',
-//   Football: '/3d/models/Football.glb',
-//   Soccer: '/3d/models/BlueSoccer.glb',
-//   Hockey: '/3d/models/Hockey.glb',
-// };
 
 const Page = () => {
   const [sizeOptionValue, setSizeOptionValue] = useState(20);
@@ -44,10 +36,9 @@ const snapshotRef = useRef<(() => Promise<string | null>) | null>(null);
 const [addingToCart, setAddingToCart] = useState(false);
 const [addToCartError, setAddToCartError] = useState<string | null>(null);
 
-// Only wired up to Experience (disabled above) — see its import comment.
-// const onSnapshotReady = useCallback((fn: () => Promise<string | null>) => {
-//   snapshotRef.current = fn;
-// }, []);
+const onSnapshotReady = useCallback((fn: () => Promise<string | null>) => {
+  snapshotRef.current = fn;
+}, []);
 
 const handleAddToCart = async () => {
   if (addingToCart) return;
@@ -90,16 +81,14 @@ const handleAddToCart = async () => {
   }
 };
 
-// Only used by Experience (disabled above) — see its import comment.
-// const currentGlbUrl = SPORT_MODELS[selectedSport] || '/3d/models/BlueSoccer.glb';
+const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
 
 
    return (
   <div className="grid h-full min-h-0 w-full grid-cols-1 grid-rows-[minmax(0,42svh)_minmax(0,1fr)] bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:grid-rows-1">
     <div className="relative min-h-0 min-w-0 p-4 pb-2 md:p-6 lg:p-8 lg:pr-4">
       <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#1a1a1a]">
-        {/* Experience (Three.js scene) temporarily disabled — see import comment above */}
-        {/* <Experience
+        <Experience
           glbUrl={currentGlbUrl}
           name={name}
           number={number}
@@ -111,7 +100,7 @@ const handleAddToCart = async () => {
           neonOn={neonOn}
           setNeonOn={setNeonOn}
           onSnapshotReady={onSnapshotReady}
-        /> */}
+        />
       </div>
     </div>
 

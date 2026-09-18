@@ -11,14 +11,16 @@ export const jerseyColors = [
   { name: 'White', hex: '#FFFFFF' },
 ] as const;
 
+import { publicAssetUrl } from '@/lib/publicAssetUrl';
+
 export const SPORTS = ['Baseball', 'Basketball', 'Football', 'Soccer', 'Hockey'] as const;
 
 export const SPORT_MODELS: Record<string, string> = {
-  Baseball: '/3d/models/BaseBall.glb',
-  Basketball: '/3d/models/Basketball.glb',
-  Football: '/3d/models/Football.glb',
-  Soccer: '/3d/models/BlueSoccer.glb',
-  Hockey: '/3d/models/Hockey.glb',
+  Baseball: publicAssetUrl('/3d/models/BaseBall.glb'),
+  Basketball: publicAssetUrl('/3d/models/Basketball.glb'),
+  Football: publicAssetUrl('/3d/models/Football.glb'),
+  Soccer: publicAssetUrl('/3d/models/BlueSoccer.glb'),
+  Hockey: publicAssetUrl('/3d/models/Hockey.glb'),
 };
 
 // Real variant IDs/prices from the mk-enterprises-x35r23fp.myshopify.com demo store.
