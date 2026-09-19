@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="flex min-h-dvh flex-col bg-white">
         <Navbar />
-        <main className="min-h-0 flex-1">
+        <main className="flex-1">
           {children}
         </main>
         <Footer />

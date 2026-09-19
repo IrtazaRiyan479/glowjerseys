@@ -120,6 +120,7 @@ const ConfiguratorUI = ({
         fontFamily: 'Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
         WebkitFontSmoothing: 'antialiased',
         MozOsxFontSmoothing: 'grayscale',
+        padding: '30px',
       }}
     >
       {/* Title + Price — Bayon matches live product title / price */}
@@ -183,7 +184,7 @@ const ConfiguratorUI = ({
                 key={option.value}
                 type="button"
                 onClick={() => setSizeOptionValue(option.value)}
-                className={`px-4 py-2 rounded-md text-sm font-semibold transition-all border ${
+                className={`px-4 py-2 text-sm font-semibold transition-all border ${
                   isActive
                     ? 'bg-black text-white border-black'
                     : 'bg-white text-gray-800 border-gray-300 hover:border-gray-400'

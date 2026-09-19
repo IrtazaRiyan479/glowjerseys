@@ -91,44 +91,37 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
   <>
   {/* Desktop: left canvas is sticky + capped to viewport; only right column scrolls.
       Mobile: canvas has fixed aspect band, then config scrolls below. */}
-    <div className="grid w-full grid-cols-1 bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:items-start">
-    {/* Left canvas — sticky, viewport-capped, never scrolls */}
-    <div
-      className="
-        relative min-h-0 min-w-0
-        p-4 pb-2 md:p-6
-        lg:sticky lg:top-0 lg:self-start
-        lg:h-[100dvh] lg:max-h-[100dvh]
-        lg:overflow-hidden
-        lg:p-6 lg:pr-3
-      "
-    >
-      <div
-        className="
-          relative w-full overflow-hidden rounded-[14px] bg-[#1a1a1a]
-          h-[min(42svh,420px)]
-          lg:h-[calc(100dvh-3rem)] lg:max-h-[calc(100dvh-3rem)]
-        "
-      >
-        <Experience
-          glbUrl={currentGlbUrl}
-          name={name}
-          number={number}
-          outlineColor={outlineColor}
-          nameColor={nameColor}
-          numberColor={numberColor}
-          backboardColor={backboardColor}
-          isDark={isDark}
-          neonOn={neonOn}
-          setNeonOn={setNeonOn}
-          onSnapshotReady={onSnapshotReady}
-        />
+  <div className="mx-auto w-full max-w-[1600px] px-4 md:px-6 lg:px-10 mb-16 lg:mb-24">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,min(100%,600px))_minmax(420px,1fr)] lg:gap-10 lg:items-start">
+      {/* Left: content-sized + sticky (matches live media column) */}
+      <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+        <div
+          className="relative w-full overflow-hidden bg-[#1a1a1a]"
+          style={{
+            aspectRatio: '1 / 1.05',
+            maxHeight: 'min(82vh, 880px)',
+          }}
+        >
+          <div className="absolute inset-0">
+            <Experience
+              glbUrl={currentGlbUrl}
+              name={name}
+              number={number}
+              outlineColor={outlineColor}
+              nameColor={nameColor}
+              numberColor={numberColor}
+              backboardColor={backboardColor}
+              isDark={isDark}
+              neonOn={neonOn}
+              setNeonOn={setNeonOn}
+              onSnapshotReady={onSnapshotReady}
+            />
+          </div>
+        </div>
       </div>
-    </div>
 
-    {/* Right column — normal flow, page scrolls here */}
-    <div className="z-10 flex min-h-0 min-w-0 w-full flex-col bg-white text-black">
-      <div className="p-4 pb-8 md:p-5 lg:pt-8 lg:pr-8">
+      {/* Right: normal flow — page scroll moves this; left stays sticky */}
+      <div className="min-w-0 w-full bg-white text-black lg:pt-2">
         <ConfiguratorUI
           sizeOptionData={SIZE_OPTIONS}
           sizeOptionValue={sizeOptionValue}
