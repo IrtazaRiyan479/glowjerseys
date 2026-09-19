@@ -1,18 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-/* A plain Route Handler, not a Server Action — deliberately. Server Actions
-   invoked from a Client Component POST back to the current page URL with
-   framework-internal headers (Content-Type: text/x-component, a Next-Action
-   id). Through the Shopify App Proxy that POST lands on
-   glowjerseys.com/apps/custom-jersey itself, and the proxy doesn't reliably
-   forward what Next.js needs to recognize it as an action invocation — it
-   just 500s. Same class of bug already fixed once in this codebase for the
-   currency switcher (see components/Footer/LocalizationSwitcher.tsx) and for
-   /_next/static assets (see next.config.ts / lib/publicAssetUrl.ts). A route
-   handler, called via the absolute-URL pattern in publicAssetUrl(), sidesteps
-   it entirely — same fix as /api/reviews. */
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
-export type ReviewerNameFormat = '' | 'last_initial' | 'first_name_only' | 'all_initials' | 'anonymous';
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}
+
+export type ReviewerNameFormat =
+  | ""
+  | "last_initial"
+  | "first_name_only"
+  | "all_initials"
+  | "anonymous";
 
 type SubmitReviewBody = {
   rating: number;
@@ -27,19 +30,22 @@ type SubmitReviewBody = {
 export async function POST(request: Request) {
   const shopDomain = process.env.NEXT_PUBLIC_JUDGEME_SHOP_DOMAIN;
   if (!shopDomain) {
-    return NextResponse.json({ ok: false, error: 'Reviews are not configured for this store yet.' });
+    return NextResponse.json(
+      { ok: false, error: "Reviews are not configured for this store yet." },
+      { headers: CORS_HEADERS },
+    );
   }
   const productExternalId = process.env.NEXT_PUBLIC_JUDGEME_PRODUCT_EXTERNAL_ID;
 
   const input: SubmitReviewBody = await request.json();
 
   try {
-    const res = await fetch('https://api.judge.me/api/v1/reviews', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("https://api.judge.me/api/v1/reviews", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         shop_domain: shopDomain,
-        platform: 'shopify',
+        platform: "shopify",
         id: productExternalId ? Number(productExternalId) : undefined,
         name: input.name,
         email: input.email,
@@ -56,13 +62,22 @@ export async function POST(request: Request) {
       // depending on the endpoint/failure ({"message": "Shop not found"} for
       // an invalid shop_domain, {"error": "..."} elsewhere per their docs).
       const data = await res.json().catch(() => null);
-      return NextResponse.json({
-        ok: false,
-        error: data?.error || data?.message || `Judge.me rejected the review (${res.status}).`,
-      });
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            data?.error ||
+            data?.message ||
+            `Judge.me rejected the review (${res.status}).`,
+        },
+        { headers: CORS_HEADERS },
+      );
     }
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true }, { headers: CORS_HEADERS });
   } catch {
-    return NextResponse.json({ ok: false, error: 'Network error — please try again.' });
+    return NextResponse.json(
+      { ok: false, error: "Network error — please try again." },
+      { headers: CORS_HEADERS },
+    );
   }
 }
