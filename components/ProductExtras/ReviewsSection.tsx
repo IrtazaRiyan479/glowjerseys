@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { publicAssetUrl } from '@/lib/publicAssetUrl';
 import { uploadImage } from '@/actions/cloudinary/uploadImage';
-import { submitReview, type ReviewerNameFormat } from '@/actions/judgeme/submitReview';
+import type { ReviewerNameFormat } from '@/app/api/submit-review/route';
 import type { JudgemeReview } from '@/lib/judgeme/getReviews';
 
 /* Renders Judge.me's own widget markup (jdgm-* classes) against their real
@@ -289,15 +289,21 @@ function WriteReviewForm({ onDone, onCancel }: { onDone: () => void; onCancel: (
 
     setError(null);
     setSubmitting(true);
-    const result = await submitReview({
-      rating,
-      title: title.trim(),
-      body: body.trim(),
-      name: name.trim(),
-      email: email.trim(),
-      reviewerNameFormat: nameFormat,
-      pictureUrls: images,
-    });
+    const result = await fetch(publicAssetUrl('/api/submit-review'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rating,
+        title: title.trim(),
+        body: body.trim(),
+        name: name.trim(),
+        email: email.trim(),
+        reviewerNameFormat: nameFormat,
+        pictureUrls: images,
+      }),
+    })
+      .then((res) => res.json())
+      .catch(() => ({ ok: false, error: 'Network error — please try again.' }));
     setSubmitting(false);
     if (result.ok) {
       setSubmitted(true);
