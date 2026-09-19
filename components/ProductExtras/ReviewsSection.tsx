@@ -10,7 +10,7 @@ import type { JudgemeReview } from '@/lib/judgeme/getReviews';
 
 const REVIEWS_PER_PAGE = 5;
 const PAGE_WINDOW_SIZE = 3;
-const WRITE_REVIEW_URL = 'https://glowjerseys.com/products/custom-jersey#judgeme_product_reviews';
+const WRITE_REVIEW_URL = 'https://glowjerseys.com/apps/custom-jersey#judgeme_product_reviews';
 const CHECKMARK_SRC = 'https://public-images.judge.me/judgeme/logos/verified-checkmark.svg';
 const SHOP_BADGE_SRC = 'https://public-images.judge.me/judgeme/verified-badge-v2/verified-by-shop_light.svg';
 const MEDAL_BASE = 'https://public-images.judge.me/judgeme/medals-v2-2025-rebranding/auth';

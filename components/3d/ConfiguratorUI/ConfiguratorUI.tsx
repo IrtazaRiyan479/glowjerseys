@@ -39,7 +39,6 @@ interface ConfiguratorUIProps {
   addToCartError?: string | null;
 }
 
-/** Exact colors from glowjerseys.com/products/custom-jersey */
 const jerseyColors = [
   { name: 'Yellow', hex: '#FFE800' },
     { name: 'Orange', hex: '#FF8A00' },
@@ -125,7 +124,6 @@ const ConfiguratorUI = ({
         padding: '30px',
       }}
     >
-      {/* Title + Price — Bayon matches live product title / price */}
             <h1
         className="m-0 leading-none uppercase"
         style={{

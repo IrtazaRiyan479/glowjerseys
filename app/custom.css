@@ -642,12 +642,7 @@
 }
 .gj-theme .list-social__link .icon { margin: 0; width: 16px; height: 16px; fill: currentColor; }
 
-/* Cart drawer
-   SIZE GUIDE — edit these to match live:
-   • Mobile width:  calc(100% - 40px)   (live: calc(100% - 4rem))
-   • Desktop width: 450px               (live: 45rem = 450px)
-   • Height:        100% of viewport
-*/
+/* Cart drawer */
 .gj-theme.mini-cart--open .shopify-section-header,
 .gj-theme.mini-cart--open .header-wrapper {
   z-index: 30;
@@ -1064,7 +1059,7 @@
   background-color: currentColor;
 }
 
-/* Recs panel — Be Yours: 320px docked to the left of the cart on desktop */
+/* Recs panel */
 .gj-theme .cart-drawer.is-empty .cart-recommendations { display: none; }
 .gj-theme .cart-recommendations {
   display: block; position: relative; text-align: start; margin-top: 20px;
@@ -1256,14 +1251,14 @@
   z-index: 10;
   filter: none;
 }
-/* Light swatches need a visible edge when idle */
+
 .gj-swatch[style*="FFFFFF"],
 .gj-swatch[style*="E8C07A"],
 .gj-swatch[style*="FBECCB"] {
   border-color: #cfc9b8;
 }
 
-/* ── Configurator UI swatches (live match) ───────────── */
+/* ── Configurator UI swatches ───────────── */
 .gj-swatch {
   position: relative;
   width: 100%;
@@ -1274,7 +1269,6 @@
   padding: 0;
   transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
   box-shadow: 0 0 10px 1px currentColor;
-  /* NO filter / opacity — colors stay true */
 }
 .gj-swatch.is-active {
   transform: scale(1.14);
@@ -1295,7 +1289,7 @@
 
 
 
-/* product__accordion — live (vars fallback if outside .gj-theme) */
+/* product__accordion  */
 .product__accordion {
   --color-border: 230, 231, 233;
   --color-foreground: 28, 29, 31;
@@ -1394,7 +1388,6 @@
   margin-top: 0;
   border-top: 0;
 }
-/* ConfiguratorUI context: tighten accordion spacing vs full product page */
 .product__accordion.accordion {
   margin-top: 0;
 }
@@ -1405,10 +1398,10 @@
 .product__accordion .accordion__content {
   padding-inline-start: 0;
   padding-inline-end: 0;
-  font-size: 14px; /* live 1.4rem assumes ~10px root */
+  font-size: 14px; 
 }
 .product__accordion .accordion__title {
-  font-size: 13px; /* live 1.3rem assumes ~10px root */
+  font-size: 13px; 
   letter-spacing: 0.3em;
 }
 .product__text .icon {
@@ -1419,7 +1412,6 @@
   margin-inline-end: 0.75rem;
 }
 
-/* Smooth open/close like Material Tailwind */
 .product__accordion details > .accordion__content {
   display: grid;
   grid-template-rows: 0fr;
