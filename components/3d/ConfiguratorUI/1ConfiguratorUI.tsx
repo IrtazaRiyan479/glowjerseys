@@ -114,57 +114,36 @@ const ConfiguratorUI = ({
 
 
   return (
-    <div
-      className="w-full text-gray-900"
-      style={{
-        fontFamily: 'Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
-        WebkitFontSmoothing: 'antialiased',
-        MozOsxFontSmoothing: 'grayscale',
-      }}
-    >
-      {/* Title + Price — Bayon matches live product title / price */}
+   <div
+  className="w-full text-gray-900"
+  style={{
+    fontFamily:
+      'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale',
+  }}
+>
+      {/* Title + Price */}
       <h1
-        className="leading-none uppercase"
-        style={{
-          fontFamily: 'Bayon, sans-serif',
-          fontWeight: 400,
-          fontSize: 'clamp(1.75rem, 2.2vw, 2.5rem)',
-          letterSpacing: '0.04em',
-          color: '#0e0f11',
-        }}
+        className="font-bold tracking-tight leading-none"
+        style={{ fontSize: '1.75rem', letterSpacing: '-0.02em' }}
       >
         CUSTOM GLOW JERSEY
       </h1>
 
       <p
-        className="mt-2 leading-none"
-        style={{
-          fontFamily: 'Bayon, sans-serif',
-          fontWeight: 400,
-          fontSize: 'clamp(1.5rem, 1.8vw, 1.8rem)',
-          letterSpacing: '0.06em',
-          color: '#0e0f11',
-        }}
+        className="mt-2 font-semibold tracking-tight"
+        style={{ fontSize: '1.65rem', letterSpacing: '-0.02em' }}
       >
         ${priceDollars}
-        <sup style={{ fontSize: '55%', letterSpacing: 0 }}>.{priceCents}</sup>
+        <span style={{ fontSize: '0.95rem', verticalAlign: 'super' }}>.{priceCents}</span>
       </p>
 
-      <p
-        className="mt-2"
-        style={{ fontSize: '13px', letterSpacing: '0.04em', color: 'rgba(28,29,31,0.65)' }}
-      >
-        Shipping calculated at checkout.
-      </p>
+      <p className="mt-1 text-sm text-gray-500">Shipping calculated at checkout.</p>
 
-      <p
-        className="mt-1"
-        style={{ fontSize: '13px', letterSpacing: '0.02em', color: 'rgba(28,29,31,0.75)' }}
-      >
+      <p className="mt-1 text-sm text-gray-600">
         4 interest-free installments, or from $14.89/mo with{' '}
-        <span className="underline cursor-pointer" style={{ color: '#0b45ff' }}>
-          shop
-        </span>
+        <span className="underline cursor-pointer">shop</span>
       </p>
 
       {/* ── SIZE ─────────────────────────────────────────── */}
@@ -609,16 +588,8 @@ const ConfiguratorUI = ({
   </details>
 </div>
 
-{/* ── REFUND NOTE — matches live product footer note */}
-<p
-  className="mt-5 leading-relaxed uppercase"
-  style={{
-    fontSize: '11px',
-    letterSpacing: '0.06em',
-    color: 'rgba(28,29,31,0.55)',
-    fontFamily: 'Poppins, sans-serif',
-  }}
->
+{/* ── REFUND NOTE ──────────────────────────────────── */}
+<p className="mt-5 text-[11px] leading-relaxed text-gray-500 uppercase tracking-wide">
   Custom Glow Jerseys are not refundable, returnable, or replaceable.
   Please make sure all details are correct.
 </p>

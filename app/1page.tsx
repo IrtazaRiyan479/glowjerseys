@@ -89,27 +89,9 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
 
    return (
   <>
-  {/* Desktop: left canvas is sticky + capped to viewport; only right column scrolls.
-      Mobile: canvas has fixed aspect band, then config scrolls below. */}
-    <div className="grid w-full grid-cols-1 bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:items-start">
-    {/* Left canvas — sticky, viewport-capped, never scrolls */}
-    <div
-      className="
-        relative min-h-0 min-w-0
-        p-4 pb-2 md:p-6
-        lg:sticky lg:top-0 lg:self-start
-        lg:h-[100dvh] lg:max-h-[100dvh]
-        lg:overflow-hidden
-        lg:p-6 lg:pr-3
-      "
-    >
-      <div
-        className="
-          relative w-full overflow-hidden rounded-[14px] bg-[#1a1a1a]
-          h-[min(42svh,420px)]
-          lg:h-[calc(100dvh-3rem)] lg:max-h-[calc(100dvh-3rem)]
-        "
-      >
+  <div className="grid min-h-[85svh] w-full grid-cols-1 grid-rows-[minmax(0,42svh)_minmax(0,1fr)] bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:grid-rows-1">
+    <div className="relative min-h-0 min-w-0 p-4 pb-2 md:p-6 lg:p-8 lg:pr-4">
+      <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#1a1a1a]">
         <Experience
           glbUrl={currentGlbUrl}
           name={name}
@@ -126,9 +108,8 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
       </div>
     </div>
 
-    {/* Right column — normal flow, page scrolls here */}
-    <div className="z-10 flex min-h-0 min-w-0 w-full flex-col bg-white text-black">
-      <div className="p-4 pb-8 md:p-5 lg:pt-8 lg:pr-8">
+    <div className="z-10 flex min-h-0 min-w-0 w-full flex-col overflow-y-auto overflow-x-hidden bg-white text-black">
+      <div className="p-4 pb-8 md:p-5 lg:pt-8">
         <ConfiguratorUI
           sizeOptionData={SIZE_OPTIONS}
           sizeOptionValue={sizeOptionValue}

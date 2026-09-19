@@ -159,7 +159,7 @@
 .gj-theme .button {
   position: relative; z-index: 1; cursor: pointer;
   display: inline-flex; justify-content: center; align-items: center;
-  padding: 10px 30px; padding-top: calc(10px + var(--font-button-baseline));
+  padding: 10px 30px;
   text-decoration: none; border-radius: var(--button-radius);
   border: var(--button-border-width) solid rgb(var(--color-button-border));
   color: rgb(var(--color-button-text));
@@ -642,23 +642,58 @@
 }
 .gj-theme .list-social__link .icon { margin: 0; width: 16px; height: 16px; fill: currentColor; }
 
-/* Cart drawer */
+/* Cart drawer
+   SIZE GUIDE — edit these to match live:
+   • Mobile width:  calc(100% - 40px)   (live: calc(100% - 4rem))
+   • Desktop width: 450px               (live: 45rem = 450px)
+   • Height:        100% of viewport
+*/
+.gj-theme.mini-cart--open .shopify-section-header,
+.gj-theme.mini-cart--open .header-wrapper {
+  z-index: 30;
+}
+
 .gj-theme .cart-drawer-overlay {
-  position: fixed; inset: 0; z-index: 80;
+    position: fixed;
+  inset: 0;
+  z-index: 140;
+
   background-color: rgba(var(--color-overlay), 0.5);
-  opacity: 0; pointer-events: none; border: 0; padding: 0; cursor: default;
+    opacity: 0;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
+  cursor: url(/cross.svg) 10 10, url(/cross.png) 10 10, zoom-out;
+
   transition: opacity var(--duration-long) ease;
 }
-.gj-theme .cart-drawer-overlay.is-open { opacity: 1; pointer-events: auto; }
+.gj-theme .cart-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .gj-theme .cart-drawer {
-  position: fixed; transform: translate(100%); visibility: hidden; z-index: 100;
-  right: 0; top: 0; width: calc(100% - 40px); height: 100%; overflow: hidden;
+  position: fixed;
+  transform: translate(100%);
+  visibility: hidden;
+  z-index: 150;
+  right: 0;
+  top: 0;
+  width: calc(100% - 40px);
+  height: 100%;
+  overflow: hidden;
   background-color: rgb(var(--color-background));
   transition: transform var(--duration-long) ease, visibility var(--duration-long) ease;
 }
-.gj-theme .cart-drawer.is-open { transform: translate(0); visibility: visible; }
+.gj-theme .cart-drawer.is-open {
+  transform: translate(0);
+  visibility: visible;
+}
 @media screen and (min-width: 750px) {
-  .gj-theme .cart-drawer { width: 450px; overflow: visible; }
+  .gj-theme .cart-drawer {
+    width: 450px;
+    overflow: visible;
+  }
 }
 .gj-theme .mini-cart { height: 100%; }
 .gj-theme .mini-cart__inner {
@@ -852,8 +887,8 @@
 .gj-theme .mini-cart__navigation .product-content { margin-top: 6px; }
 .gj-theme .mini-cart__navigation .product-content .link {
   font-family: var(--font-heading-family);
-  font-size: 15px;
-  letter-spacing: 0.04em;
+  font-size: 13.5px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .gj-theme .cart-recommendations .mini-cart__navigation .price,
@@ -954,7 +989,7 @@
   display: flex; align-items: center; justify-content: center; column-gap: 10px;
   font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
 }
-.gj-theme .mini-cart__action summary .icon { height: 14px; width: 14px; position: relative; top: -2px; }
+.gj-theme .mini-cart__action summary .icon { height: 18px; width: 18px; position: relative; top: -2px; }
 .gj-theme .mini-cart__action[open] > summary + * {
   position: fixed; bottom: 0; left: 0; width: 100%; padding: 30px;
   background-color: rgb(var(--color-background)); z-index: 120;
@@ -982,7 +1017,7 @@
   border: 1px solid #e2e2e2;
   color: #3a3a3a;
   padding: 10px 14px;
-  font-size: 13px;
+  font-size: 13.9px;
   font-weight: 600;
   font-family: var(--font-body-family);
   letter-spacing: 0;
@@ -992,10 +1027,10 @@
 .gj-theme .mini-cart__footer .button-container .button {
   width: 100%;
   min-width: auto;
-  min-height: 52px;
+  min-height: 48px !important;
   white-space: nowrap;
-  font-size: 16px !important;
-  letter-spacing: 0.18em !important;
+  font-size: 21px !important;
+  letter-spacing: 0.085em !important;
   font-weight: 700 !important;
   border-radius: 8px;
   overflow: visible;
@@ -1005,7 +1040,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px 20px;
+  padding: 0px 0px !important;
 }
 .gj-theme .mini-cart__footer .button-container .button:hover {
   background-color: rgb(9, 57, 214) !important;
@@ -1189,6 +1224,12 @@
   display: flex; flex-wrap: wrap; align-items: flex-end;
   font-size: 14px; letter-spacing: 1px; color: var(--color-price);
   font-family: var(--font-price-family);
+  margin-bottom: 2px;
+  margin-left: 1px;
 }
 .gj-theme .price bdi { line-height: 1; }
-.gj-theme .price sup { font-size: 60%; line-height: 1; letter-spacing: 0; }
+.gj-theme .price .price__prefix {
+  font-size: 70%;
+  margin-inline-end: 4px;
+}
+.gj-theme .price sup { font-size: 65%; line-height: 1; letter-spacing: 0; margin: 2px;}

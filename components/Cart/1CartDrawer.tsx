@@ -9,7 +9,7 @@ const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.va
 
 const ORIGIN = 'https://glowjerseys.com';
 
-/** Set true to show fake line items for UI preview. Set false before shipping. */
+/** Fake lines for UI preview when /cart.js is empty. Set false before shipping. */
 const PREVIEW_CART = true;
 
 const DEMO_ITEMS = [
@@ -117,8 +117,7 @@ function Price({ amount, className = '' }: { amount: number | string; className?
   return (
     <span className={`price ${className}`}>
       <bdi>
-        <span className="price__prefix">$</span>
-        {dollars}
+        ${dollars}
         <sup>.{cents}</sup>
       </bdi>
     </span>
@@ -314,7 +313,7 @@ export default function CartDrawer() {
 
   if (!shown) return null;
 
-  const usingDemo = PREVIEW_CART;
+    const usingDemo = PREVIEW_CART;
   const items = usingDemo ? demoItems : storefrontItems;
   const total = usingDemo
     ? demoItems.reduce((n, i) => n + i.line_price, 0) / 100
