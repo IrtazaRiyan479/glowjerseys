@@ -17,6 +17,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Custom Glow Jersey | Glow Jerseys',
   description: 'Customize your glow jersey',
+  icons: {
+  icon: [
+    { url: `${process.env.NEXT_PUBLIC_ASSET_PREFIX || ''}/favicon.ico` },
+  ],
+},
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
