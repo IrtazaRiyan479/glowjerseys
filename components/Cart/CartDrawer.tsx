@@ -9,8 +9,8 @@ const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.va
 
 const ORIGIN = 'https://glowjerseys.com';
 
-/** Set true to show fake line items for UI preview. Set false before shipping. */
-const PREVIEW_CART = true;
+/** Set true to show fake line items for UI preview. */
+const PREVIEW_CART = false;
 
 const DEMO_ITEMS = [
   {
