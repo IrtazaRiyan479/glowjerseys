@@ -9,6 +9,48 @@ const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.va
 
 const ORIGIN = 'https://glowjerseys.com';
 
+/** Set true to show fake line items for UI preview. Set false before shipping. */
+const PREVIEW_CART = true;
+
+const DEMO_ITEMS = [
+  {
+    key: 'demo-jefferson',
+    variant_id: 1,
+    product_title: 'Jefferson #18',
+    variant_title: '20 inches',
+    quantity: 1,
+    price: 10799,
+    line_price: 10799,
+    image:
+      'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
+    url: `${ORIGIN}/products/jefferson-18`,
+    properties: null as Record<string, string> | null,
+  },
+  {
+    key: 'demo-custom',
+    variant_id: numericVariantId(SIZE_OPTIONS[0].variantId),
+    product_title: 'Custom Glow Jersey',
+    variant_title: '20 inch',
+    quantity: 1,
+    price: 16499,
+    line_price: 16499,
+    image: null as string | null,
+    url: `${ORIGIN}/products/custom-jersey`,
+    properties: {
+      Size: '20 inch',
+      Backboard: 'Black',
+      Sport: 'Basketball',
+      Name: 'BROWN',
+      Number: '7',
+      'Jersey Color': 'Orange',
+      'Name Color': 'White',
+      'Number Color': 'White',
+      'Preview Image':
+        'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
+    },
+  },
+];
+
 const RECS: Array<{
   title: string;
   price: string;
@@ -75,7 +117,8 @@ function Price({ amount, className = '' }: { amount: number | string; className?
   return (
     <span className={`price ${className}`}>
       <bdi>
-        ${dollars}
+        <span className="price__prefix">$</span>
+        {dollars}
         <sup>.{cents}</sup>
       </bdi>
     </span>
@@ -235,6 +278,7 @@ export default function CartDrawer() {
   const updateStorefrontItem = useCartStore((s) => s.updateStorefrontItem);
 
   const [shown, setShown] = useState(isOpen);
+  const [demoItems, setDemoItems] = useState(DEMO_ITEMS);
   const [entered, setEntered] = useState(false);
   const [note, setNote] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
@@ -270,8 +314,11 @@ export default function CartDrawer() {
 
   if (!shown) return null;
 
-  const items = storefrontItems;
-  const total = subtotal();
+  const usingDemo = PREVIEW_CART;
+  const items = usingDemo ? demoItems : storefrontItems;
+  const total = usingDemo
+    ? demoItems.reduce((n, i) => n + i.line_price, 0) / 100
+    : subtotal();
   const isEmpty = items.length === 0;
   const [dollars, cents] = total.toFixed(2).split('.');
 
@@ -280,6 +327,19 @@ export default function CartDrawer() {
     setStorefrontUpdatingKey(key);
 
     try {
+      if (usingDemo) {
+        await new Promise((r) => setTimeout(r, 500));
+        setDemoItems((prev) =>
+          prev
+            .map((i) =>
+              i.key === key
+                ? { ...i, quantity: Math.max(0, quantity), line_price: i.price * Math.max(0, quantity) }
+                : i
+            )
+            .filter((i) => i.quantity > 0)
+        );
+        return;
+      }
       await updateStorefrontItem(key, quantity);
     } catch (err) {
       setStorefrontError(err instanceof Error ? err.message : 'Failed to update cart.');
