@@ -1233,3 +1233,227 @@
   margin-inline-end: 4px;
 }
 .gj-theme .price sup { font-size: 65%; line-height: 1; letter-spacing: 0; margin: 2px;}
+
+/* ── Configurator UI (product options) ───────────────── */
+.gj-swatch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  box-shadow: 0 0 10px 1px currentColor;
+}
+.gj-swatch.is-active {
+  transform: scale(1.14);
+  border-color: #fff;
+  box-shadow:
+    0 0 0 2px #000,
+    0 0 0 4px #fff,
+    0 0 14px 2px currentColor;
+  z-index: 10;
+  filter: none;
+}
+/* Light swatches need a visible edge when idle */
+.gj-swatch[style*="FFFFFF"],
+.gj-swatch[style*="E8C07A"],
+.gj-swatch[style*="FBECCB"] {
+  border-color: #cfc9b8;
+}
+
+/* ── Configurator UI swatches (live match) ───────────── */
+.gj-swatch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  box-shadow: 0 0 10px 1px currentColor;
+  /* NO filter / opacity — colors stay true */
+}
+.gj-swatch.is-active {
+  transform: scale(1.14);
+  border-color: #fff;
+  box-shadow:
+    0 0 0 2px #000,
+    0 0 0 4px #fff,
+    0 0 14px 2px currentColor;
+  z-index: 10;
+}
+.gj-swatch[style*="FFFFFF"],
+.gj-swatch[style*="FBECCB"],
+.gj-swatch[style*="E8C07A"] {
+  border-color: #cfc9b8;
+  box-shadow: 0 0 8px 1px rgba(0, 0, 0, 0.12);
+}
+
+
+
+
+/* product__accordion — live (vars fallback if outside .gj-theme) */
+.product__accordion {
+  --color-border: 230, 231, 233;
+  --color-foreground: 28, 29, 31;
+  --font-body-scale: 1;
+}
+.product__accordion summary::-webkit-details-marker { display: none; }
+.product__accordion summary { list-style: none; cursor: pointer; }
+
+.accordion summary {
+  line-height: 1;
+  padding: 1.5rem 0;
+}
+
+.accordion .summary__title {
+  display: flex;
+  flex: 1;
+}
+
+.accordion + .accordion {
+  margin-top: 0;
+  border-top: none;
+}
+
+.accordion {
+  display: block;
+  margin-top: 2.5rem;
+  margin-bottom: 0;
+  border-top: 0.1rem solid rgb(var(--color-border));
+  border-bottom: 0.1rem solid rgb(var(--color-border));
+}
+
+.accordion__title {
+  display: inline-block;
+  max-width: calc(100% - 6rem);
+  min-height: 1.6rem;
+  margin: 0;
+  word-break: break-word;
+}
+
+.accordion .summary__title .icon {
+  flex: 0 0 auto;
+  align-self: center;
+  fill: rgb(var(--color-foreground));
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-inline-end: 1.2rem;
+}
+
+.accordion details[open] > summary .icon-caret {
+  transform: scaleY(-1);
+}
+
+.accordion__content {
+  padding-bottom: 1.5rem;
+  word-break: break-word;
+}
+
+.accordion__content img {
+  max-width: 100%;
+}
+
+.product__accordion .summary__title {
+  padding: 0 1.5rem;
+}
+
+.product__accordion .accordion__title {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3rem;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.product__accordion .accordion__content::-webkit-scrollbar {
+  appearance: none;
+  width: 0.9rem;
+  background-clip: padding-box;
+  border: 0.3rem solid transparent;
+  border-radius: 1.6rem;
+  background-color: rgba(var(--color-border), 0.3);
+}
+
+.product__accordion .accordion__content::-webkit-scrollbar-thumb {
+  border: 0.3rem solid transparent;
+  background-clip: padding-box;
+  border-radius: 1.6rem;
+  background-color: rgb(var(--color-border));
+}
+
+.product__accordion .accordion__content li {
+  line-height: calc(1 + 0.4 / var(--font-body-scale));
+}
+
+.product__accordion + .product-link__button {
+  margin-top: 0;
+  border-top: 0;
+}
+/* ConfiguratorUI context: tighten accordion spacing vs full product page */
+.product__accordion.accordion {
+  margin-top: 0;
+}
+.product__accordion .summary__title {
+  padding-inline-start: 0;
+  padding-inline-end: 0;
+}
+.product__accordion .accordion__content {
+  padding-inline-start: 0;
+  padding-inline-end: 0;
+  font-size: 14px; /* live 1.4rem assumes ~10px root */
+}
+.product__accordion .accordion__title {
+  font-size: 13px; /* live 1.3rem assumes ~10px root */
+  letter-spacing: 0.3em;
+}
+.product__text .icon {
+  fill: currentColor;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-inline-end: 0.75rem;
+}
+
+/* Smooth open/close like Material Tailwind */
+.product__accordion details > .accordion__content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.product__accordion details[open] > .accordion__content {
+  grid-template-rows: 1fr;
+}
+
+.product__accordion details > .accordion__content > .accordion__content-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.product__accordion details[open] > .accordion__content > .accordion__content-inner {
+  max-height: 15rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(28, 29, 31, 0.4) transparent;
+}
+
+.product__accordion details[open] > .accordion__content > .accordion__content-inner::-webkit-scrollbar {
+  width: 6px;
+}
+.product__accordion details[open] > .accordion__content > .accordion__content-inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+.product__accordion details[open] > .accordion__content > .accordion__content-inner::-webkit-scrollbar-thumb {
+  background: rgba(28, 29, 31, 0.3);
+  border-radius: 8px;
+}
+
+.product__accordion details[open] > summary .icon-caret {
+  transform: scaleY(-1);
+}
