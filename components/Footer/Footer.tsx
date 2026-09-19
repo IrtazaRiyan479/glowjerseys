@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import LocalizationSwitcher from './LocalizationSwitcher';
 
 const ORIGIN = 'https://glowjerseys.com';
 
@@ -47,32 +48,6 @@ function IconTiktok() {
   );
 }
 
-function IconGlobe() {
-  return (
-    <svg aria-hidden focusable="false" className="icon icon-localization" width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="m15 18 1-2-2.948-1.981-1.943-.124L10 15l2 3h3Z" stroke="currentColor" />
-      <path
-        d="M12.904 2.04A9.993 9.993 0 0 0 2.039 12.903c.414 4.754 4.303 8.643 9.057 9.057a9.993 9.993 0 0 0 10.865-10.865c-.414-4.753-4.303-8.642-9.057-9.057Z"
-        stroke="currentColor"
-      />
-      <path d="M3 7.46 7.75 11l1.178-2.324 4.686-1.17L15 2" stroke="currentColor" />
-    </svg>
-  );
-}
-
-function IconCaret() {
-  return (
-    <svg aria-hidden focusable="false" className="icon icon-caret" width="10" height="7" viewBox="0 0 24 15" fill="none">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 15c-.3 0-.6-.1-.8-.4l-11-13C-.2 1.2-.1.5.3.2c.4-.4 1.1-.3 1.4.1L12 12.5 22.2.4c.4-.4 1-.5 1.4-.1.4.4.5 1 .1 1.4l-11 13c-.1.2-.4.3-.7.3z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
 function IconArrow() {
   return (
     <svg aria-hidden focusable="false" className="icon icon-arrow" width="14" height="10" viewBox="0 0 14 10" fill="none">
@@ -114,7 +89,7 @@ export default function Footer() {
             <FooterColumn heading="Support" links={SUPPORT_LINKS} />
             <FooterColumn heading="Legal" links={LEGAL_LINKS} />
           </div>
-          <div className="w-full max-w-[353px] lg:ml-auto">
+          <div className="w-full lg:ml-auto" style={{ width: '312px' }}>
             <div className={headingClass}>Join The Glow Jersey Team</div>
             <form method="post" action="/contact#ContactFooter" className="mt-[25px]">
               <div className="flex items-stretch border-b border-[#e6e7e9]">
@@ -127,7 +102,7 @@ export default function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter email here"
                   required
-                  className="flex-1 min-w-0 bg-transparent pl-3 h-[45px] text-[14px] font-[Poppins,sans-serif] text-[#1c1d1f] placeholder:text-[#1c1d1f]/60 outline-none"
+                  className="footer-email flex-1 min-w-0 bg-transparent pl-3 h-[45px] text-[14px] font-[Poppins,sans-serif] text-[#1c1d1f] placeholder:text-[#1c1d1f]/60 outline-none"
                 />
                 <button
                   type="submit"
@@ -141,14 +116,14 @@ export default function Footer() {
             <div className="mt-[14px] text-[13px] font-bold italic font-[Poppins,sans-serif] text-[#1c1d1f]">
               Sign up for special offers, giveaways &amp; exclusive drops!
             </div>
-            <ul className="flex gap-[5px] mt-[30px]" style={{ marginLeft: -10 }}>
+            <ul className="flex gap-[5px] mt-[30px]" style={{ marginLeft: -10, marginTop: '30px' }}>
               <li>
                 <a
                   target="_blank"
                   rel="noopener"
                   href="https://www.facebook.com/people/Glow-Jerseys/61559872375068/"
                   aria-label="Facebook"
-                  className="w-10 h-10 flex items-center justify-center text-[#1c1d1f] hover:opacity-60 transition-opacity"
+                  className="social-icon w-10 h-10 flex items-center justify-center text-[#1c1d1f]"
                 >
                   <IconFacebook />
                 </a>
@@ -159,7 +134,7 @@ export default function Footer() {
                   rel="noopener"
                   href="https://www.instagram.com/glowjerseys/"
                   aria-label="Instagram"
-                  className="w-10 h-10 flex items-center justify-center text-[#1c1d1f] hover:opacity-60 transition-opacity"
+                  className="social-icon w-10 h-10 flex items-center justify-center text-[#1c1d1f]"
                 >
                   <IconInstagram />
                 </a>
@@ -170,7 +145,7 @@ export default function Footer() {
                   rel="noopener"
                   href="https://www.tiktok.com/@glowjerseys?is_from_webapp=1&sender_device=pc"
                   aria-label="TikTok"
-                  className="w-10 h-10 flex items-center justify-center text-[#1c1d1f] hover:opacity-60 transition-opacity"
+                  className="social-icon w-10 h-10 flex items-center justify-center text-[#1c1d1f]"
                 >
                   <IconTiktok />
                 </a>
@@ -181,9 +156,9 @@ export default function Footer() {
       </div>
 
       <div className="page-width">
-        <div className="pb-[30px] flex flex-wrap items-end justify-between gap-4 font-[Poppins,sans-serif] text-[12px] text-[#1c1d1f]">
+        <div className="pb-[30px] flex flex-wrap items-start justify-between gap-4 font-[Poppins,sans-serif] text-[12px] text-[#1c1d1f]">
           <div>
-            <div className="h-[30px] leading-[21.6px]">
+            <div className="mb-1 leading-[21.6px]">
               © {new Date().getFullYear()}, <a href={ORIGIN} className="hover:underline">Glow Jerseys</a>. All rights
               reserved.
             </div>
@@ -198,11 +173,7 @@ export default function Footer() {
               </a>
             </div>
           </div>
-          <button type="button" className="flex items-center gap-2 text-[13px]" disabled>
-            <IconGlobe />
-            United States (USD $)
-            <IconCaret />
-          </button>
+          <LocalizationSwitcher />
         </div>
       </div>
     </footer>
