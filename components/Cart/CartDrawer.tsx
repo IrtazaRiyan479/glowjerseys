@@ -9,8 +9,8 @@ const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.va
 
 const ORIGIN = 'https://glowjerseys.com';
 
-/** Fake lines for UI preview when /cart.js is empty. Set false before shipping. */
-const PREVIEW_CART = true;
+/** Set true to show fake line items for UI preview. */
+const PREVIEW_CART = false;
 
 const DEMO_ITEMS = [
   {
@@ -35,7 +35,7 @@ const DEMO_ITEMS = [
     price: 16499,
     line_price: 16499,
     image: null as string | null,
-    url: `${ORIGIN}/products/custom-jersey`,
+    url: `${ORIGIN}/apps/custom-jersey`,
     properties: {
       Size: '20 inch',
       Backboard: 'Black',
@@ -51,31 +51,36 @@ const DEMO_ITEMS = [
   },
 ];
 
-const RECS = [
+const RECS: Array<{
+  title: string;
+  price: string;
+  href: string;
+  img: string;
+  compareAt?: string;
+}> = [
   {
-    title: 'Booker #15',
+    title: 'Jordan #23',
     price: '119.99',
-    href: `${ORIGIN}/products/booker-1`,
-    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
+    href: `${ORIGIN}/products/jordan-23`,
+    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_n0c5nvn0c5nvn0c5.png?width=140',
   },
   {
-    title: 'James #23',
+    title: 'Hall #20',
     price: '119.99',
-    href: `${ORIGIN}/products/james-23`,
-    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
+    href: `${ORIGIN}/products/hall-20`,
+    img: 'https://glowjerseys.com/cdn/shop/files/Screenshot2025-07-09at2.52.55PM.png?width=140',
   },
   {
-    title: 'Mccaffrey #23',
-    price: '107.99',
-    compareAt: '119.99',
-    href: `${ORIGIN}/products/mccaffrey-23`,
-    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_lu33yhlu33yhlu33.png?width=140',
+    title: 'Point #21',
+    price: '119.99',
+    href: `${ORIGIN}/products/point-21`,
+    img: 'https://glowjerseys.com/cdn/shop/files/Screenshot2026-01-07at3.24.23PM.png?width=140',
   },
   {
-    title: 'Murray #27',
-    price: '119.99',
-    href: `${ORIGIN}/products/murray-27`,
-    img: 'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_pawly1pawly1pawl.png?width=140',
+    title: 'Custom Soccer Glow Jersey',
+    price: '164.99',
+    href: `${ORIGIN}/products/custom-soccer-glow-jersey`,
+    img: 'https://glowjerseys.com/cdn/shop/files/Gemini_Generated_Image_f4fxr1f4fxr1f4fx.png?width=140',
   },
 ];
 
@@ -112,32 +117,11 @@ function Price({ amount, className = '' }: { amount: number | string; className?
   return (
     <span className={`price ${className}`}>
       <bdi>
-        ${dollars}
+        <span className="price__prefix">$</span>
+        {dollars}
         <sup>.{cents}</sup>
       </bdi>
     </span>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="w-4 h-4 animate-spin text-black/20 fill-black"
-      viewBox="0 0 100 101"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ marginLeft: 8 }}
-    >
-      <path
-        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-        fill="currentColor"
-      />
-      <path
-        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-        fill="currentFill"
-      />
-    </svg>
   );
 }
 
@@ -182,6 +166,40 @@ function IconArrow() {
   );
 }
 
+function IconCart({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+      focusable="false"
+      className={`icon icon-cart ${className}`.trim()}
+      fill="none"
+      viewBox="0 0 18 19"
+    >
+      <path
+        d="M3.09333 5.87954L16.2853 5.87945V5.87945C16.3948 5.8795 16.4836 5.96831 16.4836 6.07785V11.4909C16.4836 11.974 16.1363 12.389 15.6603 12.4714C11.3279 13.2209 9.49656 13.2033 5.25251 13.9258C4.68216 14.0229 4.14294 13.6285 4.0774 13.0537C3.77443 10.3963 2.99795 3.58502 2.88887 2.62142C2.75288 1.42015 0.905376 1.51528 0.283581 1.51478"
+        stroke="currentColor"
+      />
+      <path
+        d="M13.3143 16.8554C13.3143 17.6005 13.9183 18.2045 14.6634 18.2045C15.4085 18.2045 16.0125 17.6005 16.0125 16.8554C16.0125 16.1104 15.4085 15.5063 14.6634 15.5063C13.9183 15.5063 13.3143 16.1104 13.3143 16.8554Z"
+        fill="currentColor"
+      />
+      <path
+        d="M3.72831 16.8554C3.72831 17.6005 4.33233 18.2045 5.07741 18.2045C5.8225 18.2045 6.42651 17.6005 6.42651 16.8554C6.42651 16.1104 5.8225 15.5063 5.07741 15.5063C4.33233 15.5063 3.72831 16.1104 3.72831 16.8554Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconSpinner() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-spinner" fill="none" viewBox="0 0 66 66">
+      <circle className="path" fill="none" strokeWidth="6" cx="33" cy="33" r="30" />
+    </svg>
+  );
+}
+
 function IconMinus() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-minus" fill="none" viewBox="0 0 10 2">
@@ -201,18 +219,21 @@ function IconPlus() {
 function Recs() {
   return (
     <div className="cart-recommendations">
-      <div className="title h5">You may also like</div>
+      <div className="title h4">You may also like</div>
       <ul className="mini-cart__navigation">
         {RECS.map((r) => (
           <li key={r.title}>
-            <div className="product-container">
-              <a href={r.href} className="product-image">
-                <img src={r.img} alt={r.title} />
-              </a>
+            <div className="product-container product-container--link">
+              <div className="product-image">
+                <a href={r.href} className="media-wrapper media-wrapper--small">
+                  <img src={r.img} alt={r.title} width={70} height={70} />
+                </a>
+              </div>
               <div className="product-description">
+                <span className="visually-hidden">Vendor:</span>
                 <div className="caption-with-letter-spacing">Glow Jerseys</div>
                 <div className="product-content">
-                  <a href={r.href} className="link">
+                  <a href={r.href} className="link product-title">
                     {r.title}
                   </a>
                 </div>
@@ -222,7 +243,6 @@ function Recs() {
                       <span className="price-item--regular">
                         <Price amount={r.compareAt} />
                       </span>
-                      <span className="from-label">From</span>
                       <span className="price-item--sale">
                         <Price amount={r.price} />
                       </span>
@@ -232,11 +252,14 @@ function Recs() {
                   )}
                 </div>
                 <div className="product-button">
-  <a href={r.href} className="button">
-    <span>Choose options</span>
-    <IconArrow />
-  </a>
-</div>
+                  <a href={r.href} className="button button--small button--cta">
+                    <span className="small-hide">
+                      <span className="label">Choose options</span>
+                      <IconArrow />
+                    </span>
+                    <IconCart className="medium-hide large-up-hide" />
+                  </a>
+                </div>
               </div>
             </div>
           </li>
@@ -291,7 +314,7 @@ export default function CartDrawer() {
 
   if (!shown) return null;
 
-    const usingDemo = PREVIEW_CART;
+  const usingDemo = PREVIEW_CART;
   const items = usingDemo ? demoItems : storefrontItems;
   const total = usingDemo
     ? demoItems.reduce((n, i) => n + i.line_price, 0) / 100
@@ -300,22 +323,23 @@ export default function CartDrawer() {
   const [dollars, cents] = total.toFixed(2).split('.');
 
   const handleStorefrontQuantityChange = async (key: string, quantity: number) => {
-        setStorefrontError(null);
-    if (!usingDemo) setStorefrontUpdatingKey(key);
+    setStorefrontError(null);
+    setStorefrontUpdatingKey(key);
 
-    if (usingDemo) {
-      setDemoItems((prev) =>
-        prev
-          .map((i) =>
-            i.key === key
-              ? { ...i, quantity: Math.max(0, quantity), line_price: i.price * Math.max(0, quantity) }
-              : i
-          )
-          .filter((i) => i.quantity > 0)
-      );
-      return;
-    }
     try {
+      if (usingDemo) {
+        await new Promise((r) => setTimeout(r, 500));
+        setDemoItems((prev) =>
+          prev
+            .map((i) =>
+              i.key === key
+                ? { ...i, quantity: Math.max(0, quantity), line_price: i.price * Math.max(0, quantity) }
+                : i
+            )
+            .filter((i) => i.quantity > 0)
+        );
+        return;
+      }
       await updateStorefrontItem(key, quantity);
     } catch (err) {
       setStorefrontError(err instanceof Error ? err.message : 'Failed to update cart.');
@@ -391,6 +415,11 @@ export default function CartDrawer() {
                   const image = isJersey ? p['Preview Image'] || null : item.image;
                   return (
                     <li key={item.key}>
+                      <div className={`loading-overlay${storefrontUpdatingKey === item.key ? '' : ' hidden'}`}>
+                        <div className="loading-overlay__spinner">
+                          <IconSpinner />
+                        </div>
+                      </div>
                       <button
                         type="button"
                         className="delete-product"
@@ -478,7 +507,6 @@ export default function CartDrawer() {
                               >
                                 <IconPlus />
                               </button>
-                              {!usingDemo && storefrontUpdatingKey === item.key && <Spinner />}
                             </div>
                             <Price amount={item.line_price / 100} />
                           </div>

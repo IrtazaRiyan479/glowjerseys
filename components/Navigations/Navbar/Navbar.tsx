@@ -7,7 +7,7 @@ const ORIGIN = 'https://glowjerseys.com';
 
 const NAV = [
   { label: 'Featured', href: `${ORIGIN}/` },
-  { label: 'Custom', href: `${ORIGIN}/products/custom-jersey` },
+  { label: 'Custom', href: `${ORIGIN}/apps/custom-jersey` },
   {
     label: 'Jerseys',
     href: `${ORIGIN}/collections/players`,

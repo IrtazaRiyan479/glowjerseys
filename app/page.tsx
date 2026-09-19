@@ -89,27 +89,39 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
 
    return (
   <>
-  <div className="grid min-h-[85svh] w-full grid-cols-1 grid-rows-[minmax(0,42svh)_minmax(0,1fr)] bg-white lg:grid-cols-[minmax(0,1fr)_min(520px,40%)] lg:grid-rows-1">
-    <div className="relative min-h-0 min-w-0 p-4 pb-2 md:p-6 lg:p-8 lg:pr-4">
-      <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#1a1a1a]">
-        <Experience
-          glbUrl={currentGlbUrl}
-          name={name}
-          number={number}
-          outlineColor={outlineColor}
-          nameColor={nameColor}
-          numberColor={numberColor}
-          backboardColor={backboardColor}
-          isDark={isDark}
-          neonOn={neonOn}
-          setNeonOn={setNeonOn}
-          onSnapshotReady={onSnapshotReady}
-        />
+  {/* Desktop: left canvas is sticky + capped to viewport; only right column scrolls.
+      Mobile: canvas has fixed aspect band, then config scrolls below. */}
+  <div className="mx-auto w-full max-w-[1600px] px-4 md:px-6 lg:px-10 mb-16 lg:mb-24">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,min(100%,600px))_minmax(420px,1fr)] lg:gap-10 lg:items-start">
+      {/* Left: content-sized + sticky (matches live media column) */}
+      <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+        <div
+          className="relative w-full overflow-hidden bg-[#1a1a1a]"
+          style={{
+            aspectRatio: '1 / 1.05',
+            maxHeight: 'min(82vh, 880px)',
+          }}
+        >
+          <div className="absolute inset-0">
+            <Experience
+              glbUrl={currentGlbUrl}
+              name={name}
+              number={number}
+              outlineColor={outlineColor}
+              nameColor={nameColor}
+              numberColor={numberColor}
+              backboardColor={backboardColor}
+              isDark={isDark}
+              neonOn={neonOn}
+              setNeonOn={setNeonOn}
+              onSnapshotReady={onSnapshotReady}
+            />
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div className="z-10 flex min-h-0 min-w-0 w-full flex-col overflow-y-auto overflow-x-hidden bg-white text-black">
-      <div className="p-4 pb-8 md:p-5 lg:pt-8">
+      {/* Right: normal flow — page scroll moves this; left stays sticky */}
+      <div className="min-w-0 w-full bg-white text-black lg:pt-2">
         <ConfiguratorUI
           sizeOptionData={SIZE_OPTIONS}
           sizeOptionValue={sizeOptionValue}
