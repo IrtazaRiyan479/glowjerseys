@@ -35,7 +35,7 @@ const DEMO_ITEMS = [
     price: 16499,
     line_price: 16499,
     image: null as string | null,
-    url: `${ORIGIN}/products/custom-jersey`,
+    url: `${ORIGIN}/apps/custom-jersey`,
     properties: {
       Size: '20 inch',
       Backboard: 'Black',
