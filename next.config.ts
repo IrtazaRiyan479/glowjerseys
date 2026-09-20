@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       "@react-three/fiber",
       "postprocessing",
     ],
+    // Default 1mb cap rejects the jersey preview snapshot and review photo
+    // uploads (both base64 data URLs sent to the uploadImage server action).
+    serverActions: { bodySizeLimit: "10mb" },
   },
   assetPrefix: process.env.ASSET_PREFIX || undefined,
   env: {
