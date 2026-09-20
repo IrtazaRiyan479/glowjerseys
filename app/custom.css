@@ -1265,7 +1265,6 @@
   color: #fff;
 }
 
-/* ── Live #gjcz customizer (pixel-matched, light theme) ── */
 #gjcz {
   font-size: 14px;
   margin: 2px 0 4px;
@@ -1304,7 +1303,6 @@
   white-space: nowrap;
 }
 
-/* Sport — flex-basis:auto is what wraps Hockey to full width */
 #gjcz .gj-seg {
   display: flex;
   flex-wrap: wrap;
@@ -1380,7 +1378,6 @@
   letter-spacing: 0.3px;
 }
 
-/* Swatches — always 10 across, shrink with container */
 #gjcz .gj-sw {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -1416,7 +1413,6 @@
   box-shadow: 0 0 8px 1px rgba(0, 0, 0, 0.12);
 }
 
-/* Backboard — two equal pills, never wrap */
 #gjcz .gj-bb {
   display: flex;
   gap: 10px;
@@ -1461,7 +1457,6 @@
   border: 1px solid #888;
 }
 
-/* Qty + ATC — live product-form__buttons (Shopify 1rem≈10px → fixed px) */
 #gjcz .product-form__buttons {
   display: flex;
   flex-wrap: wrap;
@@ -1590,10 +1585,9 @@
   color: #000;
 }
 
-/* Small 2-col: form NOT 1.4fr — Hockey must wrap */
 @media screen and (min-width: 750px) and (max-width: 989px) {
   .gj-product {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* 50/50 */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 16px;
   }
 
@@ -1621,13 +1615,11 @@
     padding-left: 16px;
   }
 
-  /* 5th pill (Hockey) drops to its own row */
   #gjcz .gj-seg__b {
     min-width: 72px;
   }
 }
 
-/* Large: wider config UI — 5 sports in one row is fine */
 @media screen and (min-width: 990px) {
   .gj-product {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
