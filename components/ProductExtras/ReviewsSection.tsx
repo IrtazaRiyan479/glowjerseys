@@ -16,6 +16,7 @@ import type { JudgemeReview } from '@/lib/judgeme/getReviews';
 const REVIEWS_PER_PAGE = 5;
 const PAGE_WINDOW_SIZE = 3;
 const TITLE_MAX = 100;
+const BODY_MAX = 5000;
 const MAX_IMAGES = 5;
 const CHECKMARK_SRC = 'https://public-images.judge.me/judgeme/logos/verified-checkmark.svg';
 const SHOP_BADGE_SRC = 'https://public-images.judge.me/judgeme/verified-badge-v2/verified-by-shop_light.svg';
@@ -361,7 +362,7 @@ function WriteReviewForm({ onDone, onCancel }: { onDone: () => void; onCancel: (
           <label className="jdgm-form__inline-label" htmlFor="gj-review-body">
             Review content
           </label>
-          <span className="jdgm-countdown" />
+          <span className="jdgm-countdown">({BODY_MAX - body.length})</span>
           <textarea
             id="gj-review-body"
             rows={5}
@@ -403,7 +404,7 @@ function WriteReviewForm({ onDone, onCancel }: { onDone: () => void; onCancel: (
             {images.length < MAX_IMAGES && (
               <div
                 className="jdgm-picture-fieldset__box jdgm-picture-fieldset__box--input"
-                style={{ width: 80, height: 80, position: 'relative' }}
+                style={{ width: 128, height: 128, position: 'relative' }}
               >
                 <div className="jdgm-picture-fieldset__box-wrapper">
                   <div className="jdgm-media-fieldset__icon">
@@ -682,7 +683,7 @@ export default function ReviewsSection() {
           }}
         >
           <div style={{ overflow: 'hidden', minHeight: 0 }}>
-            <WriteReviewForm onDone={() => {}} onCancel={() => setWritingReview(false)} />
+            <WriteReviewForm onDone={() => { }} onCancel={() => setWritingReview(false)} />
           </div>
         </div>
 
