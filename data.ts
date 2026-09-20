@@ -76,9 +76,9 @@ export function toShopifyProperties(opts: JerseySelectedOptions) {
     { key: "Name Color", value: opts.nameColor },
     { key: "Number Color", value: opts.numberColor },
     { key: "Backboard", value: opts.backboardColor },
-    // ...(opts.previewImageUrl
-    //   ? [{ key: "Preview Image", value: opts.previewImageUrl }]
-    //   : []),
+    ...(opts.previewImageUrl
+      ? [{ key: "Preview Image", value: opts.previewImageUrl }]
+      : []),
   ];
 }
 export function toCartLineProperties(
