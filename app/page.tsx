@@ -52,11 +52,13 @@ const handleAddToCart = async () => {
 
     const dataUrl = await snapshotRef.current?.();
     if (dataUrl) {
-      try {
-        previewImageUrl = await uploadImage(dataUrl);
-      } catch {
-        previewImageUrl = dataUrl;
-      }
+      previewImageUrl = dataUrl;
+      // try {
+        
+      // previewImageUrl = await uploadImage(dataUrl);
+      // } catch {
+      //   previewImageUrl = dataUrl;
+      // }
     }
 
     const selectedOptions: JerseySelectedOptions = {
@@ -91,17 +93,10 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
   <>
   {/* Desktop: left canvas is sticky + capped to viewport; only right column scrolls.
       Mobile: canvas has fixed aspect band, then config scrolls below. */}
-  <div className="mx-auto w-full max-w-[1600px] px-4 md:px-6 lg:px-10 mb-16 lg:mb-24">
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,min(100%,600px))_minmax(420px,1fr)] lg:gap-10 lg:items-start">
-      {/* Left: content-sized + sticky (matches live media column) */}
-      <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-        <div
-          className="relative w-full overflow-hidden bg-[#1a1a1a]"
-          style={{
-            aspectRatio: '1 / 1.05',
-            maxHeight: 'min(82vh, 880px)',
-          }}
-        >
+    <div className="gj-page mx-auto w-full max-w-[1600px] mb-16 lg:mb-24">
+    <div className="gj-product">
+      <div className="gj-media">
+        <div className="gj-media__frame">
           <div className="absolute inset-0">
             <Experience
               glbUrl={currentGlbUrl}
@@ -120,6 +115,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
         </div>
       </div>
 
+      <div className="gj-info">
       {/* Right: normal flow — page scroll moves this; left stays sticky */}
       <div className="min-w-0 w-full bg-white text-black lg:pt-2">
         <ConfiguratorUI
@@ -155,6 +151,7 @@ const currentGlbUrl = SPORT_MODELS[selectedSport] || SPORT_MODELS.Soccer;
           addToCartError={addToCartError}
         />
       </div>
+    </div>
     </div>
   </div>
 

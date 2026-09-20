@@ -1265,8 +1265,129 @@
   color: #fff;
 }
 
-/* ── Configurator UI (product options) ───────────────── */
-.gj-swatch {
+/* ── Live #gjcz customizer (pixel-matched, light theme) ── */
+#gjcz {
+  font-size: 14px;
+  margin: 2px 0 4px;
+  min-width: 0;
+}
+
+#gjcz .gjcz__row {
+  margin-bottom: 13px;
+}
+
+#gjcz .gjcz__lab {
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0 0 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  opacity: 0.92;
+}
+
+#gjcz .gjcz__req {
+  color: #ff6a6a;
+  margin-left: 3px;
+}
+
+#gjcz .gj-selname {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* Sport — flex-basis:auto is what wraps Hockey to full width */
+#gjcz .gj-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#gjcz .gj-seg__b {
+  flex: 1 1 auto;
+  min-width: 58px;
+  padding: 8px 6px;
+  border: 1px solid #c7ccd1;
+  background: #fff;
+  color: inherit;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+#gjcz .gj-seg__b[aria-pressed='true'] {
+  border-color: #0b45ff !important;
+  background: rgba(11, 69, 255, 0.12) !important;
+  color: #0b45ff !important;
+  box-shadow: inset 0 0 0 1px #0b45ff !important;
+}
+
+/* Name / number */
+#gjcz .gj-nn {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+#gjcz .gj-nn .gj-name {
+  flex: 3 1 0;
+  min-width: 0;
+}
+
+#gjcz .gj-nn .gj-num {
+  flex: 1 1 0;
+  min-width: 66px;
+}
+
+#gjcz .gj-nn input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #8a8f98;
+  background: #fff;
+  color: inherit;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 15px;
+  text-transform: uppercase;
+  outline: none;
+}
+
+#gjcz .gj-nn input:focus {
+  border-color: #0b45ff;
+}
+
+#gjcz .gj-nn input::placeholder {
+  opacity: 0.4;
+  letter-spacing: 1px;
+}
+
+#gjcz .gj-cnt {
+  font-size: 10px;
+  opacity: 0.5;
+  text-align: right;
+  margin-top: 3px;
+  letter-spacing: 0.3px;
+}
+
+/* Swatches — always 10 across, shrink with container */
+#gjcz .gj-sw {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+}
+
+#gjcz .gj-sw__b {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -1274,55 +1395,281 @@
   border: 2px solid rgba(0, 0, 0, 0.12);
   cursor: pointer;
   padding: 0;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-  box-shadow: 0 0 10px 1px currentColor;
+  transition: 0.12s;
+  box-shadow: 0 0 6px -1px currentColor;
 }
-.gj-swatch.is-active {
+
+#gjcz .gj-sw__b[aria-pressed='true'] {
   transform: scale(1.14);
   border-color: #fff;
   box-shadow:
     0 0 0 2px #000,
     0 0 0 4px #fff,
-    0 0 14px 2px currentColor;
-  z-index: 10;
-  filter: none;
+    0 0 13px 1px currentColor;
+  z-index: 1;
 }
 
-.gj-swatch[style*="FFFFFF"],
-.gj-swatch[style*="E8C07A"],
-.gj-swatch[style*="FBECCB"] {
-  border-color: #cfc9b8;
-}
-
-/* ── Configurator UI swatches ───────────── */
-.gj-swatch {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  border: 2px solid rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  padding: 0;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-  box-shadow: 0 0 10px 1px currentColor;
-}
-.gj-swatch.is-active {
-  transform: scale(1.14);
-  border-color: #fff;
-  box-shadow:
-    0 0 0 2px #000,
-    0 0 0 4px #fff,
-    0 0 14px 2px currentColor;
-  z-index: 10;
-}
-.gj-swatch[style*="FFFFFF"],
-.gj-swatch[style*="FBECCB"],
-.gj-swatch[style*="E8C07A"] {
+#gjcz .gj-sw__b[style*='FFFFFF'],
+#gjcz .gj-sw__b[style*='E8C07A'],
+#gjcz .gj-sw__b[style*='FBECCB'] {
   border-color: #cfc9b8;
   box-shadow: 0 0 8px 1px rgba(0, 0, 0, 0.12);
 }
 
+/* Backboard — two equal pills, never wrap */
+#gjcz .gj-bb {
+  display: flex;
+  gap: 10px;
+}
 
+#gjcz .gj-bb__b {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #c7ccd1;
+  border-radius: 9px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.15s;
+  min-width: 0;
+}
+
+#gjcz .gj-bb__b[aria-pressed='true'] {
+  border-color: #0b45ff !important;
+  background: rgba(11, 69, 255, 0.12) !important;
+  color: #0b45ff !important;
+  box-shadow: inset 0 0 0 1px #0b45ff !important;
+}
+
+#gjcz .gj-bb__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex: none;
+}
+
+#gjcz .gj-bb__dot--clear {
+  background: conic-gradient(#cfcfcf 25%, #fff 0 50%, #cfcfcf 0 75%, #fff 0);
+  background-size: 8px 8px;
+  border: 1px solid #888;
+}
+
+/* Qty + ATC — live product-form__buttons (Shopify 1rem≈10px → fixed px) */
+#gjcz .product-form__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  row-gap: 20px;
+  margin-top: 24px;
+}
+
+#gjcz .product-form__quantity {
+  align-self: center;
+}
+
+#gjcz .quantity {
+  width: 120px;
+  display: flex;
+  align-items: center;
+}
+
+#gjcz .quantity__button {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  color: rgb(28, 29, 31);
+  background-color: rgba(28, 29, 31, 0.06);
+}
+
+#gjcz .quantity__input {
+  flex-grow: 1;
+  width: 100%;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gjcz .product-form__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Poppins, sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  text-transform: uppercase;
+  min-width: 240px;
+  max-width: 100%;
+  min-height: 46px;
+  border-radius: 8px;
+  background-color: rgb(11, 69, 255);
+  color: #fff;
+  border: 1px solid rgb(11, 69, 255);
+  cursor: pointer;
+  flex-grow: 1;
+  width: 100%;
+  padding: 10px 30px;
+}
+
+#gjcz .product-form__submit:hover {
+  background-color: rgba(11, 69, 255, 0.85);
+}
+
+#gjcz .product-form__submit:disabled {
+  opacity: 0.8;
+  cursor: wait;
+}
+
+@media screen and (min-width: 480px) {
+  #gjcz .product-form__quantity + .product-form__submit {
+    width: calc(100% - 140px);
+    flex-grow: 1;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  #gjcz .product-form__submit {
+    min-height: 50px;
+  }
+}
+
+/* Product layout */
+.gj-page {
+  padding: 0 15px;
+}
+@media screen and (min-width: 750px) {
+  .gj-page { padding: 0 50px; }
+}
+
+.gj-product {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.gj-media {
+  min-width: 0;
+  position: static;
+}
+
+.gj-media__frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #1a1a1a;
+  aspect-ratio: 1 / 1.05;
+}
+
+.gj-info {
+  min-width: 0;
+  width: 100%;
+  background: #fff;
+  color: #000;
+}
+
+/* Small 2-col: form NOT 1.4fr — Hockey must wrap */
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .gj-product {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* 50/50 */
+    gap: 16px;
+  }
+
+  .gj-media {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    z-index: 0;
+    overflow: hidden;
+    isolation: isolate;
+    max-width: none;
+  }
+
+  .gj-media__frame {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: calc(100dvh - 3rem - 8px);
+    aspect-ratio: 1 / 1.05;
+    overflow: hidden;
+  }
+
+  #gjcz {
+    padding-top: 8px;
+    padding-left: 16px;
+  }
+
+  /* 5th pill (Hockey) drops to its own row */
+  #gjcz .gj-seg__b {
+    min-width: 72px;
+  }
+}
+
+/* Large: wider config UI — 5 sports in one row is fine */
+@media screen and (min-width: 990px) {
+  .gj-product {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 16px;
+  }
+
+  .gj-media {
+    position: sticky;
+    top: 3.3rem;
+    z-index: 0;
+    max-width: none;
+  }
+
+  .gj-media__frame {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: unset;
+    height: calc(100dvh - 6rem - 8px);
+    max-height: calc(100dvh - 6rem - 8px);
+  }
+
+  #gjcz {
+    padding-left: 20px;
+  }
+
+  #gjcz .gj-seg__b {
+    min-width: 58px;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .gj-media {
+    position: static !important;
+    top: auto !important;
+    max-width: none;
+  }
+  .gj-media__frame {
+    height: auto;
+    max-height: none;
+    aspect-ratio: 1 / 1.05;
+  }
+}
 
 
 /* product__accordion  */
