@@ -394,8 +394,8 @@ const fragmentShader = `
   varying vec3 vViewDir;
 
   void main() {
-    float peak = max(max(uColor.r, uColor.g), uColor.b);
-    vec3 hue = uColor / max(peak, 0.001);
+    vec3 rgb = uColor;
+    float peak = max(max(rgb.r, rgb.g), rgb.b);
 
     float nlen = length(vWorldNormal);
     vec3 n = nlen > 1e-5 ? vWorldNormal / nlen : vec3(0.0, 0.0, 1.0);
@@ -405,7 +405,23 @@ const fragmentShader = `
     float ndvAA = mix(ndv, smoothstep(-w, w, ndv), 0.35);
     float fresnel = pow(1.0 - clamp(ndvAA, 0.0, 1.0), max(uFresnelPow, 1e-4));
 
-    vec3 col = hue * uIntensity * (1.0 + fresnel * uRim);
+    float gain = uIntensity * (1.0 + fresnel * uRim);
+    vec3 locked = mix(rgb, rgb * gain, step(vec3(peak * 0.995), rgb));
+    vec3 col = mix(locked, rgb * gain, 0.22);
+
+    float lum0 = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+    float isWhite = step(0.92, lum0);
+    float isRed   = step(0.85, rgb.r) * step(rgb.g, 0.12) * step(rgb.b, 0.12);
+    float isPink  = step(0.85, rgb.r) * step(rgb.g, 0.15) * step(0.22, rgb.b);
+
+    float whiteDim = 0.90;
+    float redLift  = 0.02;
+    float pinkLift = 0.02;
+
+    col = mix(col, locked, max(isWhite, max(isRed, isPink)));
+    col = mix(col, rgb * whiteDim, isWhite);
+    col = mix(col, mix(col, vec3(1.0), redLift), isRed);
+    col = mix(col, mix(col, vec3(1.0), pinkLift), isPink);
 
     float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
     float dither = (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
