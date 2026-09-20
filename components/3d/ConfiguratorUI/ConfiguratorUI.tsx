@@ -226,8 +226,8 @@ const ConfiguratorUI = ({
         </div>
       </div>
 
-      {/* ── SPORT — flex: 1 1 auto so Hockey wraps full-width ── */}
-      <div className="gjcz__row">
+      {/* ── SPORT  */}
+      <div className="gjcz__row mt-3">
         <div className="gjcz__lab">
           <span className="gjcz__labtxt">
             SPORT <span className="gjcz__req">*</span>
@@ -428,7 +428,7 @@ const ConfiguratorUI = ({
         </div>
       </div>
 
-      {/* ── QUANTITY + ADD TO CART (wraps at ~200% like live) ── */}
+      {/* ── QUANTITY + ADD TO CART ── */}
       <div className="product-form__buttons">
         <div className="product-form__quantity">
           <div className="quantity">
