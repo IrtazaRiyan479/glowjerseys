@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       "@react-three/fiber",
       "postprocessing",
     ],
+    serverActions: {
+      bodySizeLimit: "10mb",
+      allowedOrigins: ["*.myshopify.com", "glowjerseys.com"],
+    },
   },
   assetPrefix: process.env.ASSET_PREFIX || undefined,
   env: {
