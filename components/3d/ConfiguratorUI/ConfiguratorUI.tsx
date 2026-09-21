@@ -1,8 +1,9 @@
 'use client';
 
-import { SIZE_OPTIONS } from '@/data';
-import { computeJerseyPrice } from '@/lib/pricing';
-import { useState } from 'react';
+import { SIZE_OPTIONS, numericVariantId } from '@/data';
+import { computeJerseyPrice, getSizeOption } from '@/lib/pricing';
+import { fetchLocalizedProduct, formatPriceParts, type LocalizedProduct } from '@/lib/shopify/localizedPrice';
+import { useEffect, useState } from 'react';
 
 interface ConfiguratorUIProps {
   sizeOptionData: readonly any[];
@@ -100,8 +101,16 @@ const ConfiguratorUI = ({
   const nameLen = name?.length ?? 0;
   const numberLen = number?.length ?? 0;
 
-  const price = computeJerseyPrice(sizeOptionValue ?? 20);
-  const [priceDollars, priceCents] = price.toFixed(2).split('.');
+  const [localized, setLocalized] = useState<LocalizedProduct | null>(null);
+  useEffect(() => {
+    fetchLocalizedProduct().then(setLocalized);
+  }, []);
+
+  const currentSize = sizeOptionValue ?? 20;
+  const localizedCents = localized?.pricesByVariantId[numericVariantId(getSizeOption(currentSize).variantId)];
+  const price = localizedCents != null ? localizedCents / 100 : computeJerseyPrice(currentSize);
+  const currency = localized?.currency ?? 'USD';
+  const { symbol: priceSymbol, whole: priceDollars, fraction: priceCents } = formatPriceParts(price, currency);
 
   const [openAcc, setOpenAcc] = useState<string | null>(null);
 
@@ -142,7 +151,7 @@ const ConfiguratorUI = ({
           color: '#0e0f11',
         }}
       >
-        <span style={{ fontSize: '70%', marginRight: '0.15rem' }}>$</span>
+        <span style={{ fontSize: '70%', marginRight: '0.15rem' }}>{priceSymbol}</span>
         {priceDollars}
         <sup style={{ fontSize: '55%', letterSpacing: 0, marginLeft: '1px' }}>
           .{priceCents}
