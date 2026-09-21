@@ -1824,3 +1824,62 @@
 .product__accordion details[open] > summary .icon-caret {
   transform: scaleY(-1);
 }
+
+
+
+
+/* BOGO + DISCOUNTED PRICE */
+.gj-theme .discounts {
+  font-size: 12px;
+  margin-top: 6px;
+}
+.gj-theme .discounts__discount {
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+}
+.gj-theme .discounts__discount .icon-discount {
+  width: 12px;
+  height: 12px;
+  margin-right: 7px;
+  flex-shrink: 0;
+}
+.gj-theme .cart-item__discounted-prices {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0;
+}
+.gj-theme .cart-item__discounted-prices dd {
+  margin: 0;
+}
+.gj-theme .mini-cart__navigation .cart-item__discounted-prices .price {
+  margin: 0;
+}
+.gj-theme .mini-cart__navigation .price--on-sale .price-item--regular {
+  text-decoration: none;
+  position: relative;
+  color: rgba(var(--color-foreground), 0.7);
+}
+.gj-theme .mini-cart__navigation .price--on-sale .price-item--regular::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 40%;
+  width: 100%;
+  border-bottom: 1px solid var(--color-sale-price);
+  opacity: 0.7;
+  transform: rotate(-15deg);
+}
+.gj-theme .mini-cart__navigation .price--on-sale .price-item--regular bdi {
+  text-decoration: none;
+  font-weight: 300;
+  font-size: 14px;
+  color: rgba(var(--color-foreground), 0.7);
+}
+.gj-theme .mini-cart__navigation .cart-item__discounted-prices > .price bdi {
+  color: var(--color-price);
+}
