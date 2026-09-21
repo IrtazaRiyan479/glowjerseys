@@ -45,7 +45,7 @@ const DEMO_ITEMS = [
       'Jersey Color': 'Orange',
       'Name Color': 'White',
       'Number Color': 'White',
-      'Preview Image':
+      '_Preview Image':
         'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
     },
   },
@@ -411,8 +411,10 @@ export default function CartDrawer() {
               <ul className="mini-cart__navigation">
                 {items.map((item) => {
                   const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
-                  const p = item.properties ?? {};
-                  const image = isJersey ? p['Preview Image'] || null : item.image;
+                  const p = (item.properties ?? {}) as Record<string, string>;
+const image = isJersey
+  ? p["_Preview Image"] || p["Preview Image"] || null
+  : item.image;
                   return (
                     <li key={item.key}>
                       <div className={`loading-overlay${storefrontUpdatingKey === item.key ? '' : ' hidden'}`}>

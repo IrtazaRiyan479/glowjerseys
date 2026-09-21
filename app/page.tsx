@@ -16,7 +16,6 @@ import {
   type JerseySelectedOptions,
 } from '@/data';
 import { getSizeOption } from '@/lib/pricing';
-import { deleteReactDebugChannelForHtmlRequest } from 'next/dist/server/dev/debug-channel';
 
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
 
@@ -25,7 +24,7 @@ const Page = () => {
   const [sportsTypeValue, setSportsTypeValue] = useState('Soccer');
   const [name, setName] = useState('BROWN');
   const [number, setNumber] = useState('7');
-    const [outlineColor, setOutlineColor] = useState('#FF8A00');
+  const [outlineColor, setOutlineColor] = useState('#FF8A00');
   const [nameColor, setNameColor] = useState('#ffffff');
   const [numberColor, setNumberColor] = useState('#ffffff');
   const [backboardColor, setBackboardColor] = useState('transparent');
@@ -53,12 +52,12 @@ const handleAddToCart = async () => {
 
     const dataUrl = await snapshotRef.current?.();
     if (dataUrl) {
-      try {
-      previewImageUrl = await uploadImage(dataUrl);
-      } catch {
-        previewImageUrl = dataUrl;
-      }
-    }
+  try {
+    previewImageUrl = await uploadImage(dataUrl);
+  } catch {
+    previewImageUrl = dataUrl;
+  }
+}
 
     const selectedOptions: JerseySelectedOptions = {
       size: sizeOptionValue ?? 20,
