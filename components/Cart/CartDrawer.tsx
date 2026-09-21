@@ -412,7 +412,9 @@ export default function CartDrawer() {
                 {items.map((item) => {
                   const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
                   const p = item.properties ?? {};
-                  const image = isJersey ? p['Preview Image'] || null : item.image;
+                  const image = isJersey
+  ? p["_Preview Image"] || p["Preview Image"] || null
+  : item.image;
                   return (
                     <li key={item.key}>
                       <div className={`loading-overlay${storefrontUpdatingKey === item.key ? '' : ' hidden'}`}>
