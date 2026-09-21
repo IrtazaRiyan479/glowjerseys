@@ -10,30 +10,40 @@ const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.va
 const ORIGIN = 'https://glowjerseys.com';
 
 /** Set true to show fake line items for UI preview. */
-const PREVIEW_CART = false;
+const PREVIEW_CART = true;
 
 const DEMO_ITEMS = [
   {
-    key: 'demo-jefferson',
-    variant_id: 1,
-    product_title: 'Jefferson #18',
-    variant_title: '20 inches',
-    quantity: 1,
-    price: 10799,
-    line_price: 10799,
-    image:
-      'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_yo6udxyo6udxyo6u.png?width=140',
-    url: `${ORIGIN}/products/jefferson-18`,
-    properties: null as Record<string, string> | null,
-  },
-  {
-    key: 'demo-custom',
+    key: 'demo-custom 1',
     variant_id: numericVariantId(SIZE_OPTIONS[0].variantId),
     product_title: 'Custom Glow Jersey',
     variant_title: '20 inch',
     quantity: 1,
     price: 16499,
     line_price: 16499,
+    image: null as string | null,
+    url: `${ORIGIN}/apps/custom-jersey`,
+    properties: {
+      Size: '20 inch',
+      Backboard: 'Black',
+      Sport: 'Basketball',
+      Name: 'BROWN',
+      Number: '7',
+      'Jersey Color': 'Orange',
+      'Name Color': 'White',
+      'Number Color': 'White',
+      '_Preview Image':
+        'https://cdn.shopify.com/s/files/1/0609/3399/6637/files/Gemini_Generated_Image_gtfz7igtfz7igtfz.png?width=140',
+    },
+  },
+  {
+    key: 'demo-custom 2',
+    variant_id: numericVariantId(SIZE_OPTIONS[0].variantId),
+    product_title: 'Custom Glow Jersey',
+    variant_title: '20 inch',
+    quantity: 1,
+      price: 16499,
+line_price: 12375,
     image: null as string | null,
     url: `${ORIGIN}/apps/custom-jersey`,
     properties: {
@@ -212,6 +222,14 @@ function IconPlus() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-plus" fill="none" viewBox="0 0 10 10">
       <path fill="currentColor" d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconDiscount() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" className="icon icon-discount" fill="none" viewBox="0 0 24 24">
+      <path fillRule="evenodd" clipRule="evenodd" d="M10.9 2.1l9.899 1.415 1.414 9.9-9.192 9.192a1 1 0 0 1-1.414 0l-9.9-9.9a1 1 0 0 1 0-1.414L10.9 2.1zm2.828 8.486a2 2 0 1 0 2.828-2.829 2 2 0 0 0-2.828 2.829z" fill="currentColor" />
     </svg>
   );
 }
@@ -409,12 +427,14 @@ export default function CartDrawer() {
                 </p>
               )}
               <ul className="mini-cart__navigation">
-                {items.map((item) => {
-                  const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
-                  const p = (item.properties ?? {}) as Record<string, string>;
-const image = isJersey
-  ? p["_Preview Image"] || p["Preview Image"] || null
-  : item.image;
+                {items.map((item, index) => {
+  const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
+  const p = (item.properties ?? {}) as Record<string, string>;
+  const image = isJersey
+    ? p["_Preview Image"] || p["Preview Image"] || null
+    : item.image;
+  const originalCents = item.price * item.quantity;
+  const isDiscounted = (index + 1) % 2 === 0;
                   return (
                     <li key={item.key}>
                       <div className={`loading-overlay${storefrontUpdatingKey === item.key ? '' : ' hidden'}`}>
@@ -482,6 +502,12 @@ const image = isJersey
     </dl>
   )
 )}
+<ul className="discounts list-unstyled" role="list" aria-label="Discount">
+  <li className="discounts__discount">
+    <IconDiscount />
+    Buy One, Get One 25% Off
+  </li>
+</ul>
                           <div className="product-quantity">
                             <div className="quantity" style={{ display: 'flex', alignItems: 'center' }}>
                               <button
@@ -510,7 +536,22 @@ const image = isJersey
                                 <IconPlus />
                               </button>
                             </div>
-                            <Price amount={item.line_price / 100} />
+                            {isDiscounted ? (
+  <dl className="cart-item__discounted-prices">
+    <dt className="visually-hidden">Regular price</dt>
+    <dd className="price--on-sale">
+      <s className="price price-item--regular">
+        <Price amount={originalCents / 100} />
+      </s>
+    </dd>
+    <dt className="visually-hidden">Sale price</dt>
+    <dd className="price">
+      <Price amount={item.line_price / 100} />
+    </dd>
+  </dl>
+) : (
+  <Price amount={item.line_price / 100} />
+)}
                           </div>
                         </div>
                       </div>

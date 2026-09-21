@@ -52,11 +52,12 @@ const handleAddToCart = async () => {
 
     const dataUrl = await snapshotRef.current?.();
     if (dataUrl) {
-  try {
-    previewImageUrl = await uploadImage(dataUrl);
-  } catch {
-    previewImageUrl = dataUrl;
-  }
+      previewImageUrl = dataUrl;
+  // try {
+  //   previewImageUrl = await uploadImage(dataUrl);
+  // } catch {
+  //   previewImageUrl = dataUrl;
+  // }
 }
 
     const selectedOptions: JerseySelectedOptions = {
