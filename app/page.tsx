@@ -16,6 +16,7 @@ import {
   type JerseySelectedOptions,
 } from '@/data';
 import { getSizeOption } from '@/lib/pricing';
+import { deleteReactDebugChannelForHtmlRequest } from 'next/dist/server/dev/debug-channel';
 
 const sportsTypeData = [{ name: 'Soccer' }, { name: 'Basketball' }, { name: 'Baseball' }];
 
@@ -52,13 +53,11 @@ const handleAddToCart = async () => {
 
     const dataUrl = await snapshotRef.current?.();
     if (dataUrl) {
-      previewImageUrl = dataUrl;
-      // try {
-        
-      // previewImageUrl = await uploadImage(dataUrl);
-      // } catch {
-      //   previewImageUrl = dataUrl;
-      // }
+      try {
+      previewImageUrl = await uploadImage(dataUrl);
+      } catch {
+        previewImageUrl = dataUrl;
+      }
     }
 
     const selectedOptions: JerseySelectedOptions = {
