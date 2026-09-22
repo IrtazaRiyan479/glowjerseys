@@ -65,6 +65,35 @@ export type JerseySelectedOptions = {
   backboardColor: string;
   previewImageUrl?: string;
 };
+const COLOR_NAMES: Record<string, string> = {
+  "#FFE800": "Yellow",
+  "#FF8A00": "Orange",
+  "#FF3300": "Orange",
+  "#2CC5F5": "Ice Blue",
+  "#17D63A": "Green",
+  "#FF1A15": "Red",
+  "#0A46FF": "Blue",
+  "#0B45FF": "Blue",
+  "#8A16FF": "Purple",
+  "#FF2E9A": "Pink",
+  "#FBECCB": "Neutral White",
+  "#E8C07A": "Neutral White",
+  "#FFFFFF": "White",
+  "#111111": "Black",
+  transparent: "Transparent",
+  Transparent: "Transparent",
+};
+
+// Falls back to the raw value for any hex not in the map, rather than
+// throwing, so an unrecognized swatch still reaches checkout as *something*.
+export function getColorName(hexOrName: string): string {
+  const key = hexOrName.trim();
+  if (COLOR_NAMES[key]) return COLOR_NAMES[key];
+  const found = Object.entries(COLOR_NAMES).find(
+    ([k]) => k.toLowerCase() === key.toLowerCase(),
+  );
+  return found ? found[1] : key;
+}
 
 export function toShopifyProperties(opts: JerseySelectedOptions) {
   return [
@@ -72,10 +101,10 @@ export function toShopifyProperties(opts: JerseySelectedOptions) {
     { key: "Sport", value: opts.sport },
     { key: "Name", value: opts.name },
     { key: "Number", value: opts.number },
-    { key: "Jersey Color", value: opts.jerseyColor },
-    { key: "Name Color", value: opts.nameColor },
-    { key: "Number Color", value: opts.numberColor },
-    { key: "Backboard", value: opts.backboardColor },
+    { key: "Jersey Color", value: getColorName(opts.jerseyColor) },
+    { key: "Name Color", value: getColorName(opts.nameColor) },
+    { key: "Number Color", value: getColorName(opts.numberColor) },
+    { key: "Backboard", value: getColorName(opts.backboardColor) },
     ...(opts.previewImageUrl
       ? [{ key: "_Preview Image", value: opts.previewImageUrl }]
       : []),

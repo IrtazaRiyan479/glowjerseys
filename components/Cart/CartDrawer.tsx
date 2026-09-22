@@ -2,7 +2,7 @@
 
 import { useCartStore } from '@/store/cartStore';
 import { updateStorefrontCartNote } from '@/lib/shopify/storefrontCart';
-import { SIZE_OPTIONS, numericVariantId } from '@/data';
+import { SIZE_OPTIONS, numericVariantId, getColorName } from '@/data';
 import { useEffect, useState } from 'react';
 
 const JERSEY_VARIANT_IDS = new Set(SIZE_OPTIONS.map((o) => numericVariantId(o.variantId)));
@@ -94,31 +94,8 @@ const RECS: Array<{
   },
 ];
 
-const COLOR_MAP: Record<string, string> = {
-  '#FFE800': 'Yellow',
-  '#FF8A00': 'Orange',
-  '#FF3300': 'Orange',
-  '#2CC5F5': 'Ice Blue',
-  '#17D63A': 'Green',
-  '#FF1A15': 'Red',
-  '#0A46FF': 'Blue',
-  '#0B45FF': 'Blue',
-  '#8A16FF': 'Purple',
-  '#FF2E9A': 'Pink',
-  '#FBECCB': 'Neutral White',
-  '#E8C07A': 'Neutral White',
-  '#FFFFFF': 'White',
-  '#111111': 'Black',
-  transparent: 'Transparent',
-  Transparent: 'Transparent',
-};
-
-function getColorName(hexOrName: string | undefined): string {
-  if (!hexOrName) return '—';
-  const key = hexOrName.trim();
-  if (COLOR_MAP[key]) return COLOR_MAP[key];
-  const found = Object.entries(COLOR_MAP).find(([k]) => k.toLowerCase() === key.toLowerCase());
-  return found ? found[1] : key;
+function displayColorName(hexOrName: string | undefined): string {
+  return hexOrName ? getColorName(hexOrName) : '—';
 }
 
 function Price({ amount, className = '' }: { amount: number | string; className?: string }) {
@@ -469,7 +446,7 @@ export default function CartDrawer() {
                               </div>
                               <div className="product-option">
                                 <dt>Backboard:</dt>
-                                <dd>{getColorName(p['Backboard'])}</dd>
+                                <dd>{displayColorName(p['Backboard'])}</dd>
                               </div>
                               <div className="product-option">
                                 <dt>Sport:</dt>
@@ -481,15 +458,15 @@ export default function CartDrawer() {
                               </div>
                               <div className="product-option">
                                 <dt>Jersey Color:</dt>
-                                <dd>{getColorName(p['Jersey Color'])}</dd>
+                                <dd>{displayColorName(p['Jersey Color'])}</dd>
                               </div>
                               <div className="product-option">
                                 <dt>Name Color:</dt>
-                                <dd>{getColorName(p['Name Color'])}</dd>
+                                <dd>{displayColorName(p['Name Color'])}</dd>
                               </div>
                               <div className="product-option">
                                 <dt>Number Color:</dt>
-                                <dd>{getColorName(p['Number Color'])}</dd>
+                                <dd>{displayColorName(p['Number Color'])}</dd>
                               </div>
                             </dl>
                           ) : (
