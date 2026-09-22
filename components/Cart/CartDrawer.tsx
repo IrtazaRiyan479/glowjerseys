@@ -404,14 +404,14 @@ export default function CartDrawer() {
                 </p>
               )}
               <ul className="mini-cart__navigation">
-                {items.map((item, index) => {
-  const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
-  const p = (item.properties ?? {}) as Record<string, string>;
-  const image = isJersey
-    ? p["_Preview Image"] || p["Preview Image"] || null
-    : item.image;
-  const originalCents = item.price * item.quantity;
-  const isDiscounted = (index + 1) % 2 === 0;
+                {items.map((item) => {
+                const isJersey = JERSEY_VARIANT_IDS.has(item.variant_id);
+                const p = (item.properties ?? {}) as Record<string, string>;
+                const image = isJersey
+                  ? p["_Preview Image"] || p["Preview Image"] || null
+                  : item.image;
+                const originalCents = item.price * item.quantity;
+                const isDiscounted = item.line_price < originalCents;
                   return (
                     <li key={item.key}>
                       <div className={`loading-overlay${storefrontUpdatingKey === item.key ? '' : ' hidden'}`}>
